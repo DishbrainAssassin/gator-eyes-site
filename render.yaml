@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: gator-eyes-site
+    runtime: static
+    buildCommand: echo "No build needed"
+    staticPublishPath: .
+    headers:
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=3600

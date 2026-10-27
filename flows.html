@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gator Eyes | Solada flows dashboard</title>
+  <meta name="description" content="Where the money is moving on Solada, the Cardano launchpad: volume by hour, buys and sells for every coin, venues, and live whale alerts.">
+  <meta property="og:title" content="Gator Eyes | Lurking so you don't have to">
+  <meta property="og:description" content="Live whale buys, volume spikes and fast launches on Solada, the Cardano launchpad.">
+  <meta property="og:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta property="og:url" content="https://www.gatoreyes.fun/flows.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Gator Eyes">
+  <link rel="canonical" href="https://www.gatoreyes.fun/flows.html">
+  <meta name="twitter:site" content="@GatorEyesSolada">
+  <meta name="theme-color" content="#06090a">
+  <link rel="icon" href="./assets/img/favicon-64.png">
+  <link rel="apple-touch-icon" href="./assets/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./index.html" aria-label="Gator Eyes home">
+        <img src="./assets/img/avatar-256.webp" alt="" width="32" height="32">
+        <span>Gator Eyes</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="./index.html#alerts">Alerts</a>
+        <a href="./flows.html" aria-current="page">Flows</a>
+        <a href="./gaey.html">$GAEY</a>
+        <a href="./about.html">How it works</a>
+      </nav>
+      <a class="btn btn-sm btn-amber" data-link="discord" href="#">Join Discord</a>
+    </div>
+  </header>
+
+  <main id="main" class="dash">
+    <section class="dash-top" aria-labelledby="dash-title">
+      <div class="wrap">
+        <div class="dash-head">
+          <div>
+            <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching Solada</span></p>
+            <h1 id="dash-title">Solada flows</h1>
+            <p class="dash-lede">Where the money is moving on Solada today. Every trade the gator sees, tallied by coin, hour and venue. Days run midnight to midnight Eastern.</p>
+          </div>
+          <div class="tabs" role="tablist" aria-label="Choose a day" data-days></div>
+        </div>
+        <div class="notice" data-notice hidden role="status"></div>
+      </div>
+    </section>
+
+    <section class="wrap dash-body" aria-label="Dashboard">
+      <div class="kpis kpis-dash" data-kpis></div>
+
+      <div class="dash-grid">
+        <article class="panel panel-wide">
+          <header class="panel-head"><h2 class="panel-title">Buys and sells by hour</h2><div class="legend"><span><i class="dot buy"></i>Bought</span><span><i class="dot sell"></i>Sold</span><span><i class="dot net"></i>Net</span></div></header>
+          <div class="chart" data-hours></div>
+        </article>
+        <article class="panel">
+          <header class="panel-head"><h2 class="panel-title">Where it traded</h2></header>
+          <div data-venues></div>
+        </article>
+      </div>
+
+      <div class="dash-grid dash-grid-even">
+        <article class="panel">
+          <header class="panel-head"><h2 class="panel-title">Money in</h2><span class="panel-meta">Net bought, ADA</span></header>
+          <div data-inflow></div>
+        </article>
+        <article class="panel">
+          <header class="panel-head"><h2 class="panel-title">Money out</h2><span class="panel-meta">Net sold, ADA</span></header>
+          <div data-outflow></div>
+        </article>
+      </div>
+
+      <article class="panel">
+        <header class="panel-head panel-head-wrap">
+          <h2 class="panel-title">Every coin</h2>
+          <div class="table-tools">
+            <label class="search"><span class="sr-only">Find a coin</span><input type="search" placeholder="Find a coin" data-search autocomplete="off"></label>
+          </div>
+        </header>
+        <div class="table-wrap">
+          <table class="coin-table">
+            <thead><tr>
+              <th scope="col">Coin</th>
+              <th scope="col" class="num"><button data-sort="v" class="sort is-on" aria-label="Sort by volume">Volume</button></th>
+              <th scope="col" class="num"><button data-sort="net" class="sort" aria-label="Sort by net flow">Net flow</button></th>
+              <th scope="col" class="split-col">Buys / sells</th>
+              <th scope="col" class="num hide-sm"><button data-sort="n" class="sort" aria-label="Sort by trades">Trades</button></th>
+            </tr></thead>
+            <tbody data-coins></tbody>
+          </table>
+        </div>
+        <div class="list-foot"><button class="btn btn-ghost btn-sm" data-coins-more hidden>Show all coins</button></div>
+      </article>
+
+      <div class="dash-grid">
+        <article class="panel panel-wide">
+          <header class="panel-head"><h2 class="panel-title">Last 7 days</h2><span class="panel-meta">Daily volume, ADA</span></header>
+          <div class="chart" data-week></div>
+        </article>
+        <article class="panel">
+          <header class="panel-head"><h2 class="panel-title">Latest alerts</h2><a class="panel-meta" href="./index.html#alerts">All alerts</a></header>
+          <div class="mini-alerts" data-alerts aria-live="polite"></div>
+        </article>
+      </div>
+      <article class="panel">
+        <header class="panel-head panel-head-wrap"><h2 class="panel-title">7-day leaders</h2><span class="panel-meta" data-lead-meta>Net ADA bought minus sold, added up across days</span></header>
+        <div class="dash-grid dash-grid-even lead-grid">
+          <div><h3 class="sub">Money in</h3><div data-lead-in></div></div>
+          <div><h3 class="sub">Money out</h3><div data-lead-out></div></div>
+        </div>
+      </article>
+      <p class="dash-foot">Volume counts every buy and sell the gator saw on Solada's curve, Minswap, Splash and Pump.fun. Net flow is ADA bought minus ADA sold. USDCx values use Solada's ADA price. Want a card to share? <a href="./card.html">Make a daily flow card</a>. Not financial advice.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>Gator Eyes is an automated tracker for <a data-link="join" href="#">Solada</a>. Alerts are not financial advice. $GAEY is the Gator Eyes team's token. Links to Solada include our referral code (6pxznt5n), which may earn the team referral rewards at no extra cost to you. <a href="./about.html#disclosures">Disclosures</a>.</p>
+      <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./card.html">Flow card</a></nav>
+    </div>
+  </footer>
+  <script type="module" src="./assets/js/flows.js"></script>
+</body>
+</html>

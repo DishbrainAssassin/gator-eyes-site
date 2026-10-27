@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gator Eyes | Live Solada trade alerts</title>
+  <meta name="description" content="Gator Eyes watches every trade on Solada, the Cardano launchpad, and posts whale buys, volume spikes and fast launches as they happen. Lurking so you don't have to.">
+  <meta property="og:title" content="Gator Eyes | Lurking so you don't have to">
+  <meta property="og:description" content="Live whale buys, volume spikes and fast launches on Solada, the Cardano launchpad.">
+  <meta property="og:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta property="og:url" content="https://www.gatoreyes.fun/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Gator Eyes">
+  <link rel="canonical" href="https://www.gatoreyes.fun/">
+  <meta name="twitter:site" content="@GatorEyesSolada">
+  <meta name="theme-color" content="#06090a">
+  <link rel="icon" href="./assets/img/favicon-64.png">
+  <link rel="apple-touch-icon" href="./assets/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+  <link rel="preload" as="image" href="./assets/img/keyart-1600.webp" imagesrcset="./assets/img/keyart-900.webp 900w, ./assets/img/keyart-1600.webp 1600w" imagesizes="100vw">
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./index.html" aria-label="Gator Eyes home">
+        <img src="./assets/img/avatar-256.webp" alt="" width="32" height="32">
+        <span>Gator Eyes</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="#alerts">Alerts</a>
+        <a href="./flows.html">Flows</a>
+        <a href="./gaey.html">$GAEY</a>
+        <a href="./about.html">How it works</a>
+      </nav>
+      <a class="btn btn-sm btn-amber" data-link="discord" href="#">Join Discord</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <picture class="hero-art">
+        <img src="./assets/img/keyart-1600.webp" srcset="./assets/img/keyart-900.webp 900w, ./assets/img/keyart-1600.webp 1600w" sizes="100vw" alt="A gator's amber eyes watching from just above dark water" width="1600" height="800">
+      </picture>
+      <div class="wrap hero-inner">
+        <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching Solada</span></p>
+        <h1 id="hero-title">Lurking so you don't have to.</h1>
+        <p class="lede">Live whale buys, volume spikes and fast launches on Solada, the Cardano launchpad. Automated and free. Not financial advice.</p>
+        <div class="cta-row">
+          <a class="btn btn-amber" data-link="discord" href="#">Join the Discord</a>
+          <a class="btn btn-ghost" data-link="x" href="#">Follow @GatorEyesSolada</a>
+        </div>
+        <p class="hero-note">New to Solada? <a data-link="join" href="#">Start trading here</a>.</p>
+      </div>
+    </section>
+
+    <section class="section watches" aria-labelledby="watch-title">
+      <div class="wrap">
+        <h2 id="watch-title" class="section-title">What the gator watches</h2>
+        <ol class="watch-list" role="list">
+          <li><span class="watch-k k-whale">Whale trades</span><p>Any trade of 1,000 ADA or more, or a trade worth at least 5% of a coin's market cap.</p></li>
+          <li><span class="watch-k k-spike">Volume spikes</span><p>A coin trading four times its normal pace over 15 minutes, with at least 1,500 ADA moving.</p></li>
+          <li><span class="watch-k k-dev">Creator sells</span><p>The wallet that created a coin selling 100 ADA or more. Posted as a record, not a warning.</p></li>
+          <li><span class="watch-k k-launch">Fast launches</span><p>New coins that pull in 1,000 ADA from eight or more wallets in their first hour.</p></li>
+          <li><span class="watch-k k-tracks">Gator Tracks</span><p>A daily recap at 9 AM Eastern: volume, most traded coins, and where the money went.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section" id="alerts" aria-labelledby="alerts-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="alerts-title" class="section-title">Live alerts</h2>
+          <p class="section-meta" data-updated aria-live="polite"></p>
+        </div>
+        <div class="chips" role="group" aria-label="Filter alerts">
+          <button class="chip is-on" data-filter="all" aria-pressed="true">All</button>
+          <button class="chip" data-filter="big" aria-pressed="false">Whales</button>
+          <button class="chip" data-filter="spike" aria-pressed="false">Spikes</button>
+          <button class="chip" data-filter="dev" aria-pressed="false">Creator sells</button>
+          <button class="chip" data-filter="launch" aria-pressed="false">Launches</button>
+          <button class="chip" data-filter="watch" aria-pressed="false">$GAEY</button>
+        </div>
+        <div class="alert-list" data-alerts aria-live="polite"></div>
+        <div class="list-foot"><button class="btn btn-ghost btn-sm" data-more hidden>Show more</button></div>
+      </div>
+    </section>
+
+    <section class="section tracks" id="tracks" aria-labelledby="tracks-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="tracks-title" class="section-title">Gator Tracks</h2>
+          <div class="tabs" role="tablist" aria-label="Choose a day" data-days></div>
+        </div>
+        <div class="tracks-body" data-tracks role="tabpanel"></div>
+        <div class="list-foot"><a class="btn btn-ghost" href="./flows.html">Open the full flows dashboard</a></div>
+      </div>
+    </section>
+
+    <section class="section gaey-teaser" aria-labelledby="gaey-title">
+      <div class="wrap teaser-inner">
+        <img class="teaser-img" data-gaey-img src="./assets/img/avatar-256.webp" alt="$GAEY token image" width="120" height="120">
+        <div>
+          <h2 id="gaey-title" class="section-title">$GAEY</h2>
+          <p>The Gator Eyes team's own token, launched on Solada. Every $GAEY buy and sell posts live in its own Discord channel.</p>
+          <dl class="mini-stats" data-gaey-mini></dl>
+          <div class="cta-row">
+            <a class="btn btn-amber" href="./gaey.html">See the $GAEY page</a>
+            <a class="btn btn-ghost" data-link="gaey-coin" href="#">Trade $GAEY on Solada</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="join" aria-labelledby="join-title">
+      <div class="wrap join-inner">
+        <h2 id="join-title">Get the alerts where you already are.</h2>
+        <div class="cta-row">
+          <a class="btn btn-amber" data-link="discord" href="#">Join the Discord</a>
+          <a class="btn btn-ghost" data-link="x" href="#">Follow on X</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>Gator Eyes is an automated tracker for <a data-link="join" href="#">Solada</a>. Alerts are not financial advice. $GAEY is the Gator Eyes team's token. Links to Solada include our referral code (6pxznt5n), which may earn the team referral rewards at no extra cost to you. <a href="./about.html#disclosures">Disclosures</a>.</p>
+      <nav aria-label="Footer"><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./flows.html">Flows</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a></nav>
+    </div>
+  </footer>
+  <script type="module" src="./assets/js/home.js"></script>
+</body>
+</html>

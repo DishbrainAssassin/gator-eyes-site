@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How Gator Eyes works</title>
+  <meta name="description" content="Gator Eyes is a free, automated tracker for Solada. How it reads trades, what triggers an alert, what it doesn't do, and how to use the data.">
+  <meta property="og:title" content="How Gator Eyes works">
+  <meta property="og:description" content="Gator Eyes is a free, automated tracker for Solada. How it reads trades, what triggers an alert, what it doesn't do, and how to use the data.">
+  <meta property="og:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@GatorEyesSolada">
+  <meta name="twitter:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta property="og:url" content="https://www.gatoreyes.fun/about.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Gator Eyes">
+  <link rel="canonical" href="https://www.gatoreyes.fun/about.html">
+  <meta name="theme-color" content="#06090a">
+  <link rel="icon" href="./assets/img/favicon-64.png">
+  <link rel="apple-touch-icon" href="./assets/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./index.html" aria-label="Gator Eyes home">
+        <img src="./assets/img/avatar-256.webp" alt="" width="32" height="32">
+        <span>Gator Eyes</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="./index.html#alerts">Alerts</a>
+        <a href="./flows.html">Flows</a>
+        <a href="./gaey.html">$GAEY</a>
+        <a href="./about.html" aria-current="page">How it works</a>
+      </nav>
+      <a class="btn btn-sm btn-amber" data-link="discord" href="#">Join Discord</a>
+    </div>
+  </header>
+
+  <main id="main" class="about">
+    <section class="about-hero" aria-labelledby="about-title">
+      <div class="wrap">
+        <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching Solada</span></p>
+        <h1 id="about-title">How Gator Eyes works</h1>
+        <p class="lede">Gator Eyes is a free, automated tracker for Solada, the Cardano launchpad. It reads every public trade, adds up where the money moves, and posts what stands out. No sign-up, no wallet connection.</p>
+      </div>
+    </section>
+
+    <section class="section section-tight" aria-labelledby="steps-title">
+      <div class="wrap">
+        <h2 id="steps-title" class="section-title">Three steps, every two minutes</h2>
+        <ol class="steps" role="list">
+          <li><span class="step-n">1</span><h3>Read</h3><p>Pull the latest trades from Solada's public data: the Solada curve, Minswap, Splash and Pump.fun.</p></li>
+          <li><span class="step-n">2</span><h3>Tally</h3><p>Add each trade to the day's totals by coin, by hour and by venue. Days run midnight to midnight Eastern.</p></li>
+          <li><span class="step-n">3</span><h3>Post</h3><p>Send anything that crosses a rule below to Discord and X, update the <a href="./flows.html">flows dashboard</a>, and post Gator Tracks each morning.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section section-tight" aria-labelledby="rules-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="rules-title" class="section-title">What triggers an alert</h2>
+          <p class="section-meta">Read live from the bot's settings</p>
+        </div>
+        <div class="rules" data-rules></div>
+      </div>
+    </section>
+
+    <section class="section section-tight" aria-labelledby="not-title">
+      <div class="wrap">
+        <h2 id="not-title" class="section-title">What Gator Eyes doesn't do</h2>
+        <ul class="not-list" role="list">
+          <li><h3>No safety ratings</h3><p>Gator Eyes doesn't score coins, label rugs or call anything safe. It reports what traded.</p></li>
+          <li><h3>No wallet tracking</h3><p>It doesn't follow, rank or name wallets. Wallet addresses in alerts link to the public transaction, nothing more.</p></li>
+          <li><h3>No trading</h3><p>No swaps, no copy trading, no wallet connection. Every trade link opens Solada itself.</p></li>
+          <li><h3>No calls</h3><p>No "gem", "moon" or "buy now". Alerts describe what happened, not what to do next.</p></li>
+        </ul>
+        <p class="aside-note">Want a safety check before you buy? That's a different job, and there are tools built for it, like <a href="https://suriradar.fun/" target="_blank" rel="noopener">Suri Radar</a>.</p>
+      </div>
+    </section>
+
+    <section class="section section-tight" aria-labelledby="data-title">
+      <div class="wrap two-col">
+        <div>
+          <h2 id="data-title" class="section-title">Free data for builders</h2>
+          <p class="prose">The same numbers behind this site are open to anyone. It's plain JSON, open to any website, and refreshed every two minutes. If you build something with it, a link back to Gator Eyes is appreciated.</p>
+          <ul class="prose-list">
+            <li>Today's totals, plus coins, hours and venues</li>
+            <li>The last seven Gator Tracks recaps</li>
+            <li>The latest 80 alerts</li>
+            <li>The alert rules on this page</li>
+          </ul>
+        </div>
+        <div class="code-card">
+          <div class="code-head"><span>Feed URL</span><button class="btn btn-ghost btn-sm" data-copy="feed">Copy</button></div>
+          <pre><code data-feed-url></code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-tight" id="embed" aria-labelledby="embed-title">
+      <div class="wrap two-col">
+        <div>
+          <h2 id="embed-title" class="section-title">Put live flows on your site</h2>
+          <p class="prose">Run a Solada project? Drop this box on your site to show today's volume, net flow and latest alerts for your coin. Swap in your coin ID, the part after <span class="mono">/coin/</span> in its Solada link. Leave it off to show all of Solada.</p>
+          <label class="field"><span>Coin ID</span><input type="text" data-embed-coin placeholder="draft-gaey" autocomplete="off" spellcheck="false"></label>
+          <div class="code-card">
+            <div class="code-head"><span>Embed code</span><button class="btn btn-ghost btn-sm" data-copy="embed">Copy</button></div>
+            <pre><code data-embed-code></code></pre>
+          </div>
+        </div>
+        <div class="embed-demo">
+          <iframe data-embed-frame title="Gator Eyes live flows widget preview"></iframe>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-tight" aria-labelledby="gaey-title">
+      <div class="wrap gaey-line">
+        <img src="./assets/img/avatar-256.webp" alt="" width="64" height="64" data-gaey-img>
+        <div>
+          <h2 id="gaey-title" class="section-title">Like what Gator Eyes does?</h2>
+          <p class="prose">$GAEY is the team's own token, on Solada. It's tracked by the same rules as every other coin, in its own channel.</p>
+        </div>
+        <div class="cta-row">
+          <a class="btn btn-amber" href="./gaey.html">See the $GAEY page</a>
+          <a class="btn btn-ghost" data-link="gaey-coin" href="#">Trade $GAEY on Solada</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-tight" id="disclosures" aria-labelledby="disc-title">
+      <div class="wrap">
+        <h2 id="disc-title" class="section-title">Disclosures</h2>
+        <dl class="facts disc">
+          <div class="fact"><dt>$GAEY</dt><dd>$GAEY is the Gator Eyes team's own token. It gets its own trade channel and follows the same alert rules as every other coin.</dd></div>
+          <div class="fact"><dt>Referral code</dt><dd>Solada links from Gator Eyes include our referral code, 6pxznt5n. It may earn the team referral rewards and costs you nothing extra.</dd></div>
+          <div class="fact"><dt>Automated</dt><dd>Alerts are posted by a bot. If Solada is down or updating, alerts pause and the site says so.</dd></div>
+          <div class="fact"><dt>Not advice</dt><dd>Nothing here is financial advice. Big trades and spikes happen for many reasons.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="join" aria-labelledby="join-title">
+      <div class="wrap join-inner">
+        <h2 id="join-title">Questions or ideas? Come say hi.</h2>
+        <div class="cta-row">
+          <a class="btn btn-amber" data-link="discord" href="#">Join the Discord</a>
+          <a class="btn btn-ghost" href="./card.html">Make a daily flow card</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>Gator Eyes is an automated tracker for <a data-link="join" href="#">Solada</a>. Alerts are not financial advice. $GAEY is the Gator Eyes team's token. Links to Solada include our referral code (6pxznt5n), which may earn the team referral rewards at no extra cost to you. <a href="./about.html#disclosures">Disclosures</a>.</p>
+      <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./flows.html">Flows</a><a href="./card.html">Flow card</a></nav>
+    </div>
+  </footer>
+  <script type="module" src="./assets/js/about.js"></script>
+</body>
+</html>
