@@ -21,6 +21,19 @@ export function usdcx(ada, rate) {
   return `~${fmt(v, v < 10 ? 2 : 0)} USDCx`;
 }
 
+export function usdcxSigned(ada, rate) {
+  if (!rate || ada == null) return "";
+  const v = ada * rate;
+  const a = Math.abs(v);
+  return `~${v > 0 ? "+" : v < 0 ? "−" : ""}${fmt(a, a < 10 ? 2 : 0)} USDCx`;
+}
+
+/** One-line note on the ADA to USDCx rate behind every ~USDCx figure. */
+export function rateNote(rate) {
+  if (!rate) return "";
+  return `USDCx figures are approximate, at 1 ADA ≈ ${fmt(rate, 4)} USDCx from the latest check.`;
+}
+
 export function compact(n) {
   if (n == null) return "–";
   const a = Math.abs(n);
@@ -113,19 +126,19 @@ export function tracks(d, rate) {
   const flowList = (list, sign) =>
     list.length
       ? `<ol class="flow-list">${list
-          .map((k) => `<li>${coinLink(k.id, k.tk)}<span class="num ${sign > 0 ? "pos" : "neg"}">${sign > 0 ? "+" : "−"}${fmt(Math.abs(k.net))} ADA</span></li>`)
+          .map((k) => `<li>${coinLink(k.id, k.tk)}<span class="num ${sign > 0 ? "pos" : "neg"}">${sign > 0 ? "+" : "−"}${fmt(Math.abs(k.net))} ADA${rate ? `<span class="cell-sub">${usdcx(Math.abs(k.net), rate)}</span>` : ""}</span></li>`)
           .join("")}</ol>`
       : `<p class="muted">None</p>`;
   return `
   <div class="kpis">
     <div class="kpi"><span class="kpi-label">Volume</span><span class="kpi-value">${compact(d.volAda)} ADA</span><span class="kpi-sub">${usdcx(d.volAda, rate)}</span></div>
     <div class="kpi"><span class="kpi-label">Trades</span><span class="kpi-value">${fmt(d.trades)}</span><span class="kpi-sub">${fmt(d.wallets)} wallets</span></div>
-    <div class="kpi"><span class="kpi-label">Biggest trade</span><span class="kpi-value">${d.big ? compact(d.big.ada) + " ADA" : "–"}</span><span class="kpi-sub">${d.big ? `${esc(d.big.side)} ${coinLink(d.big.id, d.big.tk)}` : ""}</span></div>
-    <div class="kpi"><span class="kpi-label">Creator sells</span><span class="kpi-value">${fmt(d.dev.n)}</span><span class="kpi-sub">${fmt(d.dev.ada)} ADA</span></div>
+    <div class="kpi"><span class="kpi-label">Biggest trade</span><span class="kpi-value">${d.big ? compact(d.big.ada) + " ADA" : "–"}</span><span class="kpi-sub">${d.big ? `${esc(d.big.side)} ${coinLink(d.big.id, d.big.tk)}${rate ? " · " + usdcx(d.big.ada, rate) : ""}` : ""}</span></div>
+    <div class="kpi"><span class="kpi-label">Creator sells</span><span class="kpi-value">${fmt(d.dev.n)}</span><span class="kpi-sub">${fmt(d.dev.ada)} ADA${d.dev.ada && rate ? " · " + usdcx(d.dev.ada, rate) : ""}</span></div>
   </div>
   <div class="split" role="img" aria-label="${buyPct}% of volume was buys">
     <div class="split-bar"><span class="split-buy" style="width:${buyPct}%"></span></div>
-    <div class="split-legend"><span><i class="dot buy"></i>Buys ${fmt(d.buyAda)} ADA</span><span><i class="dot sell"></i>Sells ${fmt(d.sellAda)} ADA</span></div>
+    <div class="split-legend"><span><i class="dot buy"></i>Buys ${fmt(d.buyAda)} ADA <span class="muted">${usdcx(d.buyAda, rate)}</span></span><span><i class="dot sell"></i>Sells ${fmt(d.sellAda)} ADA <span class="muted">${usdcx(d.sellAda, rate)}</span></span></div>
   </div>
   <div class="tracks-grid">
     <div class="tracks-table">
@@ -139,5 +152,6 @@ export function tracks(d, rate) {
       <div><h3 class="sub">Money in</h3>${flowList(d.inflow, 1)}</div>
       <div><h3 class="sub">Money out</h3>${flowList(d.outflow, -1)}</div>
     </div>
-  </div>`;
+  </div>
+  ${rate ? `<p class="rate-note">${rateNote(rate)}</p>` : ""}`;
 }

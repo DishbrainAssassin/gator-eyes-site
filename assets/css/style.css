@@ -433,3 +433,9 @@ a.panel-meta { color: var(--color-amber); }
 .gaey-line img { width: 64px; height: 64px; border-radius: var(--radius-full); }
 .gaey-line .section-title { margin-bottom: var(--space-2); }
 @media (max-width: 760px) { .gaey-line { grid-template-columns: auto minmax(0, 1fr); } .gaey-line .cta-row { grid-column: 1 / -1; } }
+
+/* USDCx conversions */
+.rate-note { margin-top: var(--space-3); font-size: var(--text-xs); color: var(--color-text-faint); }
+.rate-note:empty { display: none; }
+.flow-list .cell-sub, .flowbars .cell-sub { text-align: right; }
+.split-legend .muted { font-family: var(--font-mono); font-size: 0.6875rem; }

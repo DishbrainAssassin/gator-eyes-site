@@ -31,3 +31,5 @@ body { background: transparent; font-family: "Satoshi", "Helvetica Neue", sans-s
 .w-foot a { color: var(--muted); text-decoration: none; }
 .w-foot a:hover strong { color: var(--amber); }
 [hidden] { display: none !important; }
+.w-kpi small { display: block; font-family: var(--mono); font-size: 10px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.w-kpi { padding: 8px; } .w-kpi b { font-size: 14px; }

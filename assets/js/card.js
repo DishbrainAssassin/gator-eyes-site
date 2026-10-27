@@ -183,7 +183,7 @@ function caption(opt) {
   const flows = new URL("./flows.html", location.href).toString();
   return [
     `Gator Tracks · ${opt.live ? "today so far" : dayLabel(d.key)}`,
-    `${fmt(d.volAda)} ADA traded on Solada by ${fmt(d.wallets)} wallets. Net flow ${signed(net)} ADA.`,
+    `${fmt(d.volAda)} ADA${feed.rate ? ` (~${fmt(d.volAda * feed.rate)} USDCx)` : ""} traded on Solada by ${fmt(d.wallets)} wallets. Net flow ${signed(net)} ADA${feed.rate ? ` (~${signed(Math.round(net * feed.rate))} USDCx)` : ""}.`,
     coins.length ? `Money in: ${coins.join(", ")}` : null,
     `Live flows: ${flows}`,
   ].filter(Boolean).join("\n");

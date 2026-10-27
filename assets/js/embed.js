@@ -1,7 +1,7 @@
 // Embeddable live-flows box. Use ?coin=<Solada coin id> for one coin, or leave it
 // off for all of Solada. Add &theme=light for light backgrounds.
 import { subscribe, setFeedParams } from "./data.js";
-import { esc, fmt, compact, timeAgo, KINDS } from "./ui.js";
+import { esc, fmt, compact, timeAgo, KINDS, usdcx, usdcxSigned } from "./ui.js";
 
 const p = new URLSearchParams(location.search);
 const coinId = (p.get("coin") || "").trim();
@@ -41,10 +41,10 @@ function render(f, err) {
   $("[data-sub]").textContent = x.sub;
   $("[data-img]").innerHTML = x.img ? `<img src="${esc(x.img)}" alt="" onerror="this.remove()">` : "";
   $("[data-kpis]").innerHTML = [
-    ["Volume", short(x.v) + " ADA", ""],
-    ["Net flow", signed(x.net) + " ADA", x.net > 0 ? "pos" : x.net < 0 ? "neg" : ""],
-    ["Trades", fmt(x.n), ""],
-  ].map(([l, v, c]) => `<div class="w-kpi"><span>${l}</span><b class="${c}">${v}</b></div>`).join("");
+    ["Volume", short(x.v) + " ADA", "", x.v ? usdcx(x.v, f.rate) : ""],
+    ["Net flow", signed(x.net) + " ADA", x.net > 0 ? "pos" : x.net < 0 ? "neg" : "", x.net ? usdcxSigned(x.net, f.rate) : ""],
+    ["Trades", fmt(x.n), "", ""],
+  ].map(([l, v, c, u]) => `<div class="w-kpi"><span>${l}</span><b class="${c}">${v}</b>${u ? `<small>${u}</small>` : ""}</div>`).join("");
   const hasSplit = x.v > 0;
   $("[data-split]").hidden = $("[data-legend]").hidden = !hasSplit;
   if (hasSplit) {
