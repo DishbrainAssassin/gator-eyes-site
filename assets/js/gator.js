@@ -1,10 +1,10 @@
 // Ask Gator: a small helper that answers common questions about Gator Eyes and
 // Solada.fun. Answers are built in (no AI, no running cost). Live questions
 // about coins use the same /tokens data as the Tokens page.
-import { CONFIG } from "./config.js?v=20261029g";
-import { coinUrl, joinUrl } from "./data.js?v=20261029g";
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261029g";
-import { esc, fmt, compact } from "./ui.js?v=20261029g";
+import { CONFIG } from "./config.js?v=20261029h";
+import { coinUrl, joinUrl } from "./data.js?v=20261029h";
+import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261029h";
+import { esc, fmt, compact } from "./ui.js?v=20261029h";
 
 const DISCORD = CONFIG.discord;
 const a = (href, label, ext) => `<a href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(label)}</a>`;
@@ -115,7 +115,7 @@ const LIVE = [
 
 // ---------- built-in answers ----------
 const FAQ = [
-  { keys: ["what is gator eyes", "what's gator eyes", "what does gator eyes", "about gator eyes", "who are you", "what are you", "what is this site", "what is this"], a: () => `I'm Gator, resident data nerd at Gator Eyes. Gator Eyes is a free, automated tracker for Solada.fun. It reads every public trade every two minutes, adds up where the money moves, and posts what stands out to ${discord()} and X. No sign-up, no wallet connection.` },
+  { keys: ["what is gator eyes", "what's gator eyes", "what does gator eyes", "about gator eyes", "who are you", "what are you", "what is this site", "what is this"], a: () => `I'm Quagmire, resident data nerd at Gator Eyes. Gator Eyes is a free, automated tracker for Solada.fun. It reads every public trade every two minutes, adds up where the money moves, and posts what stands out to ${discord()} and X. No sign-up, no wallet connection.` },
   { keys: ["alerts mean", "types of alert", "what alerts", "alert types", "kinds of alert", "what triggers", "alert rules"], a: () => `Four kinds of alert:<ul><li><strong>Whale trade</strong>: a trade of 1,000 ADA or more, or one worth at least 5% of the coin's market cap.</li><li><strong>Volume spike</strong>: a coin trading 4 times its normal pace over 15 minutes, with at least 1,500 ADA moving.</li><li><strong>Fast launch</strong>: a new coin pulling in 1,000 ADA from 8 or more wallets in its first hour.</li><li><strong>Creator sell</strong>: the wallet that created a coin selling 100 ADA or more. Posted as a record, not a warning.</li></ul>More on the ${page("about.html", "How it works page")}.` },
   { keys: ["whale"], a: () => `A whale alert is any single trade of 1,000 ADA or more, or a trade worth at least 5% of the coin's market cap. They post in #whale-alerts on ${discord()}.` },
   { keys: ["spike"], a: () => "A volume spike means a coin traded at 4 times its normal pace over 15 minutes, with at least 1,500 ADA moving. Each coin can spike at most once an hour so the channel doesn't flood." },
@@ -193,12 +193,12 @@ export function mountGator() {
   root.className = "gator";
   root.innerHTML = `
     <button class="gator-launch" type="button" aria-expanded="false" aria-controls="gator-panel">
-      <img src="./assets/img/gator-nerd-head-160.webp" alt="" width="48" height="48"><span>Ask Gator</span>
+      <img src="./assets/img/gator-nerd-head-160.webp" alt="" width="48" height="48"><span>Ask Quagmire</span>
     </button>
-    <section class="gator-panel" id="gator-panel" role="dialog" aria-label="Ask Gator" hidden>
+    <section class="gator-panel" id="gator-panel" role="dialog" aria-label="Ask Quagmire" hidden>
       <header class="gator-head">
         <img src="./assets/img/gator-nerd-head-160.webp" alt="" width="40" height="40">
-        <div><strong>Gator</strong><span>Answers about Gator Eyes and Solada.fun</span></div>
+        <div><strong>Quagmire</strong><span>Answers about Gator Eyes and Solada.fun</span></div>
         <button type="button" class="gator-x" aria-label="Close">×</button>
       </header>
       <div class="gator-log" aria-live="polite"></div>
@@ -225,7 +225,7 @@ export function mountGator() {
     if (keep) { hist.push([who, html]); save(); }
     return m;
   };
-  const greet = () => add("gator", "Hi, I'm Gator. I read every trade on Solada.fun so you don't have to. I've got numbers on everything. Ask me about a coin (try its ticker), the alerts, or how to use the tools.", false);
+  const greet = () => add("gator", "Hi, I'm Quagmire, the Gator Eyes gator. I read every trade on Solada.fun so you don't have to. I've got numbers on everything. Ask me about a coin (try its ticker), the alerts, or how to use the tools.", false);
   greet();
   for (const [w, h] of hist) add(w, h, false);
   chips.innerHTML = SUGGEST.map((s) => `<button type="button" class="gator-chip">${esc(s)}</button>`).join("");
@@ -254,6 +254,15 @@ export function mountGator() {
   addEventListener("keydown", (e) => { if (e.key === "Escape" && !panel.hidden) open(false); });
   chips.addEventListener("click", (e) => { const b = e.target.closest(".gator-chip"); if (b) ask(b.textContent); });
   form.addEventListener("submit", (e) => { e.preventDefault(); const q = input.value; input.value = ""; ask(q); });
+  // Any element with data-ask opens the chat; a value asks that question.
+  document.addEventListener("click", (e) => {
+    const t = e.target.closest?.("[data-ask]");
+    if (!t) return;
+    e.preventDefault();
+    if (panel.hidden) open(true);
+    if (t.dataset.ask) ask(t.dataset.ask);
+    else input.focus();
+  });
 }
 
 // Exposed for testing.

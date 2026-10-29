@@ -1,2 +1,2 @@
-import { wireLinks } from "./common.js?v=20261029g";
+import { wireLinks } from "./common.js?v=20261029h";
 wireLinks();

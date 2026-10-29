@@ -1,7 +1,7 @@
 // Site-wide coin search and beginner mode. Loaded on every page by common.js.
-import { getApi, price } from "./api.js?v=20261029g";
-import { coinUrl, joinUrl } from "./data.js?v=20261029g";
-import { esc, compact } from "./ui.js?v=20261029g";
+import { getApi, price } from "./api.js?v=20261029h";
+import { coinUrl, joinUrl } from "./data.js?v=20261029h";
+import { esc, compact } from "./ui.js?v=20261029h";
 
 const KEY = "ge-beginner";
 
@@ -239,7 +239,7 @@ function setBeginner(on, btn) {
     if (!bar && main) {
       bar = document.createElement("div");
       bar.className = "beginner-bar";
-      bar.innerHTML = `<div class="wrap beginner-inner"><p><strong>Beginner mode is on.</strong> Words with a dotted underline explain themselves when you point at or tap them. New to Solada? <a href="${esc(joinUrl())}" target="_blank" rel="noopener">Start trading here</a> (our referral link).</p><button type="button" class="btn btn-ghost btn-sm" data-beginner-off>Turn off</button></div>`;
+      bar.innerHTML = `<div class="wrap beginner-inner"><p><strong>Beginner mode is on.</strong> Words with a dotted underline explain themselves when you point at or tap them. Still stuck? <a href="#" data-ask>Ask Quagmire</a>. New to Solada? <a href="${esc(joinUrl())}" target="_blank" rel="noopener">Start trading here</a> (our referral link).</p><button type="button" class="btn btn-ghost btn-sm" data-beginner-off>Turn off</button></div>`;
       main.prepend(bar);
       bar.querySelector("[data-beginner-off]").addEventListener("click", () => setBeginner(false));
     }
