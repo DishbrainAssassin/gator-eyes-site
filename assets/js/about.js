@@ -1,8 +1,8 @@
 // How it works page. Alert rules are read from the live feed so this page
 // always matches what the bot is actually doing.
-import { subscribe, RULES_DEFAULT } from "./data.js?v=20261029k";
-import { wireLinks, liveStatus } from "./common.js?v=20261029k";
-import { esc, fmt } from "./ui.js?v=20261029k";
+import { subscribe, RULES_DEFAULT } from "./data.js?v=20261029l";
+import { wireLinks, liveStatus } from "./common.js?v=20261029l";
+import { esc, fmt } from "./ui.js?v=20261029l";
 
 wireLinks();
 

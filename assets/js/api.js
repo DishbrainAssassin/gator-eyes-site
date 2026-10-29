@@ -1,15 +1,20 @@
 // Worker API for the tools pages (tokens, race, follow-up, holders, coin cards).
 // ?api=<url> points a page at another copy of the worker for testing.
-import { CONFIG } from "./config.js?v=20261029k";
+import { CONFIG } from "./config.js?v=20261029l";
 
 export const API = (new URLSearchParams(location.search).get("api") || CONFIG.feedUrl.replace(/\/feed$/, "")).replace(/\/$/, "");
 
 export async function getApi(path, params = {}) {
   const u = new URL(API + path);
-  for (const [k, v] of Object.entries(params)) if (v != null && v !== "") u.searchParams.set(k, v);
-  const r = await fetch(u, { cache: "no-store" });
+  for (const [k, v] of Object.entries(params)) if (k !== "_retried" && v != null && v !== "") u.searchParams.set(k, v);
+  let r = await fetch(u, { cache: "no-store" });
   let j = null;
   try { j = await r.json(); } catch {}
+  if (r.status === 429 && !params._retried) {
+    // Busy: wait as long as the worker asks (up to 30 s), then try once more.
+    await new Promise((ok) => setTimeout(ok, Math.min(30, (j && j.retryAfter) || 20) * 1000));
+    return getApi(path, { ...params, _retried: 1 });
+  }
   if (!r.ok) throw new Error((j && j.error) || "HTTP " + r.status);
   return j;
 }

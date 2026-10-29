@@ -1,10 +1,10 @@
 // Ask Gator: a small helper that answers common questions about Gator Eyes and
 // Solada.fun. Answers are built in (no AI, no running cost). Live questions
 // about coins use the same /tokens data as the Tokens page.
-import { CONFIG } from "./config.js?v=20261029k";
-import { coinUrl, joinUrl } from "./data.js?v=20261029k";
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261029k";
-import { esc, fmt, compact } from "./ui.js?v=20261029k";
+import { CONFIG } from "./config.js?v=20261029l";
+import { coinUrl, joinUrl } from "./data.js?v=20261029l";
+import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261029l";
+import { esc, fmt, compact } from "./ui.js?v=20261029l";
 
 const DISCORD = CONFIG.discord;
 const a = (href, label, ext) => `<a href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(label)}</a>`;

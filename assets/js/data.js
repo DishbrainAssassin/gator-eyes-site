@@ -1,6 +1,6 @@
 // Data layer. Everything the site shows comes through here, so a future
 // dashboard can add views without touching how data is fetched.
-import { CONFIG } from "./config.js?v=20261029k";
+import { CONFIG } from "./config.js?v=20261029l";
 
 const listeners = new Set();
 let last = null;
@@ -44,7 +44,12 @@ function feedSource() {
 }
 
 export async function fetchFeed() {
-  const r = await fetch(feedSource(), { cache: "no-store" });
+  let r = await fetch(feedSource(), { cache: "no-store" });
+  if (r.status === 429) {
+    // Busy: wait a moment and try once more before showing an error.
+    await new Promise((ok) => setTimeout(ok, 20000));
+    r = await fetch(feedSource(), { cache: "no-store" });
+  }
   if (!r.ok) throw new Error("Feed returned HTTP " + r.status);
   const j = await r.json();
   if (!j || !Array.isArray(j.alerts)) throw new Error("Feed is missing alerts");
