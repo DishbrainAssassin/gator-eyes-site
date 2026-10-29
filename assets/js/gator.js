@@ -1,10 +1,10 @@
 // Ask Gator: a small helper that answers common questions about Gator Eyes and
 // Solada.fun. Answers are built in (no AI, no running cost). Live questions
 // about coins use the same /tokens data as the Tokens page.
-import { CONFIG } from "./config.js?v=20261029c";
-import { coinUrl, joinUrl } from "./data.js?v=20261029c";
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261029c";
-import { esc, fmt, compact } from "./ui.js?v=20261029c";
+import { CONFIG } from "./config.js?v=20261029d";
+import { coinUrl, joinUrl } from "./data.js?v=20261029d";
+import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261029d";
+import { esc, fmt, compact } from "./ui.js?v=20261029d";
 
 const DISCORD = CONFIG.discord;
 const a = (href, label, ext) => `<a href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(label)}</a>`;
@@ -115,7 +115,7 @@ const LIVE = [
 
 // ---------- built-in answers ----------
 const FAQ = [
-  { keys: ["what is gator eyes", "what's gator eyes", "what does gator eyes", "about gator eyes", "who are you", "what are you", "what is this site", "what is this"], a: () => `I'm Gator, the helper for Gator Eyes. Gator Eyes is a free, automated tracker for Solada.fun. It reads every public trade every two minutes, adds up where the money moves, and posts what stands out to ${discord()} and X. No sign-up, no wallet connection.` },
+  { keys: ["what is gator eyes", "what's gator eyes", "what does gator eyes", "about gator eyes", "who are you", "what are you", "what is this site", "what is this"], a: () => `I'm Gator, resident data nerd at Gator Eyes. Gator Eyes is a free, automated tracker for Solada.fun. It reads every public trade every two minutes, adds up where the money moves, and posts what stands out to ${discord()} and X. No sign-up, no wallet connection.` },
   { keys: ["alerts mean", "types of alert", "what alerts", "alert types", "kinds of alert", "what triggers", "alert rules"], a: () => `Four kinds of alert:<ul><li><strong>Whale trade</strong>: a trade of 1,000 ADA or more, or one worth at least 5% of the coin's market cap.</li><li><strong>Volume spike</strong>: a coin trading 4 times its normal pace over 15 minutes, with at least 1,500 ADA moving.</li><li><strong>Fast launch</strong>: a new coin pulling in 1,000 ADA from 8 or more wallets in its first hour.</li><li><strong>Creator sell</strong>: the wallet that created a coin selling 100 ADA or more. Posted as a record, not a warning.</li></ul>More on the ${page("about.html", "How it works page")}.` },
   { keys: ["whale"], a: () => `A whale alert is any single trade of 1,000 ADA or more, or a trade worth at least 5% of the coin's market cap. They post in #whale-alerts on ${discord()}.` },
   { keys: ["spike"], a: () => "A volume spike means a coin traded at 4 times its normal pace over 15 minutes, with at least 1,500 ADA moving. Each coin can spike at most once an hour so the channel doesn't flood." },
@@ -164,11 +164,11 @@ async function findCoin(q) {
 
 async function answer(raw) {
   const q = norm(raw);
-  if (/^ ?(hi|hey|hello|yo|sup|gm|howdy)\b/.test(q.trim()) && q.trim().split(" ").length <= 3) return "Hey. Ask me about the alerts, a coin by its ticker, what's close to graduating, or how to use the tools.";
-  if (/\b(thanks|thank you|thx|ty)\b/.test(q)) return "Anytime. I'll be lurking.";
+  if (/^ ?(hi|hey|hello|yo|sup|gm|howdy)\b/.test(q.trim()) && q.trim().split(" ").length <= 3) return "Oh, hi. <em>pushes up glasses</em> Ask me about the alerts, a coin by its ticker, what's close to graduating, or how to use the tools. I have data on all of it.";
+  if (/\b(thanks|thank you|thx|ty)\b/.test(q)) return "Happy to help. I'll be here, recalculating.";
   const advice = ADVICE.some((k) => q.includes(k));
   const coin = await findCoin(raw);
-  if (advice) return `I can't tell you what to buy or sell. Gator Eyes reports what traded, not what to do next.${coin ? " Here's what " + esc(tk(coin)) + " has been doing:<br><br>" + coinAnswer(coin) : ""}`;
+  if (advice) return `I just crunch the numbers, I can't tell you what to buy or sell. Gator Eyes reports what traded, not what to do next.${coin ? " Here's what " + esc(tk(coin)) + " has been doing:<br><br>" + coinAnswer(coin) : ""}`;
   if (coin && !/\b(what is|what's|how do|how does)\b/.test(q)) return coinAnswer(coin);
 
   const score = (keys, not = []) => (not.some((k) => q.includes(k)) ? 0 : keys.reduce((s, k) => s + (q.includes(k) ? k.length : 0), 0));
@@ -178,9 +178,9 @@ async function answer(raw) {
   if (coin && !best) return coinAnswer(coin);
   if (best) {
     try { return best.run ? await best.run() : best.a(); }
-    catch { return "I can't reach the live numbers right now. Try again in a minute."; }
+    catch { return "My data feed isn't answering right now. Give it a minute and ask again."; }
   }
-  return `I don't know that one yet. Try a coin ticker like $MEPE, or ask about the alerts, graduation, net flow, holder snapshots or share cards. For anything else, ask in ${discord()}.`;
+  return `Hmm, that's not in my notes yet. Try a coin ticker like $MEPE, or ask about the alerts, graduation, net flow, holder snapshots or share cards. For anything else, ask in ${discord()}.`;
 }
 
 // ---------- widget ----------
@@ -193,11 +193,11 @@ export function mountGator() {
   root.className = "gator";
   root.innerHTML = `
     <button class="gator-launch" type="button" aria-expanded="false" aria-controls="gator-panel">
-      <img src="./assets/img/gator-head-160.webp" alt="" width="48" height="48"><span>Ask Gator</span>
+      <img src="./assets/img/gator-nerd-head-160.webp" alt="" width="48" height="48"><span>Ask Gator</span>
     </button>
     <section class="gator-panel" id="gator-panel" role="dialog" aria-label="Ask Gator" hidden>
       <header class="gator-head">
-        <img src="./assets/img/gator-head-160.webp" alt="" width="40" height="40">
+        <img src="./assets/img/gator-nerd-head-160.webp" alt="" width="40" height="40">
         <div><strong>Gator</strong><span>Answers about Gator Eyes and Solada.fun</span></div>
         <button type="button" class="gator-x" aria-label="Close">×</button>
       </header>
@@ -225,7 +225,7 @@ export function mountGator() {
     if (keep) { hist.push([who, html]); save(); }
     return m;
   };
-  const greet = () => add("gator", "Hey, I'm Gator. I keep an eye on Solada.fun so you don't have to. Ask me about a coin (try its ticker), the alerts, or how to use the tools.", false);
+  const greet = () => add("gator", "Hi, I'm Gator. I read every trade on Solada.fun so you don't have to. I've got numbers on everything. Ask me about a coin (try its ticker), the alerts, or how to use the tools.", false);
   greet();
   for (const [w, h] of hist) add(w, h, false);
   chips.innerHTML = SUGGEST.map((s) => `<button type="button" class="gator-chip">${esc(s)}</button>`).join("");
