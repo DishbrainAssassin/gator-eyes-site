@@ -1,10 +1,10 @@
 // Ask Gator: a small helper that answers common questions about Gator Eyes and
 // Solada.fun. Answers are built in (no AI, no running cost). Live questions
 // about coins use the same /tokens data as the Tokens page.
-import { CONFIG } from "./config.js?v=20261029j";
-import { coinUrl, joinUrl } from "./data.js?v=20261029j";
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261029j";
-import { esc, fmt, compact } from "./ui.js?v=20261029j";
+import { CONFIG } from "./config.js?v=20261029k";
+import { coinUrl, joinUrl } from "./data.js?v=20261029k";
+import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261029k";
+import { esc, fmt, compact } from "./ui.js?v=20261029k";
 
 const DISCORD = CONFIG.discord;
 const a = (href, label, ext) => `<a href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(label)}</a>`;
@@ -133,7 +133,7 @@ const FAQ = [
   { keys: ["tokens page", "tokens table", "table", "all coins", "list of coins"], a: () => `The ${page("tokens.html", "Tokens page")} lists every coin on Solada.fun with price, change, volume, trades, net flow, market cap, curve progress and alerts. Switch between Live (15 min), 1h, 6h and 24h, and click a column to sort.` },
   { keys: ["flows", "by hour", "venue"], a: () => `The ${page("flows.html", "Flows page")} shows where the ADA went today: money in and out by coin, by hour and by venue (Solada curve, Minswap, Splash, Pump.fun). Days run midnight to midnight Eastern.` },
   { keys: ["widget", "embed", "my site", "my website"], a: () => `Run a project? Put a live box with your coin's volume, net flow and latest alerts on your own site. The embed code is on the ${page("about.html#embed", "How it works page")}.` },
-  { keys: ["api", "json", "feed url", "data for", "builder", "developer"], a: () => `The data behind the site is open JSON, refreshed every two minutes. Details are under "Free data for builders" on the ${page("about.html", "How it works page")}. A link back is appreciated.` },
+  { keys: ["api", "json", "feed url", "data for", "builder", "developer"], a: () => `Gator Eyes' data feed only powers this site. To show live Solada numbers on your own site, use the embed widget on the ${page("about.html#embed", "How it works page")}.` },
   { keys: ["gaey", "your token", "team token"], a: () => `$GAEY is the Gator Eyes team's own token on Solada.fun. Holder rewards are paid in ADA, and the creator locked 4.94M GAEY until Nov 26. Every trade posts in #gaey-trades. See the ${page("gaey.html", "$GAEY page")}.` },
   { keys: ["referral", "6pxznt5n", "ref code"], a: () => "Solada.fun links from Gator Eyes include our referral code, 6pxznt5n. It may earn the team referral rewards and costs you nothing extra." },
   { keys: ["usdcx", "usd", "dollar"], a: () => "The ~USDCx figures are approximate. They use the latest ADA to USDCx rate Gator Eyes saw, so treat them as a rough guide." },

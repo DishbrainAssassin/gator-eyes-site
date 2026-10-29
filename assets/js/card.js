@@ -1,8 +1,8 @@
 // Daily flow card: draws one day of Solada flows onto a 1200x675 canvas
 // (X and Discord friendly) and lets you download it as a PNG.
-import { subscribe } from "./data.js?v=20261029j";
-import { wireLinks, liveStatus } from "./common.js?v=20261029j";
-import { dayLabel, fmt, compact, esc } from "./ui.js?v=20261029j";
+import { subscribe } from "./data.js?v=20261029k";
+import { wireLinks, liveStatus } from "./common.js?v=20261029k";
+import { dayLabel, fmt, compact, esc } from "./ui.js?v=20261029k";
 
 wireLinks();
 

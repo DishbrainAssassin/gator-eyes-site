@@ -1,6 +1,6 @@
-import { subscribe } from "./data.js?v=20261029j";
-import { alertCard, emptyState, skeleton, tracks, dayLabel, fmt, usdcx, timeAgo, compact } from "./ui.js?v=20261029j";
-import { wireLinks, liveStatus } from "./common.js?v=20261029j";
+import { subscribe } from "./data.js?v=20261029k";
+import { alertCard, emptyState, skeleton, tracks, dayLabel, fmt, usdcx, timeAgo, compact } from "./ui.js?v=20261029k";
+import { wireLinks, liveStatus } from "./common.js?v=20261029k";
 
 wireLinks();
 

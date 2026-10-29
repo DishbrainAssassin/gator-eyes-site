@@ -1,9 +1,8 @@
 // How it works page. Alert rules are read from the live feed so this page
 // always matches what the bot is actually doing.
-import { subscribe, RULES_DEFAULT } from "./data.js?v=20261029j";
-import { CONFIG } from "./config.js?v=20261029j";
-import { wireLinks, liveStatus } from "./common.js?v=20261029j";
-import { esc, fmt } from "./ui.js?v=20261029j";
+import { subscribe, RULES_DEFAULT } from "./data.js?v=20261029k";
+import { wireLinks, liveStatus } from "./common.js?v=20261029k";
+import { esc, fmt } from "./ui.js?v=20261029k";
 
 wireLinks();
 
@@ -24,10 +23,7 @@ function renderRules(r) {
     .join("");
 }
 
-// Feed URL + embed code
-const feedUrl = CONFIG.feedUrl;
-$("[data-feed-url]").textContent = feedUrl;
-
+// Embed code
 const embedBase = new URL("./embed.html", location.href);
 embedBase.search = "";
 const coinInput = $("[data-embed-coin]");
@@ -52,7 +48,7 @@ renderEmbed();
 
 document.querySelectorAll("[data-copy]").forEach((b) =>
   b.addEventListener("click", async () => {
-    const text = b.dataset.copy === "feed" ? feedUrl : $("[data-embed-code]").textContent;
+    const text = $("[data-embed-code]").textContent;
     try {
       await navigator.clipboard.writeText(text);
       b.textContent = "Copied";
