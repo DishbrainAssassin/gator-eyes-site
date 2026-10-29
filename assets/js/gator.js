@@ -1,10 +1,10 @@
 // Ask Gator: a small helper that answers common questions about Gator Eyes and
 // Solada.fun. Answers are built in (no AI, no running cost). Live questions
 // about coins use the same /tokens data as the Tokens page.
-import { CONFIG } from "./config.js?v=20261029i";
-import { coinUrl, joinUrl } from "./data.js?v=20261029i";
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261029i";
-import { esc, fmt, compact } from "./ui.js?v=20261029i";
+import { CONFIG } from "./config.js?v=20261029j";
+import { coinUrl, joinUrl } from "./data.js?v=20261029j";
+import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261029j";
+import { esc, fmt, compact } from "./ui.js?v=20261029j";
 
 const DISCORD = CONFIG.discord;
 const a = (href, label, ext) => `<a href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(label)}</a>`;
@@ -129,7 +129,7 @@ const FAQ = [
   { keys: ["eta", "pace", "to go"], a: () => "The ETA on the Race page takes the last 6 hours of net buying on the curve and asks how long it would take to fill the rest at that pace. It changes fast and isn't a prediction. \"Not moving closer\" means more was sold than bought in that time." },
   { keys: ["follow-up", "follow up", "followup", "track record", "accurate", "do alerts work", "after an alert"], a: () => `The ${page("followup.html", "Follow-up page")} shows every alert and what the coin's price did 1 hour and 24 hours later. Good and bad, nothing hidden. It's there so you can judge the alerts yourself.` },
   { keys: ["holder", "airdrop", "snapshot", "csv"], a: () => `Use the ${page("holders.html", "Holder snapshot")}: type a ticker, then set rules. It leaves out the bonding curve, pools, locked tokens, other contracts and the creator wallet, and can group addresses by wallet. Add a minimum balance, top-N or a "hasn't sold since" date, then download the CSV.` },
-  { keys: ["share card", "coin card", "image of", "picture", "graphic"], a: () => `The ${page("coincard.html", "Coin share card")} makes a ready-to-post image of any coin's last 24 hours. Pick a coin, then Download PNG and Copy caption. For the whole market, use the ${page("card.html", "daily flow card")}.` },
+  { keys: ["share card", "coin card", "image of", "picture", "graphic"], a: () => `The ${page("coincard.html", "Coin share card")} makes a ready-to-post image of any coin's last 24 hours. Pick a coin, then tap Download PNG (or Save image on a phone) and Copy caption. For the whole market, use the ${page("card.html", "daily flow card")}.` },
   { keys: ["tokens page", "tokens table", "table", "all coins", "list of coins"], a: () => `The ${page("tokens.html", "Tokens page")} lists every coin on Solada.fun with price, change, volume, trades, net flow, market cap, curve progress and alerts. Switch between Live (15 min), 1h, 6h and 24h, and click a column to sort.` },
   { keys: ["flows", "by hour", "venue"], a: () => `The ${page("flows.html", "Flows page")} shows where the ADA went today: money in and out by coin, by hour and by venue (Solada curve, Minswap, Splash, Pump.fun). Days run midnight to midnight Eastern.` },
   { keys: ["widget", "embed", "my site", "my website"], a: () => `Run a project? Put a live box with your coin's volume, net flow and latest alerts on your own site. The embed code is on the ${page("about.html#embed", "How it works page")}.` },

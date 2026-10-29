@@ -1,8 +1,8 @@
 // Coin share card: one coin's last 24 hours on Solada.fun as a 1200x675 PNG.
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261029i";
-import { coinUrl } from "./data.js?v=20261029i";
-import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261029i";
-import { wireLinks, liveStatus } from "./common.js?v=20261029i";
+import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261029j";
+import { coinUrl } from "./data.js?v=20261029j";
+import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261029j";
+import { wireLinks, liveStatus } from "./common.js?v=20261029j";
 
 wireLinks();
 const $ = (s) => document.querySelector(s);
@@ -186,16 +186,51 @@ async function show(s) {
   const cap = caption();
   $("[data-caption-preview]").textContent = cap;
   const dl = $("[data-download]"), cp = $("[data-copy-caption]");
+  const fname = `gator-eyes-${(c.tk || c.id).replace(/[^A-Za-z0-9_-]/g, "")}.png`;
+  // Make the PNG now, so a tap can hand it straight to the phone's share sheet
+  // (phones drop the tap if we're still busy making the file).
+  let file = null;
+  try {
+    const blob = await new Promise((res) => canvas.toBlob(res, "image/png"));
+    if (coin !== c) return;
+    if (blob) file = new File([blob], fname, { type: "image/png" });
+  } catch {}
+  const canShare = !!(file && navigator.canShare && navigator.canShare({ files: [file] }));
+  const mobile = matchMedia("(pointer: coarse)").matches;
+  dl.textContent = !mobile ? "Download PNG" : canShare ? "Save or share image" : "Save image";
   dl.disabled = cp.disabled = false;
-  dl.onclick = () => {
-    const a = document.createElement("a");
-    a.download = `gator-eyes-${(c.tk || c.id).replace(/[^A-Za-z0-9_-]/g, "")}.png`;
-    try { a.href = canvas.toDataURL("image/png"); a.click(); } catch { n.hidden = false; n.innerHTML = "<strong>This coin's image blocks downloads.</strong> Right-click the card and save it instead."; }
+  dl.onclick = async () => {
+    if (!file) { n.hidden = false; n.innerHTML = "<strong>This coin's image blocks downloads.</strong> Press and hold (or right-click) the card to save it."; return; }
+    if (canShare && mobile) {
+      try { await navigator.share({ files: [file], text: cap }); return; }
+      catch (e) { if (e && e.name === "AbortError") return; }
+    }
+    if (!mobile) {
+      const url = URL.createObjectURL(file);
+      const a = document.createElement("a");
+      a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      return;
+    }
+    holdToSave(file);
   };
   cp.onclick = async () => {
     try { await navigator.clipboard.writeText(cap); cp.textContent = "Copied"; } catch { cp.textContent = "Select and copy below"; }
     setTimeout(() => (cp.textContent = "Copy caption"), 1600);
   };
+}
+
+// Last resort on phones: show the card as a normal image, which can be saved by
+// pressing and holding it.
+function holdToSave(file) {
+  const url = URL.createObjectURL(file);
+  const box = document.createElement("div");
+  box.className = "save-sheet";
+  box.innerHTML = `<div class="save-sheet-in"><p>Press and hold the image, then choose <strong>Save</strong>.</p><img alt="Coin share card" src="${url}"><button class="btn btn-ghost" type="button">Done</button></div>`;
+  const close = () => { box.remove(); URL.revokeObjectURL(url); };
+  box.querySelector("button").onclick = close;
+  box.addEventListener("click", (e) => { if (e.target === box) close(); });
+  document.body.appendChild(box);
 }
 
 async function loadSeries(c) {

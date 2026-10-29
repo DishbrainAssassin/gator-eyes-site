@@ -644,3 +644,9 @@ a.panel-meta { color: var(--color-amber); }
 .ask-quag-chips .gator-chip { background: color-mix(in oklab, var(--color-bg) 60%, transparent); }
 .ask-quag-chips .gator-chip:hover { color: var(--color-text); border-color: var(--color-text-faint); }
 @media (max-width: 560px) { .ask-quag { padding: var(--space-4); gap: var(--space-3); } .ask-quag img { width: 44px; height: 44px; } }
+
+/* Coin card: press-and-hold save sheet for phones */
+.save-sheet { position: fixed; inset: 0; z-index: 90; background: rgba(5,7,6,.96); display: flex; align-items: center; justify-content: center; padding: 20px; }
+.save-sheet-in { max-width: 640px; width: 100%; text-align: center; color: #e9e6dc; }
+.save-sheet-in p { margin: 0 0 14px; font-size: 16px; }
+.save-sheet-in img { width: 100%; height: auto; border-radius: 12px; display: block; margin: 0 auto 16px; -webkit-touch-callout: default; user-select: auto; }
