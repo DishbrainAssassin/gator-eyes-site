@@ -1,6 +1,6 @@
-import { CONFIG } from "./config.js";
-import { joinUrl, coinUrl } from "./data.js";
-import { timeAgo } from "./ui.js";
+import { CONFIG } from "./config.js?v=20261029c";
+import { joinUrl, coinUrl } from "./data.js?v=20261029c";
+import { timeAgo } from "./ui.js?v=20261029c";
 
 /** Fill every [data-link] with the right URL so links live in one place (config.js). */
 export function wireLinks(root = document) {
@@ -18,6 +18,7 @@ export function wireLinks(root = document) {
     a.rel = "noopener";
   });
   navTips();
+  import("./gator.js?v=20261029c").then((m) => m.mountGator()).catch(() => {});
 }
 
 export function liveStatus(feed, err) {
@@ -71,9 +72,10 @@ function navTips() {
   };
   const hide = () => { tip.classList.remove("is-on"); timer = setTimeout(() => (tip.hidden = true), 120); };
   // Hover only on devices with a real pointer; on phones a tap just opens the page.
-  const canHover = matchMedia("(hover: hover) and (pointer: fine)").matches;
   document.querySelectorAll(".nav a").forEach((a) => {
-    if (canHover) { a.addEventListener("mouseenter", () => show(a)); a.addEventListener("mouseleave", hide); }
+    a.addEventListener("pointerenter", (e) => e.pointerType !== "touch" && show(a));
+    a.addEventListener("pointerleave", hide);
+    a.addEventListener("click", hide);
     a.addEventListener("focus", () => a.matches(":focus-visible") && show(a));
     a.addEventListener("blur", hide);
   });
