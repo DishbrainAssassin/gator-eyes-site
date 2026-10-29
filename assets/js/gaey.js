@@ -26,6 +26,7 @@ function facts(launchMs) {
     `<div class="fact"><dt>${label}</dt><dd><code>${v}</code><button class="copy" data-copy="${v}" aria-label="Copy ${label}">Copy</button></dd></div>`;
   factsEl.innerHTML = `
     <div class="fact"><dt>Name</dt><dd>${G.name} ($${G.ticker})</dd></div>
+    <div class="fact"><dt>Rewards</dt><dd>Holder rewards are paid in ADA</dd></div>
     <div class="fact"><dt>Total supply</dt><dd>${fmt(G.totalSupply)}</dd></div>
     <div class="fact"><dt>Launched</dt><dd>${launchMs ? new Date(launchMs).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "America/New_York" }) + " ET" : "Oct 26, 2026"} on Solada</dd></div>
     ${copy("Cardano policy ID", G.cardanoPolicy)}

@@ -22,6 +22,7 @@ export function withRef(url) {
 }
 
 export function coinUrl(tokenId) {
+  if (tokenId && tokenId === CONFIG.watchToken && CONFIG.watchSlug) tokenId = CONFIG.watchSlug;
   const path = !tokenId || tokenId === "SOLADA" ? "/" : "/coin/" + encodeURIComponent(tokenId);
   return withRef(CONFIG.solada + path);
 }

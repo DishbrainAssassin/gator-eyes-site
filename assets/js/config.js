@@ -8,6 +8,8 @@ export const CONFIG = {
   x: "https://x.com/GatorEyesSolada",
   xHandle: "@GatorEyesSolada",
   watchToken: "draft-gaey",
+  // $GAEY's permanent Solada coin page (the old draft-gaey address only works because Solada forwards it).
+  watchSlug: "7477b579ed8bd221dcbbd730f859b22ce9a7935635ab4ae8b70a660c",
   // Facts about $GAEY from its Solada listing. The live price, market cap and holders come from the feed.
   gaey: {
     name: "Gator Eyes",
