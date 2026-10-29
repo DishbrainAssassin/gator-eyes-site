@@ -1,16 +1,17 @@
 // Tokens table: every coin on Solada.fun with windowed volume, net flow,
 // price change, graduation progress and each coin's Gator Eyes alerts.
-import { getApi, price, pct, signed, hours, age } from "./api.js?v=20261029e";
-import { coinUrl } from "./data.js?v=20261029e";
-import { esc, fmt, compact, usdcx, timeAgo } from "./ui.js?v=20261029e";
-import { wireLinks, liveStatus } from "./common.js?v=20261029e";
+import { getApi, price, pct, signed, hours, age } from "./api.js?v=20261029g";
+import { coinUrl } from "./data.js?v=20261029g";
+import { esc, fmt, compact, usdcx, timeAgo } from "./ui.js?v=20261029g";
+import { wireLinks, liveStatus } from "./common.js?v=20261029g";
 
 wireLinks();
 const $ = (s) => document.querySelector(s);
 const rowsEl = $("[data-rows]"), moreBtn = $("[data-more]"), notice = $("[data-notice]");
 const AL = { big: ["Whale", "var(--color-amber)"], spike: ["Spike", "var(--color-spike)"], launch: ["Fast launch", "var(--color-launch)"], dev: ["Creator sell", "var(--color-sell)"] };
 const params = new URLSearchParams(location.search);
-const st = { win: params.get("w") || "h24", sort: "v", dir: -1, f: "all", q: "", quiet: false, all: false, data: null };
+const st = { win: params.get("w") || "h24", sort: "v", dir: -1, f: "all", q: (params.get("q") || "").trim(), quiet: false, all: false, data: null };
+if (st.q) $("[data-search]").value = st.q;
 
 function val(c, k) {
   const w = c.w[st.win] || {};
@@ -68,7 +69,7 @@ function render() {
   if (!st.data) return;
   const q = st.q.toLowerCase();
   let list = st.data.coins.filter((c) => {
-    if (q && !((c.tk || "").toLowerCase().includes(q) || (c.name || "").toLowerCase().includes(q) || c.id.toLowerCase() === q)) return false;
+    if (q && !((c.tk || "").toLowerCase().includes(q) || (c.name || "").toLowerCase().includes(q) || c.id.toLowerCase() === q || (c.slug || "").toLowerCase() === q)) return false;
     if (st.f === "curve" && c.cs !== "open") return false;
     if (st.f === "grad" && c.cs !== "graduated") return false;
     if (st.f === "alerts" && !Object.keys(c.al || {}).length) return false;
