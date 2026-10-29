@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gator Eyes | Alert follow-up</title>
+  <meta name="description" content="What every Gator Eyes alert's coin did 1 hour and 24 hours later. Every alert is included, good and bad.">
+  <meta property="og:title" content="Gator Eyes | Lurking so you don't have to">
+  <meta property="og:description" content="Live whale buys, volume spikes and fast launches on Solada.fun.">
+  <meta property="og:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta property="og:url" content="https://www.gatoreyes.fun/followup.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Gator Eyes">
+  <link rel="canonical" href="https://www.gatoreyes.fun/followup.html">
+  <meta name="twitter:site" content="@GatorEyesSolada">
+  <meta name="theme-color" content="#06090a">
+  <link rel="icon" href="./assets/img/favicon-64.png">
+  <link rel="apple-touch-icon" href="./assets/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./index.html" aria-label="Gator Eyes home">
+        <img src="./assets/img/avatar-256.webp" alt="" width="32" height="32">
+        <span>Gator Eyes</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="./index.html#alerts">Alerts</a>
+        <a href="./tokens.html">Tokens</a>
+        <a href="./race.html">Race</a>
+        <a href="./flows.html">Flows</a>
+        <a href="./followup.html" aria-current="page">Follow-up</a>
+        <a href="./tools.html">Tools</a>
+        <a href="./gaey.html">$GAEY</a>
+        <a href="./about.html">How it works</a>
+      </nav>
+      <a class="btn btn-sm btn-amber" data-link="discord" href="#">Join Discord</a>
+    </div>
+  </header>
+
+    <main id="main" class="dash">
+    <section class="dash-top" aria-labelledby="dash-title">
+      <div class="wrap">
+        <div class="dash-head">
+          <div>
+            <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching Solada</span></p>
+            <h1 id="dash-title">Alert follow-up</h1>
+            <p class="dash-lede">What happened after each alert. For every whale trade, volume spike, fast launch and creator sell Gator Eyes posted, this shows the coin's price change 1 hour and 24 hours later. Every alert is included, good and bad.</p>
+          </div>
+          <div class="tabs" role="tablist" aria-label="Period" data-periods><button class="tab" data-p="1">24 hours</button><button class="tab is-on" data-p="7">7 days</button><button class="tab" data-p="0">All</button></div>
+        </div>
+        <div class="notice" data-notice hidden role="status"></div>
+      </div>
+    </section>
+
+    <section class="wrap dash-body" aria-label="Alert follow-up">
+      <div class="fu-sum" data-sum></div>
+      <article class="panel">
+        <header class="panel-head panel-head-wrap">
+          <div class="chips" style="margin:0" role="group" aria-label="Alert type" data-kinds>
+            <button class="chip is-on" data-k="">All alerts</button>
+            <button class="chip" data-k="bigbuy">Whale buys</button>
+            <button class="chip" data-k="bigsell">Whale sells</button>
+            <button class="chip" data-k="spike">Volume spikes</button>
+            <button class="chip" data-k="launch">Fast launches</button>
+            <button class="chip" data-k="dev">Creator sells</button>
+          </div>
+          <label class="search"><span class="sr-only">Find a coin</span><input type="search" placeholder="Find a coin" data-search autocomplete="off"></label>
+        </header>
+        <div class="table-wrap">
+          <table class="coin-table">
+            <thead><tr>
+              <th scope="col">When</th><th scope="col">Coin</th><th scope="col">Alert</th>
+              <th scope="col" class="num hide-sm">Size</th><th scope="col" class="num hide-sm">Price then</th>
+              <th scope="col" class="num">1 hour later</th><th scope="col" class="num">24 hours later</th>
+            </tr></thead>
+            <tbody data-rows></tbody>
+          </table>
+        </div>
+        <div class="list-foot"><button class="btn btn-ghost btn-sm" data-more hidden>Show more</button></div>
+      </article>
+      <article class="panel">
+        <header class="panel-head"><h2 class="panel-title">How this is measured</h2></header>
+        <div class="method">
+          <div><h3>Price then</h3><p>The coin's last trade price on Solada when the alert fired.</p></div>
+          <div><h3>Later</h3><p>The last trade price 1 hour and 24 hours after the alert. If nobody traded, the price hasn't changed.</p></div>
+          <div><h3>Nothing left out</h3><p>Every alert Gator Eyes posted since Oct 26 is here, including the ones that went nowhere. Past moves don't predict future ones.</p></div>
+        </div>
+      </article>
+      <p class="dash-foot">Alerts are information, not financial advice. <span class="updated" data-updated></span></p>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>Gator Eyes is an automated tracker for <a data-link="join" href="#">Solada</a>. Alerts are not financial advice. $GAEY is the Gator Eyes team's token. Links to Solada include our referral code (6pxznt5n), which may earn the team referral rewards at no extra cost to you. <a href="./about.html#disclosures">Disclosures</a>.</p>
+      <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./tokens.html">Tokens</a><a href="./tools.html">Tools</a></nav>
+    </div>
+  </footer>
+  <script type="module" src="./assets/js/followup.js"></script>
+</body>
+</html>

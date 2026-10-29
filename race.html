@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gator Eyes | Solada.fun graduation race</title>
+  <meta name="description" content="Which Solada.fun coins are closest to graduating, how fast they are getting there, and which coins graduated this week.">
+  <meta property="og:title" content="Gator Eyes | Lurking so you don't have to">
+  <meta property="og:description" content="Live whale buys, volume spikes and fast launches on Solada.fun.">
+  <meta property="og:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta property="og:url" content="https://www.gatoreyes.fun/race.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Gator Eyes">
+  <link rel="canonical" href="https://www.gatoreyes.fun/race.html">
+  <meta name="twitter:site" content="@GatorEyesSolada">
+  <meta name="theme-color" content="#06090a">
+  <link rel="icon" href="./assets/img/favicon-64.png">
+  <link rel="apple-touch-icon" href="./assets/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./index.html" aria-label="Gator Eyes home">
+        <img src="./assets/img/avatar-256.webp" alt="" width="32" height="32">
+        <span>Gator Eyes</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="./index.html#alerts">Alerts</a>
+        <a href="./tokens.html">Tokens</a>
+        <a href="./race.html" aria-current="page">Race</a>
+        <a href="./flows.html">Flows</a>
+        <a href="./followup.html">Follow-up</a>
+        <a href="./tools.html">Tools</a>
+        <a href="./gaey.html">$GAEY</a>
+        <a href="./about.html">How it works</a>
+      </nav>
+      <a class="btn btn-sm btn-amber" data-link="discord" href="#">Join Discord</a>
+    </div>
+  </header>
+
+    <main id="main" class="dash">
+    <section class="dash-top" aria-labelledby="dash-title">
+      <div class="wrap">
+        <div class="dash-head">
+          <div>
+            <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching Solada</span></p>
+            <h1 id="dash-title">Graduation race</h1>
+            <p class="dash-lede">A coin graduates from Solada's bonding curve to Minswap when enough ADA is in the curve. This page shows how close every coin is and, at the last 6 hours' pace of net buying, roughly how long it has left.</p>
+          </div>
+          <div class="tabs" role="tablist" aria-label="Sort" data-sorts><button class="tab is-on" data-s="close">Closest</button><button class="tab" data-s="fast">Fastest</button><button class="tab" data-s="new">Newest</button></div>
+        </div>
+        <div class="notice" data-notice hidden role="status"></div>
+      </div>
+    </section>
+
+    <section class="wrap dash-body" aria-label="Graduation race">
+      <div class="kpis kpis-dash" data-kpis></div>
+      <article class="panel">
+        <header class="panel-head panel-head-wrap"><h2 class="panel-title">On the curve</h2><label class="toggle"><input type="checkbox" data-all> Show coins under 3%</label></header>
+        <ol class="race-list" data-race></ol>
+        <div class="list-foot"><button class="btn btn-ghost btn-sm" data-more hidden>Show more</button></div>
+      </article>
+      <article class="panel">
+        <header class="panel-head"><h2 class="panel-title">Graduated this week</h2><span class="panel-meta">Time from launch to graduation</span></header>
+        <ul class="grad-list" data-grads></ul>
+      </article>
+      <p class="dash-foot">Pace is net ADA bought on the curve (buys minus sells) over the last 6 hours. A coin with no net buying shows as not moving. Estimates change quickly and are not predictions. <span class="updated" data-updated></span> Not financial advice.</p>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>Gator Eyes is an automated tracker for <a data-link="join" href="#">Solada</a>. Alerts are not financial advice. $GAEY is the Gator Eyes team's token. Links to Solada include our referral code (6pxznt5n), which may earn the team referral rewards at no extra cost to you. <a href="./about.html#disclosures">Disclosures</a>.</p>
+      <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./tokens.html">Tokens</a><a href="./tools.html">Tools</a></nav>
+    </div>
+  </footer>
+  <script type="module" src="./assets/js/race.js"></script>
+</body>
+</html>

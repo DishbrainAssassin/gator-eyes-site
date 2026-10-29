@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gator Eyes | Every coin on Solada.fun</title>
+  <meta name="description" content="Every coin trading on Solada.fun, sortable by volume, net flow, price change and market cap, with each coin's Gator Eyes alerts and graduation pace.">
+  <meta property="og:title" content="Gator Eyes | Lurking so you don't have to">
+  <meta property="og:description" content="Live whale buys, volume spikes and fast launches on Solada.fun.">
+  <meta property="og:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta property="og:url" content="https://www.gatoreyes.fun/tokens.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Gator Eyes">
+  <link rel="canonical" href="https://www.gatoreyes.fun/tokens.html">
+  <meta name="twitter:site" content="@GatorEyesSolada">
+  <meta name="theme-color" content="#06090a">
+  <link rel="icon" href="./assets/img/favicon-64.png">
+  <link rel="apple-touch-icon" href="./assets/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./index.html" aria-label="Gator Eyes home">
+        <img src="./assets/img/avatar-256.webp" alt="" width="32" height="32">
+        <span>Gator Eyes</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="./index.html#alerts">Alerts</a>
+        <a href="./tokens.html" aria-current="page">Tokens</a>
+        <a href="./race.html">Race</a>
+        <a href="./flows.html">Flows</a>
+        <a href="./followup.html">Follow-up</a>
+        <a href="./tools.html">Tools</a>
+        <a href="./gaey.html">$GAEY</a>
+        <a href="./about.html">How it works</a>
+      </nav>
+      <a class="btn btn-sm btn-amber" data-link="discord" href="#">Join Discord</a>
+    </div>
+  </header>
+
+    <main id="main" class="dash">
+    <section class="dash-top" aria-labelledby="dash-title">
+      <div class="wrap">
+        <div class="dash-head">
+          <div>
+            <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching Solada</span></p>
+            <h1 id="dash-title">Every coin on Solada</h1>
+            <p class="dash-lede">Every coin trading on Solada.fun in one table. Net flow is ADA bought minus ADA sold. The Alerts column shows what Gator Eyes flagged for that coin in the last 24 hours. Live means the last 15 minutes.</p>
+          </div>
+          <div class="tabs" role="tablist" aria-label="Time window" data-wins><button class="tab" role="tab" data-win="live">Live</button><button class="tab" role="tab" data-win="h1">1h</button><button class="tab" role="tab" data-win="h6">6h</button><button class="tab is-on" role="tab" aria-selected="true" data-win="h24">24h</button></div>
+        </div>
+        <div class="notice" data-notice hidden role="status"></div>
+      </div>
+    </section>
+
+    <section class="wrap dash-body" aria-label="Tokens">
+      <article class="panel">
+        <header class="panel-head panel-head-wrap">
+          <div class="chips" style="margin:0" role="group" aria-label="Filter coins" data-filters>
+            <button class="chip is-on" data-f="all">All</button>
+            <button class="chip" data-f="curve">On the curve</button>
+            <button class="chip" data-f="grad">Graduated</button>
+            <button class="chip" data-f="alerts">Flagged today</button>
+          </div>
+          <div class="table-tools page-tools">
+            <label class="toggle"><input type="checkbox" data-quiet> Include quiet coins</label>
+            <label class="search"><span class="sr-only">Find a coin</span><input type="search" placeholder="Find a coin" data-search autocomplete="off"></label>
+          </div>
+        </header>
+        <div class="table-wrap">
+          <table class="coin-table">
+            <thead><tr>
+              <th scope="col">Coin</th>
+              <th scope="col" class="num"><button data-sort="price" class="sort">Price</button></th>
+              <th scope="col" class="num"><button data-sort="ch" class="sort">Change</button></th>
+              <th scope="col" class="num"><button data-sort="v" class="sort is-on">Volume</button></th>
+              <th scope="col" class="num hide-sm"><button data-sort="n" class="sort">Trades</button></th>
+              <th scope="col" class="num split-col"><button data-sort="net" class="sort">Net flow</button></th>
+              <th scope="col" class="num hide-sm"><button data-sort="mc" class="sort">Mkt cap</button></th>
+              <th scope="col" class="hide-sm"><button data-sort="prog" class="sort">Curve</button></th>
+              <th scope="col" class="num"><button data-sort="al" class="sort">Alerts</button></th>
+              <th scope="col" class="hide-sm"><span class="sr-only">Share</span></th>
+            </tr></thead>
+            <tbody data-rows></tbody>
+          </table>
+        </div>
+        <div class="list-foot"><button class="btn btn-ghost btn-sm" data-more hidden>Show all coins</button></div>
+      </article>
+      <p class="dash-foot" data-foot>Prices are in ADA from the last trade the gator saw. Change compares the price now with the price at the start of the window (24h uses Solada's own figure). Curve shows progress toward graduation and, at the last 6 hours' pace of net buying on the curve, roughly when it gets there. <span class="updated" data-updated></span> Not financial advice.</p>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>Gator Eyes is an automated tracker for <a data-link="join" href="#">Solada</a>. Alerts are not financial advice. $GAEY is the Gator Eyes team's token. Links to Solada include our referral code (6pxznt5n), which may earn the team referral rewards at no extra cost to you. <a href="./about.html#disclosures">Disclosures</a>.</p>
+      <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./tokens.html">Tokens</a><a href="./tools.html">Tools</a></nav>
+    </div>
+  </footer>
+  <script type="module" src="./assets/js/tokens.js"></script>
+</body>
+</html>
