@@ -1,6 +1,6 @@
-import { CONFIG } from "./config.js?v=20261029e";
-import { joinUrl, coinUrl } from "./data.js?v=20261029e";
-import { timeAgo } from "./ui.js?v=20261029e";
+import { CONFIG } from "./config.js?v=20261029f";
+import { joinUrl, coinUrl } from "./data.js?v=20261029f";
+import { timeAgo } from "./ui.js?v=20261029f";
 
 /** Fill every [data-link] with the right URL so links live in one place (config.js). */
 export function wireLinks(root = document) {
@@ -18,7 +18,7 @@ export function wireLinks(root = document) {
     a.rel = "noopener";
   });
   navTips();
-  import("./gator.js?v=20261029e").then((m) => m.mountGator()).catch(() => {});
+  import("./gator.js?v=20261029f").then((m) => m.mountGator()).catch(() => {});
 }
 
 export function liveStatus(feed, err) {
@@ -43,6 +43,7 @@ const NAV_TIPS = {
   "./followup.html": ["Follow-up", "What each alert's coin did 1 hour and 24 hours later. Every alert, good and bad."],
   "./tools.html": ["Tools", "Free tools for projects: holder snapshot with CSV, coin share cards, daily flow card and an alerts widget."],
   "./gaey.html": ["$GAEY", "The Gator Eyes team token: live trades, holder rewards and the creator lock."],
+  "./suri.html": ["+ Suri", "What Gator Eyes can't do for free, like safety checks and wallet profiles, and where to get it."],
   "./about.html": ["How it works", "What sets off each alert, where the data comes from and what each Discord channel is for."],
 };
 

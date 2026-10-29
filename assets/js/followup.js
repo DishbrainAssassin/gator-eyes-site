@@ -1,8 +1,8 @@
 // Alert follow-up: what each alert's coin did 1 hour and 24 hours later.
-import { getApi, price, pct } from "./api.js?v=20261029e";
-import { coinUrl } from "./data.js?v=20261029e";
-import { esc, fmt, timeAgo } from "./ui.js?v=20261029e";
-import { wireLinks, liveStatus } from "./common.js?v=20261029e";
+import { getApi, price, pct } from "./api.js?v=20261029f";
+import { coinUrl } from "./data.js?v=20261029f";
+import { esc, fmt, timeAgo } from "./ui.js?v=20261029f";
+import { wireLinks, liveStatus } from "./common.js?v=20261029f";
 
 wireLinks();
 const $ = (s) => document.querySelector(s);

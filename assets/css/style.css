@@ -593,3 +593,32 @@ a.panel-meta { color: var(--color-amber); }
 /* Free forever pledge */
 .free-list li { border-top-color: var(--color-amber, #e8a33a); }
 .free-pledge .section-title { max-width: 34ch; }
+
+/* Gator Eyes + Suri page */
+.section-sub { margin: var(--space-3) 0 var(--space-8); }
+.lanes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6); margin-top: var(--space-6); }
+.lane { display: grid; gap: var(--space-5); align-content: start; padding: var(--space-6); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); }
+.lane-ge { border-top: 3px solid var(--color-amber); }
+.lane-suri { border-top: 3px solid var(--color-spike); }
+.lane-head { display: flex; align-items: center; gap: var(--space-4); }
+.lane-head img { border-radius: var(--radius-full); }
+.lane-head h3 { font-family: var(--font-display); font-weight: 800; font-size: var(--text-lg); }
+.lane-tag { color: var(--color-text-muted); font-size: var(--text-sm); }
+.lane-mark { display: inline-grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: var(--radius-full); border: 1px solid var(--color-spike); color: var(--color-spike); font-family: var(--font-display); font-weight: 800; }
+.lane-suri .prose-list li::before { background: var(--color-spike); }
+.lane .prose-list { margin-top: 0; }
+.lane-foot { font-size: var(--text-xs); color: var(--color-text-faint); border-top: 1px solid var(--color-divider); padding-top: var(--space-4); }
+.cant-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-6); }
+.cant-list li { display: grid; gap: var(--space-2); align-content: start; border-top: 2px solid var(--color-spike); padding-top: var(--space-4); }
+.cant-list h3 { font-family: var(--font-display); font-weight: 700; font-size: var(--text-lg); }
+.cant-list p { color: var(--color-text-muted); font-size: var(--text-sm); }
+.cant-list a { font-size: var(--text-sm); font-weight: 700; margin-top: var(--space-1); }
+.facts-1 { grid-template-columns: 1fr; }
+.suri-teaser .teaser-inner { align-items: center; }
+@media (max-width: 1000px) { .cant-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .lanes { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .cant-list { grid-template-columns: 1fr; } }
+.about-hero .cta-row { margin-top: var(--space-8); }
+.suri-teaser .two-col { align-items: center; }
+.suri-teaser .cta-row { justify-content: flex-end; }
+@media (max-width: 1000px) { .suri-teaser .cta-row { justify-content: flex-start; } }
