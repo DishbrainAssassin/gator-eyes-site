@@ -1,10 +1,10 @@
 // Ask Gator: a small helper that answers common questions about Gator Eyes and
 // Solada.fun. Answers are built in (no AI, no running cost). Live questions
 // about coins use the same /tokens data as the Tokens page.
-import { CONFIG } from "./config.js?v=20261029f";
-import { coinUrl, joinUrl } from "./data.js?v=20261029f";
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261029f";
-import { esc, fmt, compact } from "./ui.js?v=20261029f";
+import { CONFIG } from "./config.js?v=20261029e";
+import { coinUrl, joinUrl } from "./data.js?v=20261029e";
+import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261029e";
+import { esc, fmt, compact } from "./ui.js?v=20261029e";
 
 const DISCORD = CONFIG.discord;
 const a = (href, label, ext) => `<a href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(label)}</a>`;
@@ -144,7 +144,7 @@ const FAQ = [
   { keys: ["solana", "dual", "pump.fun", "pumpfun"], a: () => "Gator Eyes counts Solada.fun trades on Cardano (the Solada curve, Minswap and Splash) plus Pump.fun trades of Solada coins that are also on Solana. Holder snapshots are Cardano-side only." },
   { keys: ["eastern", "time zone", "timezone", "midnight"], a: () => "All times on Gator Eyes are Eastern (New York). Days run midnight to midnight Eastern." },
   { keys: ["contact", "bug", "suggest", "idea", "feedback", "who made", "who runs", "owner"], a: () => `Ideas or bugs? Drop them in ${discord()}. The team reads everything.` },
-  { keys: ["suri", "risk check", "rug check", "wallet pnl", "copy trad", "smart money", "win rate"], a: () => `Gator Eyes is free forever, so it sticks to what traded. Safety checks, wallet profiles and copy trading can't be done for free, so for those we point you to ${a("https://suriradar.fun/", "Suri Radar", true)}. ${page("suri.html", "See who does what")}.` },
+  { keys: ["suri"], a: () => `${a("https://suriradar.fun/", "Suri Radar", true)} is built for checking coin safety. Gator Eyes sticks to reporting what traded.` },
 ];
 
 const ADVICE = ["should i buy", "should i sell", "good buy", "will it pump", "will it moon", "going to moon", "price prediction", "is it safe", "worth buying", "next 100x", "gem", "financial advice", "invest in"];
