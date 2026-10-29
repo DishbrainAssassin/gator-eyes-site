@@ -17,6 +17,7 @@ export function wireLinks(root = document) {
     a.target = "_blank";
     a.rel = "noopener";
   });
+  navTips();
 }
 
 export function liveStatus(feed, err) {
@@ -30,4 +31,52 @@ export function liveStatus(feed, err) {
   else if (fresh) txt.textContent = "Watching Solada · checked " + timeAgo(feed.updatedAt.getTime());
   else if (feed && feed.updatedAt) txt.textContent = "Solada paused · last update " + timeAgo(feed.updatedAt.getTime());
   else txt.textContent = "Watching Solada";
+}
+
+// Short hover descriptions for the top navigation.
+const NAV_TIPS = {
+  "./index.html#alerts": ["Alerts", "Whale trades, volume spikes, fast launches and creator sells on Solada.fun, as they happen."],
+  "./tokens.html": ["Tokens", "Every coin in one table: volume, net flow, price change and graduation progress."],
+  "./race.html": ["Race", "Coins on the bonding curve, ranked by how close they are to graduating, with pace and a rough ETA."],
+  "./flows.html": ["Flows", "Where the ADA went today: money in and out by coin, by hour and by venue."],
+  "./followup.html": ["Follow-up", "What each alert's coin did 1 hour and 24 hours later. Every alert, good and bad."],
+  "./tools.html": ["Tools", "Free tools for projects: holder snapshot with CSV, coin share cards, daily flow card and an alerts widget."],
+  "./gaey.html": ["$GAEY", "The Gator Eyes team token: live trades, holder rewards and the creator lock."],
+  "./about.html": ["How it works", "What sets off each alert, where the data comes from and what each Discord channel is for."],
+};
+
+function navTips() {
+  if (document.querySelector(".nav-tip")) return;
+  const tip = document.createElement("div");
+  tip.className = "nav-tip";
+  tip.id = "nav-tip";
+  tip.setAttribute("role", "tooltip");
+  tip.hidden = true;
+  document.body.appendChild(tip);
+  let timer = 0;
+  const show = (a) => {
+    const t = NAV_TIPS[a.getAttribute("href")];
+    if (!t) return;
+    clearTimeout(timer);
+    tip.innerHTML = `<strong>${t[0]}</strong><span>${t[1]}</span>`;
+    tip.hidden = false;
+    const r = a.getBoundingClientRect();
+    const w = tip.offsetWidth;
+    const left = Math.max(12, Math.min(innerWidth - w - 12, r.left + r.width / 2 - w / 2));
+    tip.style.left = left + "px";
+    tip.style.top = r.bottom + 10 + "px";
+    tip.style.setProperty("--arrow", r.left + r.width / 2 - left + "px");
+    a.setAttribute("aria-describedby", "nav-tip");
+    requestAnimationFrame(() => tip.classList.add("is-on"));
+  };
+  const hide = () => { tip.classList.remove("is-on"); timer = setTimeout(() => (tip.hidden = true), 120); };
+  // Hover only on devices with a real pointer; on phones a tap just opens the page.
+  const canHover = matchMedia("(hover: hover) and (pointer: fine)").matches;
+  document.querySelectorAll(".nav a").forEach((a) => {
+    if (canHover) { a.addEventListener("mouseenter", () => show(a)); a.addEventListener("mouseleave", hide); }
+    a.addEventListener("focus", () => a.matches(":focus-visible") && show(a));
+    a.addEventListener("blur", hide);
+  });
+  document.querySelector(".nav")?.addEventListener("scroll", hide, { passive: true });
+  addEventListener("keydown", (e) => e.key === "Escape" && hide());
 }
