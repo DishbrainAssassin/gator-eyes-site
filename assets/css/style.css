@@ -589,3 +589,7 @@ a.panel-meta { color: var(--color-amber); }
   .gator-launch { padding: 4px; }
   .gator-panel { width: 100%; height: min(72vh, 600px); }
 }
+
+/* Free forever pledge */
+.free-list li { border-top-color: var(--color-amber, #e8a33a); }
+.free-pledge .section-title { max-width: 34ch; }

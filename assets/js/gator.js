@@ -1,10 +1,10 @@
 // Ask Gator: a small helper that answers common questions about Gator Eyes and
 // Solada.fun. Answers are built in (no AI, no running cost). Live questions
 // about coins use the same /tokens data as the Tokens page.
-import { CONFIG } from "./config.js?v=20261029d";
-import { coinUrl, joinUrl } from "./data.js?v=20261029d";
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261029d";
-import { esc, fmt, compact } from "./ui.js?v=20261029d";
+import { CONFIG } from "./config.js?v=20261029e";
+import { coinUrl, joinUrl } from "./data.js?v=20261029e";
+import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261029e";
+import { esc, fmt, compact } from "./ui.js?v=20261029e";
 
 const DISCORD = CONFIG.discord;
 const a = (href, label, ext) => `<a href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(label)}</a>`;
@@ -138,7 +138,7 @@ const FAQ = [
   { keys: ["referral", "6pxznt5n", "ref code"], a: () => "Solada.fun links from Gator Eyes include our referral code, 6pxznt5n. It may earn the team referral rewards and costs you nothing extra." },
   { keys: ["usdcx", "usd", "dollar"], a: () => "The ~USDCx figures are approximate. They use the latest ADA to USDCx rate Gator Eyes saw, so treat them as a rough guide." },
   { keys: ["how often", "update", "refresh", "delay", "real time", "realtime", "live"], a: () => "Gator Eyes checks Solada.fun every two minutes. Alerts usually land within a few minutes of the trade. If Solada is down or updating, alerts pause and the site says so at the top." },
-  { keys: ["cost", "free", "price of gator", "pay", "subscription", "premium"], a: () => "Gator Eyes is free. No sign-up, no wallet connection, no paid tier." },
+  { keys: ["cost", "free", "price of gator", "pay", "subscription", "premium", "charge", "paywall", "how much", "fee", "pro version", "token gate", "need to hold"], a: () => "Gator Eyes is free, and it always will be. We will never charge for access: no paywall, no subscriptions, no premium alerts, no token gate. You don't need to hold $GAEY to use anything. No sign-up or wallet connection either. Trust me, I ran the numbers on this one." },
   { keys: ["wallet", "connect", "safe to use", "private key", "seed"], a: () => "Gator Eyes never asks you to connect a wallet and can't trade for you. Never share your seed phrase with anyone, including bots in Discord DMs." },
   { keys: ["what is solada", "solada.fun", "how to buy", "how do i buy", "start trading", "how do i trade"], a: () => `Solada.fun is a launchpad for meme coins on Cardano, with some coins also on Solana. You buy and sell on Solada.fun itself; Gator Eyes just watches. ${a(joinUrl(), "Start on Solada.fun", true)}.` },
   { keys: ["solana", "dual", "pump.fun", "pumpfun"], a: () => "Gator Eyes counts Solada.fun trades on Cardano (the Solada curve, Minswap and Splash) plus Pump.fun trades of Solada coins that are also on Solana. Holder snapshots are Cardano-side only." },

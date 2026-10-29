@@ -1,6 +1,6 @@
-import { CONFIG } from "./config.js?v=20261029d";
-import { joinUrl, coinUrl } from "./data.js?v=20261029d";
-import { timeAgo } from "./ui.js?v=20261029d";
+import { CONFIG } from "./config.js?v=20261029e";
+import { joinUrl, coinUrl } from "./data.js?v=20261029e";
+import { timeAgo } from "./ui.js?v=20261029e";
 
 /** Fill every [data-link] with the right URL so links live in one place (config.js). */
 export function wireLinks(root = document) {
@@ -18,7 +18,7 @@ export function wireLinks(root = document) {
     a.rel = "noopener";
   });
   navTips();
-  import("./gator.js?v=20261029d").then((m) => m.mountGator()).catch(() => {});
+  import("./gator.js?v=20261029e").then((m) => m.mountGator()).catch(() => {});
 }
 
 export function liveStatus(feed, err) {
