@@ -650,3 +650,13 @@ a.panel-meta { color: var(--color-amber); }
 .save-sheet-in { max-width: 640px; width: 100%; text-align: center; color: #e9e6dc; }
 .save-sheet-in p { margin: 0 0 14px; font-size: 16px; }
 .save-sheet-in img { width: 100%; height: auto; border-radius: 12px; display: block; margin: 0 auto 16px; -webkit-touch-callout: default; user-select: auto; }
+
+/* Suri banner above the site header */
+.suri-bar{background:color-mix(in oklab,var(--color-amber) 12%,var(--color-bg));border-bottom:1px solid color-mix(in oklab,var(--color-amber) 30%,var(--color-divider));font-size:var(--text-xs);line-height:1.45}
+.suri-bar-inner{display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);padding-block:var(--space-2)}
+.suri-bar p{margin:0;max-width:none;color:var(--color-text-muted)}
+.suri-bar strong{color:var(--color-text)}
+.suri-bar-short{display:none}
+.suri-bar-link{flex-shrink:0;color:var(--color-amber);font-weight:700;text-decoration:none;white-space:nowrap}
+.suri-bar-link:hover{color:var(--color-amber-hover);text-decoration:underline}
+@media (max-width:760px){.suri-bar-inner{flex-direction:column;align-items:flex-start;gap:var(--space-1)}.suri-bar-list{display:none}.suri-bar-short{display:inline}}
