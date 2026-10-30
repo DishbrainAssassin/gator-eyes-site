@@ -23,6 +23,7 @@
   <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/css/style.css?v=20261029l">
+  <link rel="stylesheet" href="./assets/css/feature-map.css?v=20261030a">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -52,9 +53,10 @@
         <img src="./assets/img/keyart-1600.webp" srcset="./assets/img/keyart-900.webp 900w, ./assets/img/keyart-1600.webp 1600w" sizes="100vw" alt="A gator's amber eyes watching from just above dark water" width="1600" height="800">
       </picture>
       <div class="wrap hero-inner">
+        <p class="promise-line"><strong>Free forever.</strong> No paywall, no subscriptions, no sign-up and no coin required.</p>
         <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching Solada</span></p>
         <h1 id="hero-title">Lurking so you don't have to.</h1>
-        <p class="lede">Live whale buys, volume spikes and fast launches on Solada.fun. Automated, and free forever. Not financial advice.</p>
+        <p class="lede">Whale buys, volume spikes and fast launches on Solada.fun, as they happen. Not financial advice.</p>
         <div class="cta-row">
           <a class="btn btn-amber" data-link="discord" href="#">Join the Discord</a>
           <a class="btn btn-ghost" data-link="x" href="#">Follow @GatorEyesSolada</a>
@@ -75,19 +77,6 @@
       </div>
     </section>
 
-    <section class="section section-tight free-pledge" aria-labelledby="free-title">
-      <div class="wrap">
-        <p class="eyebrow">Our promise</p>
-        <h2 id="free-title" class="section-title">Free forever. Gator Eyes will never charge for access.</h2>
-        <ul class="not-list free-list" role="list">
-          <li><h3>No paywall</h3><p>Every page, alert, tool and data feed stays open to everyone. Nothing gets moved behind a paid tier later.</p></li>
-          <li><h3>No subscriptions</h3><p>No monthly plan, no premium alerts, no "pro" version. What you see is the whole thing.</p></li>
-          <li><h3>No token gate</h3><p>You don't need to hold $GAEY or any other coin to use Gator Eyes.</p></li>
-          <li><h3>No sign-up</h3><p>No account, no email, no wallet connection. Open the page and it works.</p></li>
-        </ul>
-      </div>
-    </section>
-
     <section class="section explore" aria-labelledby="explore-title">
       <div class="wrap">
         <h2 id="explore-title" class="section-title">Explore Gator Eyes</h2>
@@ -99,6 +88,81 @@
           <a class="tool" href="./holders.html"><span class="tag">For projects</span><h3>Holder snapshot</h3><p>A clean holder list for airdrops, ready as a CSV.</p></a>
           <a class="tool" href="./coincard.html"><span class="tag">For projects</span><h3>Coin share card</h3><p>A ready-to-post image of any coin's last 24 hours.</p></a>
         </div>
+      </div>
+    </section>
+
+    <section class="section fmap" id="map" aria-labelledby="map-title">
+      <div class="wrap">
+        <p class="eyebrow">Feature map</p>
+        <h2 id="map-title" class="section-title">Everything Gator Eyes does, in one picture.</h2>
+        <p class="fmap-sub">One gator watches every trade. What it sees goes three places: Discord for right now, X for recaps, and this site to dig in.</p>
+
+        <div class="fmap-hub">
+          <img src="./assets/img/avatar-256.webp" alt="" width="44" height="44">
+          <div><strong>The gator</strong><span>Reads every Solada.fun trade, checked every 2 minutes</span></div>
+        </div>
+
+        <div class="fmap-lanes">
+          <div class="fmap-bus" aria-hidden="true"></div>
+
+          <div class="fmap-lane" style="--lane: var(--color-amber)">
+            <div class="fmap-head"><h3>Discord</h3><small>right now</small></div>
+            <ul class="fmap-list" role="list">
+              <li><div class="fmap-item"><b><i class="fmap-dot" style="background:var(--color-amber)"></i>Whale trades</b><span>1,000+ ADA, or 5% of market cap</span></div></li>
+              <li><div class="fmap-item"><b><i class="fmap-dot" style="background:var(--color-spike)"></i>Volume spikes</b><span>4x normal pace in 15 minutes</span></div></li>
+              <li><div class="fmap-item"><b><i class="fmap-dot" style="background:var(--color-sell)"></i>Creator sells</b><span>Launch wallet sells 100+ ADA</span></div></li>
+              <li><div class="fmap-item"><b><i class="fmap-dot" style="background:var(--color-launch)"></i>Fast launches</b><span>1,000+ ADA from 8+ wallets, first hour</span></div></li>
+              <li><div class="fmap-item"><b>$GAEY trades</b><span>Every trade of the team's token</span></div></li>
+            </ul>
+            <a class="btn btn-amber btn-sm fmap-cta" data-link="discord" href="#">Join Discord</a>
+          </div>
+
+          <div class="fmap-lane" style="--lane: var(--color-buy)">
+            <div class="fmap-head"><h3>X</h3><small>recaps</small></div>
+            <ul class="fmap-list" role="list">
+              <li><div class="fmap-item"><b>Gator Tracks</b><span>Daily at 9 AM ET: yesterday's volume, top coins, money in and out</span></div></li>
+              <li><div class="fmap-item"><b>Solada Pulse</b><span>Every 4 hours: volume, top coins, spikes and new launches</span></div></li>
+            </ul>
+            <a class="btn btn-ghost btn-sm fmap-cta" data-link="x" href="#">Follow @GatorEyesSolada</a>
+          </div>
+
+          <div class="fmap-lane" style="--lane: var(--color-spike)">
+            <div class="fmap-head"><h3>gatoreyes.fun</h3><small>dig in</small></div>
+            <div class="fmap-groups">
+              <div class="fmap-group">
+                <h4>Watch the market</h4>
+                <ul class="fmap-list" role="list">
+                  <li><a class="fmap-item" href="#alerts"><b>Live alerts</b><span>The Discord feed, right on this page</span></a></li>
+                  <li><a class="fmap-item" href="./tokens.html"><b>Tokens</b><span>Every coin, sortable by volume and net flow</span></a></li>
+                  <li><a class="fmap-item" href="./race.html"><b>Graduation race</b><span>Closest to 50,000 ADA, with pace and ETA</span></a></li>
+                  <li><a class="fmap-item" href="./flows.html"><b>Flows</b><span>Where the ADA went, by coin, hour and venue</span></a></li>
+                </ul>
+              </div>
+              <div class="fmap-group">
+                <h4>Check the record</h4>
+                <ul class="fmap-list" role="list">
+                  <li><a class="fmap-item" href="./followup.html"><b>Alert follow-up</b><span>What each coin did 1 hour and 24 hours after its alert</span></a></li>
+                  <li><a class="fmap-item" href="./gaey.html"><b>$GAEY</b><span>The team's token, holder rewards paid in ADA</span></a></li>
+                </ul>
+                <h4 style="margin-top:var(--space-4)">For projects</h4>
+                <ul class="fmap-list" role="list">
+                  <li><a class="fmap-item" href="./holders.html"><b>Holder snapshot</b><span>Clean holder list for airdrops, as a CSV</span></a></li>
+                  <li><a class="fmap-item" href="./coincard.html"><b>Coin share card</b><span>A ready-to-post image of any coin</span></a></li>
+                  <li><a class="fmap-item" href="./about.html#embed"><b>Embed widget</b><span>Put live Gator Eyes data on your own site</span></a></li>
+                </ul>
+              </div>
+              <div class="fmap-group" style="grid-column:1 / -1">
+                <h4>Get help</h4>
+                <ul class="fmap-list fmap-help" role="list">
+                  <li><div class="fmap-item"><b>Search</b><span>Press / or tap Search up top</span></div></li>
+                  <li><div class="fmap-item"><b>Beginner mode</b><span>Tap ? to explain the jargon</span></div></li>
+                  <li><button type="button" class="fmap-item" data-ask><b>Ask Quagmire</b><span>Our gator answers anything</span></button></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="fmap-free"><strong>All of it is free, forever.</strong> No sign-up, no wallet.</p>
       </div>
     </section>
 
