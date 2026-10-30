@@ -61,3 +61,7 @@ a.fmap-item:hover,button.fmap-item:hover,a.fmap-item:focus-visible,button.fmap-i
 @media (min-width:761px){.hero{min-height:0}.hero-inner{padding-top:var(--space-16)}}
 .promise-line{margin-bottom:var(--space-4);font-size:var(--text-sm);color:var(--color-text-muted);max-width:60ch}
 .promise-line strong{color:var(--color-amber);font-weight:700}
+/* Suri promo (home) */
+.suri-teaser .two-col{align-items:center}
+.suri-teaser .cta-row{justify-content:flex-end}
+@media (max-width:1000px){.suri-teaser .cta-row{justify-content:flex-start}}
