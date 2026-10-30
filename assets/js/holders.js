@@ -1,9 +1,9 @@
 // Holder snapshot: every Cardano holder of a Solada.fun coin, filtered by rules,
 // ready to download as a CSV for airdrops.
-import { getApi } from "./api.js?v=20261029l";
-import { coinUrl } from "./data.js?v=20261029l";
-import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261029l";
-import { wireLinks, liveStatus } from "./common.js?v=20261029l";
+import { getApi } from "./api.js?v=20261030m";
+import { coinUrl } from "./data.js?v=20261030m";
+import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261030m";
+import { wireLinks, liveStatus } from "./common.js?v=20261030m";
 
 wireLinks();
 const $ = (s) => document.querySelector(s);

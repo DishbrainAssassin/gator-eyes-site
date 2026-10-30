@@ -1,6 +1,6 @@
 // Data layer. Everything the site shows comes through here, so a future
 // dashboard can add views without touching how data is fetched.
-import { CONFIG } from "./config.js?v=20261029l";
+import { CONFIG } from "./config.js?v=20261030m";
 
 const listeners = new Set();
 let last = null;
@@ -65,7 +65,7 @@ function neutral(a) {
   };
 }
 
-export const RULES_DEFAULT = { bigAda: 1000, mcapPct: 5, mcapMinAda: 250, spikeMinAda: 1500, spikeMult: 4, spikeWindowMin: 15, creatorMinAda: 100, launchMinAda: 1000, launchMinBuyers: 8, launchWindowMin: 60, recapHourET: 9, refreshMin: 2 };
+export const RULES_DEFAULT = { bigUsd: 500, bigAda: 2600, mcapPct: 5, mcapMinAda: 250, spikeMinAda: 1500, spikeMult: 4, spikeWindowMin: 15, creatorMinAda: 100, launchMinAda: 1000, launchMinBuyers: 8, launchWindowMin: 60, recapHourET: 9, refreshMin: 2 };
 
 function normalize(j) {
   const rate = Number(j.adaUsd) || null;
