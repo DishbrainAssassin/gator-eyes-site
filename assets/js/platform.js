@@ -31,7 +31,7 @@ export function pill(key, { button = true } = {}) {
 }
 
 function paint() {
-  document.documentElement.dataset.platform = cur;
+  document.documentElement.dataset.lpScope = cur;
   document.querySelectorAll("[data-platform]").forEach((b) => {
     const on = b.dataset.platform === cur;
     b.classList.toggle("is-on", on);
@@ -84,7 +84,7 @@ export function mount(host = document.querySelector("[data-platform-bar]")) {
 }
 
 document.addEventListener("click", (e) => {
-  const b = e.target.closest("[data-platform], [data-platform-pick]");
+  const b = e.target.closest("button[data-platform], button[data-platform-pick]");
   if (!b || b.disabled) return;
   e.preventDefault();
   set(b.dataset.platform || b.dataset.platformPick);

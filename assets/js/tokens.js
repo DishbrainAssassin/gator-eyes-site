@@ -4,8 +4,8 @@ import { getApi, price, pct, signed, hours, age } from "./api.js?v=20261031s";
 import { coinUrl } from "./data.js?v=20261031s";
 import { esc, fmt, compact, usdcx, timeAgo } from "./ui.js?v=20261031s";
 import { wireLinks, liveStatus } from "./common.js?v=20261031s";
-import * as platform from "./platform.js?v=20261031s";
-import { pill } from "./platform.js?v=20261031s";
+import * as platform from "./platform.js?v=20261031t";
+import { pill } from "./platform.js?v=20261031t";
 
 wireLinks();
 platform.mount();

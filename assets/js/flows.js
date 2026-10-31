@@ -2,8 +2,8 @@
 import { subscribe, coinUrl } from "./data.js?v=20261031s";
 import { alertCard, emptyState, skeleton, dayLabel, fmt, usdcx, usdcxSigned, rateNote, compact, clock, timeAgo, esc, mergeDays, lpSplit } from "./ui.js?v=20261031s";
 import { wireLinks, liveStatus } from "./common.js?v=20261031s";
-import * as platform from "./platform.js?v=20261031s";
-import { pill } from "./platform.js?v=20261031s";
+import * as platform from "./platform.js?v=20261031t";
+import { pill } from "./platform.js?v=20261031t";
 
 wireLinks();
 platform.mount();
