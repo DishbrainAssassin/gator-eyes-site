@@ -67,7 +67,7 @@ const LIVE = [
     },
   },
   {
-    keys: ["inflow", "money in", "money going", "being bought", "most bought", "buying most", "net buy", "accumulat"],
+    keys: ["inflow", "highest inflow", "biggest inflow", "most inflow", "top inflow", "inflow volume", "money in", "money going", "being bought", "most bought", "buying most", "net buy", "accumulat"],
     run: async () => {
       const d = await tokens();
       const l = d.coins.filter((c) => h24(c).net > 0).sort((x, y) => h24(y).net - h24(x).net);
@@ -76,7 +76,7 @@ const LIVE = [
     },
   },
   {
-    keys: ["outflow", "money out", "being sold", "most sold", "selling most", "dump"],
+    keys: ["outflow", "highest outflow", "biggest outflow", "most outflow", "top outflow", "money out", "being sold", "most sold", "selling most", "dump"],
     run: async () => {
       const d = await tokens();
       const l = d.coins.filter((c) => h24(c).net < 0).sort((x, y) => h24(x).net - h24(y).net);
@@ -104,6 +104,7 @@ const LIVE = [
   },
   {
     keys: ["solada today", "volume today", "how is solada", "how's solada", "market today", "total volume", "overall"],
+    not: ["inflow", "outflow", "which", "what coin", "what token", "who had", "most traded", "highest volume", "most volume"],
     run: async () => {
       const d = await tokens();
       let v = 0, n = 0, net = 0;
