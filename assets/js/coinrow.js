@@ -1,8 +1,8 @@
 // One table row for a coin from /tokens. Shared by the Tokens page and the Watchlist
 // so both show the same numbers the same way.
-import { price, pct, signed, hours, age } from "./api.js?v=20261031s";
-import { coinUrl } from "./data.js?v=20261031s";
-import { esc, fmt, compact, usdcx } from "./ui.js?v=20261031s";
+import { price, pct, signed, hours, age } from "./api.js?v=20261031t";
+import { coinUrl } from "./data.js?v=20261031t";
+import { esc, fmt, compact, usdcx } from "./ui.js?v=20261031t";
 import { pill } from "./platform.js?v=20261031t";
 import { starBtn } from "./watchlist.js?v=20261031w";
 
