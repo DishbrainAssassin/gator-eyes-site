@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
   <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/css/style.css?v=20261031t">
+  <link rel="stylesheet" href="./assets/css/style.css?v=20261031w">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -43,6 +43,7 @@
         <a href="./race.html">Race</a>
         <a href="./flows.html">Flows</a>
         <a href="./followup.html">Follow-up</a>
+        <a href="./watchlist.html">Watchlist</a>
         <a href="./tools.html">Tools</a>
         <a href="./gaey.html">$GAEY</a>
         <a href="./about.html">How it works</a>
@@ -59,7 +60,7 @@
           <div>
             <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching Solada</span></p>
             <h1 id="dash-title">Every coin, every launchpad</h1>
-            <p class="dash-lede">Every coin trading on Solada.fun and Snek.fun in one table. Use the launchpad bar to narrow it. Net flow is ADA bought minus ADA sold. The Alerts column shows what Gator Eyes flagged for that coin in the last 24 hours. Live means the last 15 minutes.</p>
+            <p class="dash-lede">Every coin trading on Solada.fun and Snek.fun in one table. Use the launchpad bar to narrow it. Net flow is ADA bought minus ADA sold. The Alerts column shows what Gator Eyes flagged for that coin in the last 24 hours. Live means the last 15 minutes. Tap the star to save a coin to your <a href="./watchlist.html">Watchlist</a>.</p>
           </div>
           <div class="tabs" role="tablist" aria-label="Time window" data-wins><button class="tab" role="tab" data-win="live">Live</button><button class="tab" role="tab" data-win="h1">1h</button><button class="tab" role="tab" data-win="h6">6h</button><button class="tab is-on" role="tab" aria-selected="true" data-win="h24">24h</button></div>
         </div>
@@ -75,6 +76,7 @@
             <button class="chip" data-f="curve">On the curve</button>
             <button class="chip" data-f="grad">Graduated</button>
             <button class="chip" data-f="alerts">Flagged today</button>
+            <button class="chip chip-watch" data-f="watch" title="Coins you starred, saved in this browser">Watching <span class="chip-count" data-watch-count hidden></span></button>
           </div>
           <div class="table-tools page-tools">
             <label class="toggle"><input type="checkbox" data-quiet> Include quiet coins</label>
@@ -84,6 +86,7 @@
         <div class="table-wrap">
           <table class="coin-table">
             <thead><tr>
+              <th scope="col" class="star-col"><span class="sr-only">Watchlist</span></th>
               <th scope="col">Coin</th>
               <th scope="col" class="num"><button data-sort="price" class="sort">Price</button></th>
               <th scope="col" class="num"><button data-sort="ch" class="sort">Change</button></th>
@@ -109,6 +112,6 @@
       <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./tokens.html">Tokens</a><a href="./tools.html">Tools</a></nav>
     </div>
   </footer>
-  <script type="module" src="./assets/js/tokens.js?v=20261031t"></script>
+  <script type="module" src="./assets/js/tokens.js?v=20261031w"></script>
 </body>
 </html>

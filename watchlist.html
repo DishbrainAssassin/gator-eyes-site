@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gator Eyes | Your watchlist</title>
+  <meta name="description" content="Your own list of Solada.fun and Snek.fun coins, saved in this browser: price, flows, graduation progress and every Gator Eyes alert on them in one place. No sign-up, no wallet.">
+  <meta property="og:title" content="Gator Eyes | Lurking so you don't have to">
+  <meta property="og:description" content="Free, live tracker for Solada.fun: whale buys, volume spikes, new launches, money flows and holder checks. No sign-up, no wallet. Just ask Quagmire the gator.">
+  <meta property="og:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta property="og:url" content="https://www.gatoreyes.fun/watchlist.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Gator Eyes">
+  <link rel="canonical" href="https://www.gatoreyes.fun/watchlist.html">
+  <meta name="twitter:site" content="@GatorEyesADA">
+  <meta name="theme-color" content="#06090a">
+  <link rel="icon" href="./assets/img/favicon-64.png">
+  <link rel="apple-touch-icon" href="./assets/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/style.css?v=20261031w">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <aside class="suri-bar" aria-label="Paid features from Suri">
+    <div class="wrap suri-bar-inner">
+      <p>Safety checks on new coins, wallet profiles, and copy trading take a paid tool, we point you to Suri instead of building a paywall.</p>
+      <a class="suri-bar-link" href="https://suriradar.fun/" target="_blank" rel="noopener">See Suri's tiers <span aria-hidden="true">&rarr;</span></a>
+    </div>
+  </aside>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./index.html" aria-label="Gator Eyes home">
+        <img src="./assets/img/avatar-256.webp" alt="" width="32" height="32">
+        <span>Gator Eyes</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="./index.html#alerts">Alerts</a>
+        <a href="./tokens.html">Tokens</a>
+        <a href="./race.html">Race</a>
+        <a href="./flows.html">Flows</a>
+        <a href="./followup.html">Follow-up</a>
+        <a href="./watchlist.html" aria-current="page">Watchlist</a>
+        <a href="./tools.html">Tools</a>
+        <a href="./gaey.html">$GAEY</a>
+        <a href="./about.html">How it works</a>
+      </nav>
+      <a class="btn btn-sm btn-amber" data-link="discord" href="#">Join Discord</a>
+    </div>
+  </header>
+  <div data-platform-bar></div>
+
+    <main id="main" class="dash">
+    <section class="dash-top" aria-labelledby="dash-title">
+      <div class="wrap">
+        <div class="dash-head">
+          <div>
+            <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching Solada</span></p>
+            <h1 id="dash-title">Your watchlist</h1>
+            <p class="dash-lede">The coins you star, in one view: price, flows, graduation progress and every Gator Eyes alert on them. The list is saved in this browser only, so there's no sign-up and no wallet. <span data-persist-note></span></p>
+          </div>
+          <div class="tabs" role="tablist" aria-label="Time window" data-wins><button class="tab" role="tab" data-win="live">Live</button><button class="tab" role="tab" data-win="h1">1h</button><button class="tab" role="tab" data-win="h6">6h</button><button class="tab is-on" role="tab" aria-selected="true" data-win="h24">24h</button></div>
+        </div>
+        <div class="notice" data-notice hidden role="status"></div>
+        <div class="notice notice-import" data-import hidden role="status"></div>
+      </div>
+    </section>
+
+    <section class="wrap dash-body" aria-label="Watchlist">
+      <div class="kpis kpis-dash kpis-watch" data-kpis hidden>
+        <div class="kpi"><span class="kpi-label">Watching</span><span class="kpi-value" data-k="n">–</span><span class="kpi-sub" data-k="nsub"></span></div>
+        <div class="kpi"><span class="kpi-label">Volume</span><span class="kpi-value" data-k="v">–</span><span class="kpi-sub" data-k="vsub"></span></div>
+        <div class="kpi"><span class="kpi-label">Net flow</span><span class="kpi-value" data-k="net">–</span><span class="kpi-sub" data-k="netsub"></span></div>
+        <div class="kpi"><span class="kpi-label">Alerts, 24h</span><span class="kpi-value" data-k="al">–</span><span class="kpi-sub" data-k="alsub"></span></div>
+      </div>
+
+      <article class="panel">
+        <header class="panel-head panel-head-wrap">
+          <div>
+            <h2 class="panel-title">Coins</h2>
+            <p class="panel-sub" data-sub>Star coins on the <a href="./tokens.html">Tokens</a> page or add one here.</p>
+          </div>
+          <div class="table-tools page-tools">
+            <div class="add-coin" data-add>
+              <label class="search"><span class="sr-only">Add a coin by ticker or name</span><input type="search" placeholder="Add a coin: ticker or name" data-add-input autocomplete="off" aria-controls="add-matches" aria-expanded="false"></label>
+              <ul class="add-matches" id="add-matches" role="listbox" data-add-matches hidden></ul>
+            </div>
+            <button class="btn btn-ghost btn-sm" type="button" data-share title="Copy a link that carries this list to another device">Copy link to this list</button>
+            <button class="btn btn-ghost btn-sm" type="button" data-clear hidden>Clear list</button>
+          </div>
+        </header>
+        <div class="table-wrap">
+          <table class="coin-table">
+            <thead><tr>
+              <th scope="col" class="star-col"><span class="sr-only">Watchlist</span></th>
+              <th scope="col">Coin</th>
+              <th scope="col" class="num"><button data-sort="price" class="sort">Price</button></th>
+              <th scope="col" class="num"><button data-sort="ch" class="sort">Change</button></th>
+              <th scope="col" class="num"><button data-sort="v" class="sort is-on">Volume</button></th>
+              <th scope="col" class="num hide-sm"><button data-sort="n" class="sort">Trades</button></th>
+              <th scope="col" class="num split-col"><button data-sort="net" class="sort">Net flow</button></th>
+              <th scope="col" class="num hide-sm"><button data-sort="mc" class="sort">Mkt cap</button></th>
+              <th scope="col" class="hide-sm"><button data-sort="prog" class="sort">Curve</button></th>
+              <th scope="col" class="num"><button data-sort="al" class="sort">Alerts</button></th>
+              <th scope="col" class="hide-sm"><span class="sr-only">Tools</span></th>
+            </tr></thead>
+            <tbody data-rows></tbody>
+          </table>
+        </div>
+        <div data-empty hidden></div>
+      </article>
+
+      <article class="panel">
+        <header class="panel-head panel-head-wrap">
+          <div style="flex:1 1 16rem">
+            <h2 class="panel-title">Alerts on your coins</h2>
+            <p class="panel-sub">Everything Gator Eyes flagged on a starred coin, newest first, from the recent alerts the feed keeps.</p>
+          </div>
+          <a class="btn btn-ghost btn-sm" href="./followup.html" data-fu-link>Follow-up on these</a>
+        </header>
+        <div class="alert-list" data-alerts aria-live="polite"></div>
+      </article>
+
+      <p class="dash-foot" data-foot>Prices are in ADA from the last trade the gator saw. Change compares the price now with the price at the start of the window (24h uses Solada's own figure). Net flow is ADA bought minus ADA sold. The list stays on this device; use "Copy link to this list" to carry it to your phone or another computer. <span class="updated" data-updated></span> Not financial advice.</p>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>Gator Eyes is free and will never charge for access. It's an automated tracker for <a data-link="join" href="#">Solada</a> and Snek.fun. Alerts are not financial advice. $GAEY is the Gator Eyes team's token. Links to Solada include our referral code (6pxznt5n), which may earn the team referral rewards at no extra cost to you. <a href="./about.html#disclosures">Disclosures</a>.</p>
+      <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./tokens.html">Tokens</a><a href="./tools.html">Tools</a></nav>
+    </div>
+  </footer>
+  <script type="module" src="./assets/js/watch.js?v=20261031w"></script>
+</body>
+</html>

@@ -1,20 +1,24 @@
 // Tokens table: every coin on Solada.fun with windowed volume, net flow,
 // price change, graduation progress and each coin's Gator Eyes alerts.
-import { getApi, price, pct, signed, hours, age } from "./api.js?v=20261031s";
-import { coinUrl, fetchFeed } from "./data.js?v=20261031s";
-import { esc, fmt, compact, usdcx, timeAgo } from "./ui.js?v=20261031s";
+import { getApi } from "./api.js?v=20261031s";
+import { fetchFeed } from "./data.js?v=20261031s";
+import { timeAgo } from "./ui.js?v=20261031s";
 import { wireLinks, liveStatus } from "./common.js?v=20261031s";
 import * as platform from "./platform.js?v=20261031t";
-import { pill } from "./platform.js?v=20261031t";
+import * as watchlist from "./watchlist.js?v=20261031w";
+import { coinRow } from "./coinrow.js?v=20261031w";
 
 wireLinks();
 platform.mount();
+watchlist.wire();
+watchlist.on(() => { if (st.f === "watch") render(); });
 platform.on(() => { st.all = false; render(); });
 const $ = (s) => document.querySelector(s);
 const rowsEl = $("[data-rows]"), moreBtn = $("[data-more]"), notice = $("[data-notice]");
-const AL = { big: ["Whale", "var(--color-amber)"], spike: ["Spike", "var(--color-spike)"], launch: ["Fast launch", "var(--color-launch)"], dev: ["Creator sell", "var(--color-sell)"] };
 const params = new URLSearchParams(location.search);
-const st = { win: params.get("w") || "h24", sort: "v", dir: -1, f: "all", q: (params.get("q") || "").trim(), quiet: false, all: false, data: null };
+const FILTERS = ["all", "curve", "grad", "alerts", "watch"];
+const st = { win: params.get("w") || "h24", sort: "v", dir: -1, f: FILTERS.includes(params.get("f")) ? params.get("f") : "all", q: (params.get("q") || "").trim(), quiet: false, all: false, data: null };
+document.querySelectorAll("[data-f]").forEach((x) => x.classList.toggle("is-on", x.dataset.f === st.f));
 if (st.q) $("[data-search]").value = st.q;
 
 function val(c, k) {
@@ -32,51 +36,6 @@ function val(c, k) {
   return 0;
 }
 
-function curveCell(c) {
-  if (c.src === "snek") {
-    if (c.cs === "graduated") return `<span class="prog is-done lp-snek"><i style="--p:100%"></i></span><span class="cell-sub">Splash pool</span>`;
-    if (c.cs === "open" && c.prog != null) {
-      const p = Math.min(100, (c.prog || 0) / 100);
-      return `<span class="prog lp-snek" title="${p.toFixed(1)}% of the way to graduating"><i style="--p:${p}%"></i></span><span class="cell-sub">${p.toFixed(0)}% · Snek.fun curve</span>`;
-    }
-    return `<span class="cell-sub">Snek.fun curve</span>`;
-  }
-  if (c.cs === "open") {
-    const p = Math.min(100, (c.prog || 0) / 100);
-    const eta = c.pace && c.pace.etaH != null ? hours(c.pace.etaH) + " to go" : "not moving closer";
-    return `<span class="prog" title="${p.toFixed(1)}% of the way to graduating"><i style="--p:${p}%"></i></span><span class="cell-sub">${p.toFixed(0)}% · ${esc(eta)}</span>`;
-  }
-  if (c.cs === "graduated") return `<span class="prog is-done"><i style="--p:100%"></i></span><span class="cell-sub">Graduated</span>`;
-  if (c.kind === "pump") return `<span class="cell-sub">Pump.fun</span>`;
-  if (c.id === "SOLADA") return `<span class="cell-sub">Minswap</span>`;
-  return `<span class="cell-sub">–</span>`;
-}
-
-function alertsCell(c) {
-  const al = c.al || {};
-  const bits = Object.entries(AL).filter(([k]) => al[k]).map(([k, [label, color]]) => `<a class="al-dot" style="--k:${color}" href="./followup.html?coin=${encodeURIComponent(c.tk || c.id)}" title="${al[k]} ${label} alert${al[k] > 1 ? "s" : ""} in the last 24 hours">${al[k]}</a>`);
-  return bits.length ? `<span class="al-dots">${bits.join("")}</span>` : `<span class="cell-sub">–</span>`;
-}
-
-function row(c) {
-  const w = c.w[st.win] || { v: 0, n: 0, b: 0, s: 0, net: 0, wal: 0, ch: null };
-  const tot = (w.b || 0) + (w.s || 0);
-  const bp = tot ? Math.round((w.b / tot) * 100) : 50;
-  const img = c.img ? `<img src="${esc(c.img)}" alt="" loading="lazy" width="28" height="28">` : `<span class="coin-dot"></span>`;
-  return `<tr>
-    <td><div class="coin-cell">${img}<div><a href="${esc(coinUrl(c.id))}" target="_blank" rel="noopener">${esc(c.tk || "?")}</a>${platform.get() === "all" && c.src === "snek" ? pill("snek") : ""}<span class="cell-sub">${esc((c.name || "").slice(0, 22))}${c.born ? " · " + esc(age(c.born)) : ""}</span></div></div></td>
-    <td class="num">${price(c.price)}</td>
-    <td class="num ${w.ch > 0 ? "pos" : w.ch < 0 ? "neg" : ""}">${pct(w.ch)}</td>
-    <td class="num">${fmt(w.v)}<span class="cell-sub">${esc(usdcx(w.v, st.data.adaUsd))}</span></td>
-    <td class="num hide-sm">${fmt(w.n)}<span class="cell-sub">${fmt(w.wal)} wallets</span></td>
-    <td class="num split-col"><span class="${w.net > 0 ? "pos" : w.net < 0 ? "neg" : ""}">${signed(w.net)}</span><span class="rowsplit" title="${fmt(w.b)} ADA bought, ${fmt(w.s)} ADA sold"><span class="split-buy" style="width:${bp}%"></span></span></td>
-    <td class="num hide-sm">${compact(c.mc)}</td>
-    <td class="hide-sm curve-cell">${curveCell(c)}</td>
-    <td class="num">${alertsCell(c)}</td>
-    <td class="hide-sm">${c.src === "snek" ? `<a class="icon-btn" href="${esc(coinUrl(c.id))}" target="_blank" rel="noopener" title="Open ${esc(c.tk || "")} on Snek.fun">Snek.fun</a>` : `<a class="icon-btn" href="./coincard.html?coin=${encodeURIComponent(c.id)}" title="Make a share card for ${esc(c.tk || "")}">Card</a>`}</td>
-  </tr>`;
-}
-
 function render() {
   if (!st.data) return;
   const q = st.q.toLowerCase();
@@ -86,15 +45,22 @@ function render() {
     if (st.f === "curve" && c.cs !== "open") return false;
     if (st.f === "grad" && c.cs !== "graduated") return false;
     if (st.f === "alerts" && !Object.keys(c.al || {}).length) return false;
+    if (st.f === "watch") return watchlist.has(c.id);
     if (!st.quiet && !q && !(c.w[st.win] && c.w[st.win].n)) return false;
     return true;
   });
   list.sort((a, b) => (val(a, st.sort) - val(b, st.sort)) * st.dir || (val(b, "v") - val(a, "v")));
   const shown = st.all ? list : list.slice(0, 50);
   const lp = platform.get();
-  const emptyMsg = st.win === "live" ? "No trades in the last 15 minutes." : lp === "all" ? "No coins match." : `No ${platform.label(lp)} coins match.`;
-  const emptyHint = lp === "all" ? "Try a longer window or include quiet coins." : `Try a longer window, include quiet coins, or <button type="button" class="link" data-platform="all">show all launchpads</button>.`;
-  rowsEl.innerHTML = shown.length ? shown.map(row).join("") : `<tr><td colspan="10"><div class="empty"><p>${emptyMsg} ${emptyHint}</p></div></td></tr>`;
+  let emptyMsg = st.win === "live" ? "No trades in the last 15 minutes." : lp === "all" ? "No coins match." : `No ${platform.label(lp)} coins match.`;
+  let emptyHint = lp === "all" ? "Try a longer window or include quiet coins." : `Try a longer window, include quiet coins, or <button type="button" class="link" data-platform="all">show all launchpads</button>.`;
+  if (st.f === "watch") {
+    const n = watchlist.count();
+    emptyMsg = n ? (lp === "all" ? "None of your starred coins are in the live list right now." : `None of your starred coins are on ${platform.label(lp)}.`) : "You haven't starred any coins yet.";
+    emptyHint = n ? `See them all on your <a href="./watchlist.html">Watchlist</a>.` : "Tap the star next to a coin to save it in this browser. No sign-up, no wallet.";
+  }
+  rowsEl.innerHTML = shown.length ? shown.map((c) => coinRow(c, { win: st.win, rate: st.data.adaUsd, showPill: platform.get() === "all" })).join("") : `<tr><td colspan="11"><div class="empty"><p>${emptyMsg} ${emptyHint}</p></div></td></tr>`;
+  watchlist.wire();
   moreBtn.hidden = st.all || list.length <= 50;
   moreBtn.textContent = `Show all ${list.length} coins`;
   $("[data-updated]").textContent = st.data.updatedAt ? "Updated " + timeAgo(Date.parse(st.data.updatedAt)) + "." : "";
@@ -122,7 +88,7 @@ $("[data-search]").addEventListener("input", (e) => { st.q = e.target.value.trim
 $("[data-quiet]").addEventListener("change", (e) => { st.quiet = e.target.checked; render(); });
 moreBtn.addEventListener("click", () => { st.all = true; render(); });
 
-rowsEl.innerHTML = Array.from({ length: 8 }, () => `<tr><td colspan="10"><div class="skel-block" style="min-height:36px"></div></td></tr>`).join("");
+rowsEl.innerHTML = Array.from({ length: 8 }, () => `<tr><td colspan="11"><div class="skel-block" style="min-height:36px"></div></td></tr>`).join("");
 
 // Which launchpads the worker watches, read once from the feed so the status line is right even on a quiet Snek.fun day.
 let srcCache = null;
