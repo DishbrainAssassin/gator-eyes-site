@@ -1,8 +1,8 @@
 // How it works page. Alert rules are read from the live feed so this page
 // always matches what the bot is actually doing.
-import { subscribe, RULES_DEFAULT } from "./data.js?v=20261030m";
-import { wireLinks, liveStatus } from "./common.js?v=20261030m";
-import { esc, fmt } from "./ui.js?v=20261030m";
+import { subscribe, RULES_DEFAULT } from "./data.js?v=20261031s";
+import { wireLinks, liveStatus } from "./common.js?v=20261031s";
+import { esc, fmt } from "./ui.js?v=20261031s";
 
 wireLinks();
 
@@ -15,6 +15,7 @@ function renderRules(r) {
     ["k-spike", "Volume spike", `At least ${fmt(r.spikeMinAda)} ADA traded in ${fmt(r.spikeWindowMin)} minutes, at ${fmt(r.spikeMult)} times or more the coin's normal pace, from two or more wallets. One per coin per hour.`, "#whale-alerts"],
     ["k-dev", "Creator sell", `The wallet that created a coin sells ${fmt(r.creatorMinAda)} ADA or more. Posted for transparency. Creators sell for lots of reasons.`, "#creator-sells"],
     ["k-launch", "Fast launch", `A new coin pulls in ${fmt(r.launchMinAda)} ADA of buys from ${fmt(r.launchMinBuyers)} or more wallets within its first ${fmt(r.launchWindowMin)} minutes.`, "#fast-launch"],
+    ["k-whale", "Snek.fun whale trade", `On Snek.fun, any single trade of ${fmt((r.snek && r.snek.bigAda) || 1000)} ADA or more on the curve, or a trade worth at least ${fmt(r.mcapPct)}% of a coin's market cap. Snek.fun alerts post to their own channel.`, "#snek-alerts"],
     ["k-tracks", "Gator Tracks", `Yesterday's recap at ${hour(r.recapHourET)} Eastern: volume, net flow, busiest hour, top venue, most traded coins, and where the money went.`, "#gator-tracks"],
     ["k-gaey", "$GAEY trades", "Every buy and sell of $GAEY, the team's own token, in its own channel so it never crowds the others.", "#gaey-trades"],
   ];

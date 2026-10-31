@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
   <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/css/style.css?v=20261030d">
+  <link rel="stylesheet" href="./assets/css/style.css?v=20261031s">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -77,7 +77,7 @@
       <div class="wrap">
         <h2 id="steps-title" class="section-title">Three steps, every two minutes</h2>
         <ol class="steps" role="list">
-          <li><span class="step-n">1</span><h3>Read</h3><p>Pull the latest trades from Solada's public data: the Solada curve, Minswap, Splash and Pump.fun.</p></li>
+          <li><span class="step-n">1</span><h3>Read</h3><p>Pull the latest trades from Solada's public data (the Solada curve, Minswap, Splash and Pump.fun) and from Snek.fun's public data (its curve and graduated Splash pools).</p></li>
           <li><span class="step-n">2</span><h3>Tally</h3><p>Add each trade to the day's totals by coin, by hour and by venue. Days run midnight to midnight Eastern.</p></li>
           <li><span class="step-n">3</span><h3>Post</h3><p>Send anything that crosses a rule below to Discord and X, update the <a href="./flows.html">flows dashboard</a>, and post Gator Tracks each morning.</p></li>
         </ol>
@@ -94,13 +94,28 @@
       </div>
     </section>
 
+    <section class="section section-tight" id="snek" aria-labelledby="snek-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="snek-title" class="section-title">Snek.fun coverage</h2>
+          <p class="section-meta">Added October 2026</p>
+        </div>
+        <dl class="facts">
+          <div class="fact"><dt>What's covered</dt><dd>Trades on the Snek.fun bonding curve and in the Splash pools coins graduate into. They show up in alerts, the <a href="./flows.html">flows dashboard</a>, the <a href="./tokens.html">tokens table</a> and Gator Tracks, tagged <span class="lp-pill lp-snek"><i></i>Snek.fun</span>.</dd></div>
+          <div class="fact"><dt>Whale line</dt><dd>A Snek.fun trade is a whale trade at 1,000 ADA or more, or when it moves a large share of a small coin's market cap. The Solada rules are unchanged.</dd></div>
+          <div class="fact"><dt>Pick a launchpad</dt><dd>The launchpad bar under the menu narrows every page to Solada or Snek.fun. "All" shows both together, with a "By launchpad" split in Gator Tracks and on the flows dashboard.</dd></div>
+          <div class="fact"><dt>No referral</dt><dd>Snek.fun links carry no referral code. Gator Eyes earns nothing from Snek.fun trades.</dd></div>
+        </dl>
+      </div>
+    </section>
+
     <section class="section section-tight" aria-labelledby="not-title">
       <div class="wrap">
         <h2 id="not-title" class="section-title">What Gator Eyes doesn't do</h2>
         <ul class="not-list" role="list">
           <li><h3>No safety ratings</h3><p>Gator Eyes doesn't score coins, label rugs or call anything safe. It reports what traded.</p></li>
           <li><h3>No wallet tracking</h3><p>It doesn't follow, rank or name wallets. Wallet addresses in alerts link to the public transaction, nothing more.</p></li>
-          <li><h3>No trading</h3><p>No swaps, no copy trading, no wallet connection. Every trade link opens Solada itself.</p></li>
+          <li><h3>No trading</h3><p>No swaps, no copy trading, no wallet connection. Every trade link opens Solada or Snek.fun itself.</p></li>
           <li><h3>No calls</h3><p>No "gem", "moon" or "buy now". Alerts describe what happened, not what to do next.</p></li>
         </ul>
         <p class="aside-note">Want a safety check before you buy? That's a different job, and there are tools built for it, like <a href="https://suriradar.fun/" target="_blank" rel="noopener">Suri Radar</a>.</p>
@@ -143,8 +158,8 @@
         <h2 id="disc-title" class="section-title">Disclosures</h2>
         <dl class="facts disc">
           <div class="fact"><dt>$GAEY</dt><dd>$GAEY is the Gator Eyes team's own token. It gets its own trade channel and follows the same alert rules as every other coin.</dd></div>
-          <div class="fact"><dt>Referral code</dt><dd>Solada links from Gator Eyes include our referral code, 6pxznt5n. It may earn the team referral rewards and costs you nothing extra.</dd></div>
-          <div class="fact"><dt>Automated</dt><dd>Alerts are posted by a bot. If Solada is down or updating, alerts pause and the site says so.</dd></div>
+          <div class="fact"><dt>Referral code</dt><dd>Solada links from Gator Eyes include our referral code, 6pxznt5n. It may earn the team referral rewards and costs you nothing extra. Snek.fun links have no referral code.</dd></div>
+          <div class="fact"><dt>Automated</dt><dd>Alerts are posted by a bot. If Solada or Snek.fun is down or updating, alerts for that launchpad pause and the site says so.</dd></div>
           <div class="fact"><dt>Not advice</dt><dd>Nothing here is financial advice. Big trades and spikes happen for many reasons.</dd></div>
         </dl>
       </div>
@@ -163,10 +178,10 @@
 
   <footer class="site-footer">
     <div class="wrap footer-inner">
-      <p>Gator Eyes is free and will never charge for access. It's an automated tracker for <a data-link="join" href="#">Solada</a>. Alerts are not financial advice. $GAEY is the Gator Eyes team's token. Links to Solada include our referral code (6pxznt5n), which may earn the team referral rewards at no extra cost to you. <a href="./about.html#disclosures">Disclosures</a>.</p>
+      <p>Gator Eyes is free and will never charge for access. It's an automated tracker for <a data-link="join" href="#">Solada</a> and Snek.fun. Alerts are not financial advice. $GAEY is the Gator Eyes team's token. Links to Solada include our referral code (6pxznt5n), which may earn the team referral rewards at no extra cost to you. <a href="./about.html#disclosures">Disclosures</a>.</p>
       <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./flows.html">Flows</a><a href="./card.html">Flow card</a></nav>
     </div>
   </footer>
-  <script type="module" src="./assets/js/about.js?v=20261030m"></script>
+  <script type="module" src="./assets/js/about.js?v=20261031s"></script>
 </body>
 </html>

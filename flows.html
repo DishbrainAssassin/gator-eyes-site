@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Gator Eyes | Solada flows dashboard</title>
-  <meta name="description" content="Where the money is moving on Solada.fun: volume by hour, buys and sells for every coin, venues, and live whale alerts.">
+  <title>Gator Eyes | Launchpad flows dashboard</title>
+  <meta name="description" content="Where the money is moving on Solada.fun and Snek.fun: volume by hour, buys and sells for every coin, venues, and live whale alerts.">
   <meta property="og:title" content="Gator Eyes | Lurking so you don't have to">
   <meta property="og:description" content="Free, live tracker for Solada.fun: whale buys, volume spikes, new launches, money flows and holder checks. No sign-up, no wallet. Just ask Quagmire the gator.">
   <meta property="og:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
   <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/css/style.css?v=20261030d">
+  <link rel="stylesheet" href="./assets/css/style.css?v=20261031s">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -50,6 +50,7 @@
       <a class="btn btn-sm btn-amber" data-link="discord" href="#">Join Discord</a>
     </div>
   </header>
+  <div data-platform-bar></div>
 
   <main id="main" class="dash">
     <section class="dash-top" aria-labelledby="dash-title">
@@ -57,8 +58,8 @@
         <div class="dash-head">
           <div>
             <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching Solada</span></p>
-            <h1 id="dash-title">Solada flows</h1>
-            <p class="dash-lede">Where the money is moving on Solada today. Every trade the gator sees, tallied by coin, hour and venue. Days run midnight to midnight Eastern.</p>
+            <h1 id="dash-title">Launchpad flows</h1>
+            <p class="dash-lede">Where the money is moving on Solada.fun and Snek.fun today. Every trade the gator sees, tallied by coin, hour and venue. Days run midnight to midnight Eastern.</p>
           </div>
           <div class="tabs" role="tablist" aria-label="Choose a day" data-days></div>
         </div>
@@ -69,6 +70,7 @@
     <section class="wrap dash-body" aria-label="Dashboard">
       <div class="kpis kpis-dash" data-kpis></div>
       <p class="rate-note" data-rate></p>
+      <div class="lp-split-host" data-lp-split></div>
 
       <div class="dash-grid">
         <article class="panel panel-wide">
@@ -131,16 +133,16 @@
           <div><h3 class="sub">Money out</h3><div data-lead-out></div></div>
         </div>
       </article>
-      <p class="dash-foot">Volume counts every buy and sell the gator saw on Solada's curve, Minswap, Splash and Pump.fun. Net flow is ADA bought minus ADA sold. USDCx values use Solada's ADA price. Want a card to share? <a href="./card.html">Make a daily flow card</a>. Not financial advice.</p>
+      <p class="dash-foot">Volume counts every buy and sell the gator saw on Solada's curve, Minswap, Splash and Pump.fun, plus Snek.fun's curve and its Splash pools. Net flow is ADA bought minus ADA sold. USDCx values use Solada's ADA price. Want a card to share? <a href="./card.html">Make a daily flow card</a>. Not financial advice.</p>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="wrap footer-inner">
-      <p>Gator Eyes is free and will never charge for access. It's an automated tracker for <a data-link="join" href="#">Solada</a>. Alerts are not financial advice. $GAEY is the Gator Eyes team's token. Links to Solada include our referral code (6pxznt5n), which may earn the team referral rewards at no extra cost to you. <a href="./about.html#disclosures">Disclosures</a>.</p>
+      <p>Gator Eyes is free and will never charge for access. It's an automated tracker for <a data-link="join" href="#">Solada</a> and Snek.fun. Alerts are not financial advice. $GAEY is the Gator Eyes team's token. Links to Solada include our referral code (6pxznt5n), which may earn the team referral rewards at no extra cost to you. <a href="./about.html#disclosures">Disclosures</a>.</p>
       <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./card.html">Flow card</a></nav>
     </div>
   </footer>
-  <script type="module" src="./assets/js/flows.js?v=20261030m"></script>
+  <script type="module" src="./assets/js/flows.js?v=20261031s"></script>
 </body>
 </html>

@@ -1,9 +1,16 @@
 // Flows dashboard. Reads the same feed as the home page through data.js.
-import { subscribe, coinUrl } from "./data.js?v=20261030m";
-import { alertCard, emptyState, skeleton, dayLabel, fmt, usdcx, usdcxSigned, rateNote, compact, clock, timeAgo, esc } from "./ui.js?v=20261030m";
-import { wireLinks, liveStatus } from "./common.js?v=20261030m";
+import { subscribe, coinUrl } from "./data.js?v=20261031s";
+import { alertCard, emptyState, skeleton, dayLabel, fmt, usdcx, usdcxSigned, rateNote, compact, clock, timeAgo, esc, mergeDays, lpSplit } from "./ui.js?v=20261031s";
+import { wireLinks, liveStatus } from "./common.js?v=20261031s";
+import * as platform from "./platform.js?v=20261031s";
+import { pill } from "./platform.js?v=20261031s";
 
 wireLinks();
+platform.mount();
+platform.on(() => {
+  showAll = false;
+  render();
+});
 
 const $ = (s) => document.querySelector(s);
 const el = {
@@ -23,9 +30,10 @@ const el = {
   leadOut: $("[data-lead-out]"),
   leadMeta: $("[data-lead-meta]"),
   rate: $("[data-rate]"),
+  split: $("[data-lp-split]"),
 };
 
-const VENUES = { curve: "Solada curve", minswap: "Minswap", splash: "Splash", pump: "Pump.fun", other: "Other" };
+const VENUES = { curve: "Solada curve", minswap: "Minswap", splash: "Splash", pump: "Pump.fun", other: "Other", "snek-curve": "Snek.fun curve", "snek-splash": "Snek.fun splash" };
 const STALE_MS = 15 * 60000;
 
 let feed = null;
@@ -43,12 +51,31 @@ const coinImg = (k, size = 28) =>
   `<span class="coin-img coin-ph" aria-hidden="true">${esc((k.tk || "?").slice(0, 1))}${
     k.img ? `<img src="${esc(k.img)}" alt="" width="${size}" height="${size}" loading="lazy" onerror="this.remove()">` : ""
   }</span>`;
-const coinLink = (k) => `<a class="coin" href="${esc(coinUrl(k.id))}" target="_blank" rel="noopener">${coinImg(k)}<span>$${esc(k.tk)}</span></a>`;
+const coinLink = (k) => `<a class="coin" href="${esc(coinUrl(k.id))}" target="_blank" rel="noopener">${coinImg(k)}<span>$${esc(k.tk)}</span></a>${k.lp && platform.get() === "all" ? pill(k.lp) : ""}`;
 
+const dayName = (key) => dayLabel(key).slice(0, 3) + " " + key.slice(5).replace("-", "/");
+
+/** Day tabs for the chosen launchpad. "All" folds Solada and Snek.fun into one tally per day. */
 function dayOptions() {
+  const scope = platform.get();
+  const sol = { today: feed.today, recaps: feed.recaps || [] };
+  const snek = feed.snek || { today: null, recaps: [] };
   const opts = [];
-  if (feed.today && feed.today.trades) opts.push({ id: "today", label: "Today", d: feed.today, live: true });
-  for (const r of feed.recaps) opts.push({ id: r.key, label: dayLabel(r.key).slice(0, 3) + " " + r.key.slice(5).replace("-", "/"), d: r });
+  if (scope !== "all") {
+    const src = scope === "snek" ? snek : sol;
+    if (src.today && src.today.trades) opts.push({ id: "today", label: "Today", d: src.today, live: true });
+    for (const r of src.recaps) if (r.trades) opts.push({ id: r.key, label: dayName(r.key), d: r });
+    return opts;
+  }
+  const today = mergeDays(sol.today, snek.today);
+  if (today) opts.push({ id: "today", label: "Today", d: today, live: true, parts: { solada: sol.today, snek: snek.today } });
+  const keys = [...new Set([...sol.recaps.map((r) => r.key), ...snek.recaps.map((r) => r.key)])].sort().reverse();
+  for (const key of keys) {
+    const a = sol.recaps.find((r) => r.key === key);
+    const b = snek.recaps.find((r) => r.key === key);
+    const d = mergeDays(a, b);
+    if (d) opts.push({ id: key, label: dayName(key), d, parts: { solada: a, snek: b } });
+  }
   return opts;
 }
 
@@ -91,7 +118,7 @@ function renderKpis(d, rate) {
     k("Net flow", signed(net) + " ADA", [usdcxSigned(net, rate), `${buyPct}% buys`].filter(Boolean).join(" · "), net >= 0 ? "pos" : "neg"),
     k("Trades", fmt(d.trades), d.trades && d.volAda ? `avg ${fmt(d.volAda / d.trades)} ADA` : ""),
     k("Wallets", fmt(d.wallets), "traded at least once"),
-    k("Biggest trade", d.big ? compact(d.big.ada) + " ADA" : "–", d.big ? `${esc(d.big.side)} <a href="${esc(coinUrl(d.big.id))}" target="_blank" rel="noopener">$${esc(d.big.tk)}</a>${rate ? " · " + usdcx(d.big.ada, rate) : ""}` : ""),
+    k("Biggest trade", d.big ? compact(d.big.ada) + " ADA" : "–", d.big ? `${esc(d.big.side)} <a href="${esc(coinUrl(d.big.id))}" target="_blank" rel="noopener">$${esc(d.big.tk)}</a>${d.big.lp && platform.get() === "all" ? pill(d.big.lp) : ""}${rate ? " · " + usdcx(d.big.ada, rate) : ""}` : ""),
     k("Creator sells", fmt(d.dev ? d.dev.n : 0), d.dev ? fmt(d.dev.ada) + " ADA" + (d.dev.ada && rate ? " · " + usdcx(d.dev.ada, rate) : "") : ""),
   ].join("");
   el.rate.textContent = rateNote(rate);
@@ -246,7 +273,7 @@ function renderLeaders(opts) {
   const sum = {};
   for (const o of days)
     for (const k of o.d.coins) {
-      const s = (sum[k.id] ||= { id: k.id, tk: k.tk, img: k.img, net: 0, v: 0 });
+      const s = (sum[k.id] ||= { id: k.id, tk: k.tk, img: k.img, lp: k.lp, net: 0, v: 0 });
       s.net += k.net;
       s.v += k.v;
       if (!s.img && k.img) s.img = k.img;
@@ -258,8 +285,11 @@ function renderLeaders(opts) {
 }
 
 function renderAlerts() {
-  const list = feed.alerts.slice(0, 6);
-  el.alerts.innerHTML = list.length ? list.map(alertCard).join("") : emptyState("Quiet water. No alerts in the last few hours.");
+  const lp = platform.get();
+  const list = feed.alerts.filter(platform.inScope).slice(0, 6);
+  el.alerts.innerHTML = list.length
+    ? list.map(alertCard).join("")
+    : emptyState(lp === "all" ? "Quiet water. No alerts in the last few hours." : `No ${platform.label(lp)} alerts in the last few hours. <button type="button" class="link" data-platform="all">Show all launchpads</button>`);
 }
 
 const body = document.querySelector(".dash-body");
@@ -269,16 +299,20 @@ function render() {
   if (!feed) return;
   const opts = dayOptions();
   renderAlerts();
+  if (el.split) el.split.innerHTML = "";
   if (!opts.length) {
     el.days.innerHTML = "";
     el.kpis.innerHTML = "";
-    for (const t of [el.hours, el.venues, el.inflow, el.outflow, el.week]) t.innerHTML = emptyState("Counting starts with the first trade of the day.");
+    const lp = platform.get();
+    const msg = lp === "all" ? "Counting starts with the first trade of the day." : `No ${platform.label(lp)} trades counted yet today. <button type="button" class="link" data-platform="all">Show all launchpads</button>`;
+    for (const t of [el.hours, el.venues, el.inflow, el.outflow, el.week]) t.innerHTML = emptyState(msg);
     el.coins.innerHTML = "";
     return;
   }
   renderDays(opts);
   const cur = opts.find((o) => o.id === day);
   renderKpis(cur.d, feed.rate);
+  if (el.split) el.split.innerHTML = lpSplit(cur.parts, feed.rate, platform.get());
   renderHours(cur.d, !!cur.live);
   renderVenues(cur.d);
   renderFlows(cur.d);

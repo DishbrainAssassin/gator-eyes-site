@@ -1,6 +1,6 @@
 // Worker API for the tools pages (tokens, race, follow-up, holders, coin cards).
 // ?api=<url> points a page at another copy of the worker for testing.
-import { CONFIG } from "./config.js?v=20261030m";
+import { CONFIG } from "./config.js?v=20261031s";
 
 export const API = (new URLSearchParams(location.search).get("api") || CONFIG.feedUrl.replace(/\/feed$/, "")).replace(/\/$/, "");
 
