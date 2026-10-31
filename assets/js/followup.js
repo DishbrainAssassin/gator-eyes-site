@@ -1,10 +1,16 @@
 // Alert follow-up: what each alert's coin did 1 hour and 24 hours later.
 import { getApi, price, pct } from "./api.js?v=20261031s";
-import { coinUrl } from "./data.js?v=20261031s";
+import { coinUrl, isSnek, fetchFeed } from "./data.js?v=20261031s";
 import { esc, fmt, timeAgo } from "./ui.js?v=20261031s";
 import { wireLinks, liveStatus } from "./common.js?v=20261031s";
+import * as platform from "./platform.js?v=20261031t";
+import { pill } from "./platform.js?v=20261031t";
 
 wireLinks();
+platform.mount();
+platform.on(() => { st.more = false; render(); });
+// Alert rows carry no src field; the launchpad comes from the coin id (snek:… is Snek.fun).
+const scoped = (a) => platform.inScope({ src: isSnek(a.id) ? "snek" : "solada" });
 const $ = (s) => document.querySelector(s);
 const TYPES = {
   bigbuy: { label: "Whale buy", color: "var(--color-buy)", test: (a) => a.kind === "big" && a.side === "buy" },
@@ -33,7 +39,7 @@ function later(a, key, ms) {
 }
 
 function summary() {
-  const base = st.list.filter(inPeriod);
+  const base = st.list.filter((a) => inPeriod(a) && scoped(a));
   $("[data-sum]").innerHTML = Object.entries(TYPES).map(([k, t]) => {
     const xs = base.filter((a) => typeOf(a) === k);
     const one = xs.filter((a) => a.p1 != null).map((a) => chg(a.p0, a.p1));
@@ -56,21 +62,22 @@ function summary() {
 function render() {
   summary();
   const q = st.q.toLowerCase();
-  const list = st.list.filter((a) => inPeriod(a) && (!st.k || typeOf(a) === st.k) && (!q || (a.tk || "").toLowerCase().includes(q) || a.id.toLowerCase() === q)).sort((a, b) => b.at - a.at);
+  const list = st.list.filter((a) => inPeriod(a) && scoped(a) && (!st.k || typeOf(a) === st.k) && (!q || (a.tk || "").toLowerCase().includes(q) || a.id.toLowerCase() === q)).sort((a, b) => b.at - a.at);
+  const lp = platform.get();
   const shown = st.more ? list : list.slice(0, 100);
   $("[data-rows]").innerHTML = shown.length ? shown.map((a) => {
     const t = TYPES[typeOf(a)] || { label: a.kind, color: "var(--color-text-muted)" };
     const im = st.imgs[a.id] ? `<img src="${esc(st.imgs[a.id])}" alt="" loading="lazy" width="28" height="28">` : `<span class="coin-dot"></span>`;
     return `<tr>
       <td><span class="cell-sub" style="font-size:var(--text-xs)">${esc(when(a.at))}</span></td>
-      <td><div class="coin-cell">${im}<a href="${esc(coinUrl(a.id))}" target="_blank" rel="noopener">${esc(a.tk || "?")}</a></div></td>
+      <td><div class="coin-cell">${im}<a href="${esc(coinUrl(a.id))}" target="_blank" rel="noopener">${esc(a.tk || "?")}</a>${lp === "all" && isSnek(a.id) ? pill("snek") : ""}</div></td>
       <td><span class="badge-k" style="--k:${t.color}">${esc(t.label)}</span></td>
       <td class="num hide-sm">${a.ada != null ? fmt(a.ada) + " ADA" : "–"}</td>
       <td class="num hide-sm">${price(a.p0)}</td>
       <td class="num">${later(a, "p1", 36e5)}</td>
       <td class="num">${later(a, "p24", 864e5)}</td>
     </tr>`;
-  }).join("") : `<tr><td colspan="7"><div class="empty"><p>No alerts match.</p></div></td></tr>`;
+  }).join("") : `<tr><td colspan="7"><div class="empty"><p>${lp === "all" ? "No alerts match." : `No ${esc(platform.label(lp))} alerts match.`}${lp === "all" ? "" : ` <button type="button" class="link" data-platform="all">Show all launchpads</button>`}</p></div></td></tr>`;
   $("[data-more]").hidden = st.more || list.length <= 100;
   $("[data-more]").textContent = `Show all ${list.length}`;
   $("[data-updated]").textContent = st.updatedAt ? "Updated " + timeAgo(st.updatedAt) + "." : "";
@@ -97,7 +104,8 @@ async function load() {
   try {
     const j = await getApi("/followup");
     rows = j.alerts || []; imgs = j.imgs || {}; at = j.updatedAt ? Date.parse(j.updatedAt) : null;
-    liveStatus({ updatedAt: new Date(at || Date.now()) });
+    let sources; try { sources = (await fetchFeed()).sources || undefined; } catch {}
+    liveStatus({ updatedAt: new Date(at || Date.now()), sources });
   } catch (e) { liveStatus(null, e); }
   if (!rows.length) {
     // Until the worker has its own copy, fall back to the saved history.

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Gator Eyes | Holder snapshot for Solada.fun coins</title>
-  <meta name="description" content="Free holder snapshot for any Solada.fun coin. Leaves out the curve, pools, locks, contracts and creator wallet, with minimum balance and held-since rules and a CSV download.">
+  <title>Gator Eyes | Holder snapshot for Solada.fun and Snek.fun coins</title>
+  <meta name="description" content="Free holder snapshot for any Solada.fun or Snek.fun coin. Leaves out the curve, pools, locks, contracts and creator wallet, with minimum balance and held-since rules and a CSV download.">
   <meta property="og:title" content="Gator Eyes | Lurking so you don't have to">
   <meta property="og:description" content="Free, live tracker for Solada.fun: whale buys, volume spikes, new launches, money flows and holder checks. No sign-up, no wallet. Just ask Quagmire the gator.">
   <meta property="og:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
@@ -50,6 +50,7 @@
       <a class="btn btn-sm btn-amber" data-link="discord" href="#">Join Discord</a>
     </div>
   </header>
+  <div data-platform-bar></div>
 
     <main id="main" class="dash">
     <section class="dash-top" aria-labelledby="dash-title">
@@ -58,7 +59,7 @@
           <div>
             <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching Solada</span></p>
             <h1 id="dash-title">Holder snapshot</h1>
-            <p class="dash-lede">Every holder of a Solada.fun coin on Cardano, ready for an airdrop list. Pick a coin, set your rules, then download a CSV. Free, no sign-up.</p>
+            <p class="dash-lede">Every holder of a Solada.fun or Snek.fun coin on Cardano, ready for an airdrop list. Pick a coin, set your rules, then download a CSV. Free, no sign-up.</p>
           </div>
           
         </div>
@@ -69,7 +70,7 @@
     <section class="wrap dash-body" aria-label="Holder snapshot">
       <article class="panel">
         <form class="coin-pick" data-pick>
-          <label class="field"><span>Coin: ticker, Solada coin link or coin ID</span><input name="coin" list="coin-list" placeholder="e.g. MEPE" autocomplete="off" required data-coin></label>
+          <label class="field"><span>Coin: ticker, Solada or Snek.fun coin link, or coin ID</span><input name="coin" list="coin-list" placeholder="e.g. MEPE" autocomplete="off" required data-coin></label>
           <datalist id="coin-list" data-list></datalist>
           <button class="btn btn-amber" type="submit" data-go>Load holders</button>
         </form>
@@ -78,7 +79,7 @@
         <header class="panel-head panel-head-wrap"><div class="snap-head" data-head></div><span class="updated" data-taken></span></header>
         <div class="form-grid">
           <div class="checks">
-            <label class="toggle"><input type="checkbox" data-r="curve" checked><span>Leave out the bonding curve and pools<small>Solada's curve and Minswap pool addresses</small></span></label>
+            <label class="toggle"><input type="checkbox" data-r="curve" checked><span>Leave out the bonding curve and pools<small>Solada's curve and Minswap pool addresses. Snek.fun contracts count as "other contracts" below</small></span></label>
             <label class="toggle"><input type="checkbox" data-r="locks" checked><span>Leave out locked tokens<small>Tokens sitting in a lock until a future date</small></span></label>
             <label class="toggle"><input type="checkbox" data-r="script" checked><span>Leave out other contracts<small>Script addresses such as DEX orders and vaults</small></span></label>
             <label class="toggle"><input type="checkbox" data-r="dev" checked><span>Leave out the creator wallet<small>The wallet that launched the coin</small></span></label>
@@ -90,9 +91,9 @@
             <label class="field"><span>Leave out these addresses (one per line)</span><textarea data-r="skip" placeholder="addr1… or stake1…"></textarea></label>
           </div>
           <div class="checks">
-            <label class="field"><span>Bought on Solada before (optional)</span><input type="date" data-r="before"></label>
+            <label class="field"><span>Bought on the launchpad before (optional)</span><input type="date" data-r="before"></label>
             <label class="field"><span>Hasn't sold since (optional)</span><input type="date" data-r="nosell"></label>
-            <p class="excl">Date rules read the coin's trade history on Solada, so they only see buys and sells made there, not wallet-to-wallet transfers. Times are midnight Eastern.</p>
+            <p class="excl">Date rules read the coin's trade history on its launchpad (Solada or Snek.fun), so they only see buys and sells made there, not wallet-to-wallet transfers. Times are midnight Eastern.</p>
           </div>
         </div>
       </article>
@@ -114,7 +115,7 @@
         <div class="list-foot"><button class="btn btn-ghost btn-sm" data-more hidden>Show all</button></div>
         <p class="excl" data-left></p>
       </article>
-      <p class="dash-foot">Holder balances come from the Cardano blockchain through Koios, with Solada's own labels for the curve, pools, locks and creator wallet. Solana-side balances of dual-chain coins aren't included.</p>
+      <p class="dash-foot">Holder balances come from the Cardano blockchain through Koios, with Solada's own labels for the curve, pools, locks and creator wallet. Snek.fun coins get the creator wallet from the pool data and no other labels. Solana-side balances of dual-chain coins aren't included.</p>
     </section>
   </main>
   <footer class="site-footer">
@@ -123,6 +124,6 @@
       <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./tokens.html">Tokens</a><a href="./tools.html">Tools</a></nav>
     </div>
   </footer>
-  <script type="module" src="./assets/js/holders.js?v=20261031s"></script>
+  <script type="module" src="./assets/js/holders.js?v=20261031u"></script>
 </body>
 </html>
