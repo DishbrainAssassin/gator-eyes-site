@@ -150,7 +150,7 @@ function draw() {
 
   ctx.fillStyle = C.line; ctx.fillRect(P, H - 70, W - 2 * P, 1);
   text("Lurking so you don't have to", P, H - 32, { font: `800 18px ${F.d}` });
-  text("gatoreyes.fun  ·  @GatorEyesSolada  ·  Not financial advice", W - P, H - 32, { font: `500 14px ${F.b}`, color: C.muted, align: "right" });
+  text("gatoreyes.fun  ·  @GatorEyesADA  ·  Not financial advice", W - P, H - 32, { font: `500 14px ${F.b}`, color: C.muted, align: "right" });
 }
 
 function caption() {
