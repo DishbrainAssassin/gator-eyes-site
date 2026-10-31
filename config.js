@@ -5,8 +5,8 @@ export const CONFIG = {
   ref: "6pxznt5n",
   solada: "https://www.solada.fun",
   discord: "https://discord.gg/8vq4NkAj6v",
-  x: "https://x.com/GatorEyesSolada",
-  xHandle: "@GatorEyesSolada",
+  x: "https://x.com/GatorEyesADA",
+  xHandle: "@GatorEyesADA",
   watchToken: "draft-gaey",
   // Facts about $GAEY from its Solada listing. The live price, market cap and holders come from the feed.
   gaey: {
