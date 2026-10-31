@@ -774,3 +774,8 @@ button.link:hover { color: var(--color-amber-hover); }
   .notice-actions { margin-left: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .star, .toast { transition: none; } }
+
+/* "What should we build next?" feedback ask (home + Tools) */
+.tool-ask { border: 1px dashed var(--color-amber); }
+.ask-next .section-title { margin-bottom: var(--space-4); }
+.ask-next { border-top: 1px solid var(--color-border); }
