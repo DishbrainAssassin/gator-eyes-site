@@ -1,11 +1,15 @@
 // Tokens table: every coin on Solada.fun with windowed volume, net flow,
 // price change, graduation progress and each coin's Gator Eyes alerts.
-import { getApi, price, pct, signed, hours, age } from "./api.js?v=20261030m";
-import { coinUrl } from "./data.js?v=20261030m";
-import { esc, fmt, compact, usdcx, timeAgo } from "./ui.js?v=20261030m";
-import { wireLinks, liveStatus } from "./common.js?v=20261030m";
+import { getApi, price, pct, signed, hours, age } from "./api.js?v=20261031s";
+import { coinUrl } from "./data.js?v=20261031s";
+import { esc, fmt, compact, usdcx, timeAgo } from "./ui.js?v=20261031s";
+import { wireLinks, liveStatus } from "./common.js?v=20261031s";
+import * as platform from "./platform.js?v=20261031s";
+import { pill } from "./platform.js?v=20261031s";
 
 wireLinks();
+platform.mount();
+platform.on(() => { st.all = false; render(); });
 const $ = (s) => document.querySelector(s);
 const rowsEl = $("[data-rows]"), moreBtn = $("[data-more]"), notice = $("[data-notice]");
 const AL = { big: ["Whale", "var(--color-amber)"], spike: ["Spike", "var(--color-spike)"], launch: ["Fast launch", "var(--color-launch)"], dev: ["Creator sell", "var(--color-sell)"] };
@@ -29,6 +33,14 @@ function val(c, k) {
 }
 
 function curveCell(c) {
+  if (c.src === "snek") {
+    if (c.cs === "graduated") return `<span class="prog is-done lp-snek"><i style="--p:100%"></i></span><span class="cell-sub">Splash pool</span>`;
+    if (c.cs === "open" && c.prog != null) {
+      const p = Math.min(100, (c.prog || 0) / 100);
+      return `<span class="prog lp-snek" title="${p.toFixed(1)}% of the way to graduating"><i style="--p:${p}%"></i></span><span class="cell-sub">${p.toFixed(0)}% · Snek.fun curve</span>`;
+    }
+    return `<span class="cell-sub">Snek.fun curve</span>`;
+  }
   if (c.cs === "open") {
     const p = Math.min(100, (c.prog || 0) / 100);
     const eta = c.pace && c.pace.etaH != null ? hours(c.pace.etaH) + " to go" : "not moving closer";
@@ -52,7 +64,7 @@ function row(c) {
   const bp = tot ? Math.round((w.b / tot) * 100) : 50;
   const img = c.img ? `<img src="${esc(c.img)}" alt="" loading="lazy" width="28" height="28">` : `<span class="coin-dot"></span>`;
   return `<tr>
-    <td><div class="coin-cell">${img}<div><a href="${esc(coinUrl(c.id))}" target="_blank" rel="noopener">${esc(c.tk || "?")}</a><span class="cell-sub">${esc((c.name || "").slice(0, 22))}${c.born ? " · " + esc(age(c.born)) : ""}</span></div></div></td>
+    <td><div class="coin-cell">${img}<div><a href="${esc(coinUrl(c.id))}" target="_blank" rel="noopener">${esc(c.tk || "?")}</a>${platform.get() === "all" && c.src === "snek" ? pill("snek") : ""}<span class="cell-sub">${esc((c.name || "").slice(0, 22))}${c.born ? " · " + esc(age(c.born)) : ""}</span></div></div></td>
     <td class="num">${price(c.price)}</td>
     <td class="num ${w.ch > 0 ? "pos" : w.ch < 0 ? "neg" : ""}">${pct(w.ch)}</td>
     <td class="num">${fmt(w.v)}<span class="cell-sub">${esc(usdcx(w.v, st.data.adaUsd))}</span></td>
@@ -61,7 +73,7 @@ function row(c) {
     <td class="num hide-sm">${compact(c.mc)}</td>
     <td class="hide-sm curve-cell">${curveCell(c)}</td>
     <td class="num">${alertsCell(c)}</td>
-    <td class="hide-sm"><a class="icon-btn" href="./coincard.html?coin=${encodeURIComponent(c.id)}" title="Make a share card for ${esc(c.tk || "")}">Card</a></td>
+    <td class="hide-sm">${c.src === "snek" ? `<a class="icon-btn" href="${esc(coinUrl(c.id))}" target="_blank" rel="noopener" title="Open ${esc(c.tk || "")} on Snek.fun">Snek.fun</a>` : `<a class="icon-btn" href="./coincard.html?coin=${encodeURIComponent(c.id)}" title="Make a share card for ${esc(c.tk || "")}">Card</a>`}</td>
   </tr>`;
 }
 
@@ -69,6 +81,7 @@ function render() {
   if (!st.data) return;
   const q = st.q.toLowerCase();
   let list = st.data.coins.filter((c) => {
+    if (!platform.inScope(c)) return false;
     if (q && !((c.tk || "").toLowerCase().includes(q) || (c.name || "").toLowerCase().includes(q) || c.id.toLowerCase() === q || (c.slug || "").toLowerCase() === q)) return false;
     if (st.f === "curve" && c.cs !== "open") return false;
     if (st.f === "grad" && c.cs !== "graduated") return false;
@@ -78,7 +91,10 @@ function render() {
   });
   list.sort((a, b) => (val(a, st.sort) - val(b, st.sort)) * st.dir || (val(b, "v") - val(a, "v")));
   const shown = st.all ? list : list.slice(0, 50);
-  rowsEl.innerHTML = shown.length ? shown.map(row).join("") : `<tr><td colspan="10"><div class="empty"><p>${st.win === "live" ? "No trades in the last 15 minutes." : "No coins match."} Try a longer window or include quiet coins.</p></div></td></tr>`;
+  const lp = platform.get();
+  const emptyMsg = st.win === "live" ? "No trades in the last 15 minutes." : lp === "all" ? "No coins match." : `No ${platform.label(lp)} coins match.`;
+  const emptyHint = lp === "all" ? "Try a longer window or include quiet coins." : `Try a longer window, include quiet coins, or <button type="button" class="link" data-platform="all">show all launchpads</button>.`;
+  rowsEl.innerHTML = shown.length ? shown.map(row).join("") : `<tr><td colspan="10"><div class="empty"><p>${emptyMsg} ${emptyHint}</p></div></td></tr>`;
   moreBtn.hidden = st.all || list.length <= 50;
   moreBtn.textContent = `Show all ${list.length} coins`;
   $("[data-updated]").textContent = st.data.updatedAt ? "Updated " + timeAgo(Date.parse(st.data.updatedAt)) + "." : "";
@@ -113,7 +129,7 @@ async function load() {
     const j = await getApi("/tokens");
     st.data = j;
     notice.hidden = true;
-    liveStatus({ updatedAt: new Date(j.updatedAt) });
+    liveStatus({ updatedAt: new Date(j.updatedAt), sources: { snek: { on: (j.coins || []).some((c) => c.src === "snek") } } });
     render();
   } catch (e) {
     liveStatus(null, e);

@@ -1,6 +1,6 @@
-import { CONFIG } from "./config.js?v=20261030m";
-import { joinUrl, coinUrl } from "./data.js?v=20261030m";
-import { timeAgo } from "./ui.js?v=20261030m";
+import { CONFIG } from "./config.js?v=20261031s";
+import { joinUrl, coinUrl } from "./data.js?v=20261031s";
+import { timeAgo } from "./ui.js?v=20261031s";
 
 /** Fill every [data-link] with the right URL so links live in one place (config.js). */
 export function wireLinks(root = document) {
@@ -18,8 +18,8 @@ export function wireLinks(root = document) {
     a.rel = "noopener";
   });
   navTips();
-  import("./gator.js?v=20261031d").then((m) => m.mountGator()).catch(() => {});
-  import("./extras.js?v=20261030m").then((m) => m.mountExtras()).catch(() => {});
+  import("./gator.js?v=20261031s").then((m) => m.mountGator()).catch(() => {});
+  import("./extras.js?v=20261031s").then((m) => m.mountExtras()).catch(() => {});
 }
 
 export function liveStatus(feed, err) {
@@ -29,15 +29,16 @@ export function liveStatus(feed, err) {
   const fresh = feed && feed.updatedAt && Date.now() - feed.updatedAt.getTime() < 15 * 60000;
   dot.classList.toggle("is-live", !!fresh);
   dot.classList.toggle("is-stale", !fresh);
+  const pads = feed && feed.sources && feed.sources.snek && feed.sources.snek.on ? "Solada and Snek.fun" : "Solada";
   if (err && !feed) txt.textContent = "Live feed reconnecting";
-  else if (fresh) txt.textContent = "Watching Solada · checks every 2 min";
-  else if (feed && feed.updatedAt) txt.textContent = "Solada paused · last update " + timeAgo(feed.updatedAt.getTime());
-  else txt.textContent = "Watching Solada";
+  else if (fresh) txt.textContent = `Watching ${pads} · checks every 2 min`;
+  else if (feed && feed.updatedAt) txt.textContent = "Feed paused · last update " + timeAgo(feed.updatedAt.getTime());
+  else txt.textContent = `Watching ${pads}`;
 }
 
 // Short hover descriptions for the top navigation.
 const NAV_TIPS = {
-  "./index.html#alerts": ["Alerts", "Whale trades, volume spikes, fast launches and creator sells on Solada.fun, as they happen."],
+  "./index.html#alerts": ["Alerts", "Whale trades, volume spikes, fast launches and creator sells on Solada.fun and Snek.fun, as they happen."],
   "./tokens.html": ["Tokens", "Every coin in one table: volume, net flow, price change and graduation progress."],
   "./race.html": ["Race", "Coins on the bonding curve, ranked by how close they are to graduating, with pace and a rough ETA."],
   "./flows.html": ["Flows", "Where the ADA went today: money in and out by coin, by hour and by venue."],
@@ -57,7 +58,7 @@ function navTips() {
   document.body.appendChild(tip);
   let timer = 0;
   const show = (a) => {
-    const t = NAV_TIPS[a.getAttribute("href")];
+    const t = NAV_TIPS[(a.getAttribute("href") || "").replace(/\?[^#]*/, "")];
     if (!t) return;
     clearTimeout(timer);
     tip.innerHTML = `<strong>${t[0]}</strong><span>${t[1]}</span>`;

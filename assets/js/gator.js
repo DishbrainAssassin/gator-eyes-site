@@ -1,10 +1,10 @@
 // Ask Gator: a small helper that answers common questions about Gator Eyes and
 // Solada.fun. Answers are built in (no AI, no running cost). Live questions
 // about coins use the same /tokens data as the Tokens page.
-import { CONFIG } from "./config.js?v=20261030m";
-import { coinUrl, joinUrl } from "./data.js?v=20261030m";
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261030m";
-import { esc, fmt, compact } from "./ui.js?v=20261030m";
+import { CONFIG } from "./config.js?v=20261031s";
+import { coinUrl, joinUrl } from "./data.js?v=20261031s";
+import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261031s";
+import { esc, fmt, compact } from "./ui.js?v=20261031s";
 
 const DISCORD = CONFIG.discord;
 const a = (href, label, ext) => `<a href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(label)}</a>`;
@@ -133,7 +133,7 @@ const FAQ = [
   { keys: ["fast launch"], a: () => `A fast launch is a new coin that pulls in 1,000 ADA from 8 or more different wallets in its first hour. They post in #fast-launch on ${discord()}.` },
   { keys: ["creator sell", "dev sell", "creator wallet", "dev wallet", "rug"], a: () => `A creator sell is the wallet that made a coin selling 100 ADA or more. It's posted for transparency, not as a warning. Creators sell for lots of reasons. Gator Eyes doesn't rate coins or call rugs. For a safety check, a tool like ${a("https://suriradar.fun/", "Suri Radar", true)} is built for that.` },
   { keys: ["gator tracks", "daily recap", "recap"], a: () => `Gator Tracks is the daily recap: volume, most traded coins and where the money went, for the previous day midnight to midnight Eastern. It posts at 9 AM Eastern in #gator-tracks and on ${a(CONFIG.x, "X", true)}. Make your own day image with the ${page("card.html", "daily flow card")}.` },
-  { keys: ["pulse", "every 4 hours", "x posts", "twitter"], a: () => `On ${a(CONFIG.x, "X (@GatorEyesADA)", true)} Gator Eyes posts a Solada Pulse every 4 hours (12, 4 and 8, AM and PM Eastern): volume, most traded, biggest inflow, spikes, fast starts, new coins and the biggest trade. Instant alerts stay on Discord.` },
+  { keys: ["pulse", "every 4 hours", "x posts", "twitter"], a: () => `On ${a(CONFIG.x, "X (@GatorEyesADA)", true)} Gator Eyes posts a Launchpad Pulse every 4 hours (12, 4 and 8, AM and PM Eastern): volume, most traded, biggest inflow, spikes, fast starts, new coins and the biggest trade. Instant alerts stay on Discord.` },
   { keys: ["discord", "channel", "join", "community"], a: () => `${discord("Join the Discord")} for instant alerts. Channels: #whale-alerts (big trades and volume spikes), #fast-launch, #creator-sells, #gator-tracks (daily recap) and #gaey-trades. #alerts-overview explains them all.` },
   { keys: ["net flow", "netflow", "inflow mean"], a: () => "Net flow is ADA bought minus ADA sold. +500 means buyers put in 500 ADA more than sellers took out. It shows direction, not price, and big trades can swing it." },
   { keys: ["what is graduat", "what does graduat", "graduation mean", "what is a bonding", "what's a bonding", "bonding curve", "how does graduat", "graduate mean"], a: () => `New Solada.fun coins start on a bonding curve, where price rises as people buy. When enough ADA is in the curve (about 10,344 ADA), the coin graduates and moves to a Minswap pool. The ${page("race.html", "Race page")} shows who's closest.` },
@@ -145,7 +145,7 @@ const FAQ = [
   { keys: ["flows", "by hour", "venue"], a: () => `The ${page("flows.html", "Flows page")} shows where the ADA went today: money in and out by coin, by hour and by venue (Solada curve, Minswap, Splash, Pump.fun). Days run midnight to midnight Eastern.` },
   { keys: ["widget", "embed", "my site", "my website"], a: () => `Run a project? Put a live box with your coin's volume, net flow and latest alerts on your own site. The embed code is on the ${page("about.html#embed", "How it works page")}.` },
   { keys: ["api", "json", "feed url", "data for", "builder", "developer"], a: () => `Gator Eyes' data feed only powers this site. To show live Solada numbers on your own site, use the embed widget on the ${page("about.html#embed", "How it works page")}.` },
-  { keys: ["gaey", "your token", "team token"], a: () => `$GAEY is the Gator Eyes team's own token on Solada.fun. Holder rewards are paid in ADA, and the creator locked 4.94M GAEY until Nov 26. Every trade posts in #gaey-trades. See the ${page("gaey.html", "$GAEY page")}.` },
+  { keys: ["gaey", "your token", "team token"], a: () => `$GAEY is the Gator Eyes team's own token. It trades on Solada.fun until it bonds, not on Snek.fun. Holder rewards are paid in ADA, and the creator locked 4.94M GAEY until Nov 26. Every trade posts in #gaey-trades. See the ${page("gaey.html", "$GAEY page")}.` },
   { keys: ["referral", "6pxznt5n", "ref code"], a: () => "Solada.fun links from Gator Eyes include our referral code, 6pxznt5n. It may earn the team referral rewards and costs you nothing extra." },
   { keys: ["usdcx", "usd", "dollar"], a: () => "The ~USDCx figures are approximate. They use the latest ADA to USDCx rate Gator Eyes saw, so treat them as a rough guide." },
   { keys: ["how often", "update", "refresh", "delay", "real time", "realtime", "live"], a: () => "Gator Eyes checks Solada.fun every two minutes. Alerts usually land within a few minutes of the trade. If Solada is down or updating, alerts pause and the site says so at the top." },

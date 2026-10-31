@@ -1,8 +1,17 @@
-import { subscribe } from "./data.js?v=20261030m";
-import { alertCard, emptyState, skeleton, tracks, dayLabel, fmt, usdcx, timeAgo, compact } from "./ui.js?v=20261030m";
-import { wireLinks, liveStatus } from "./common.js?v=20261030m";
+import { subscribe } from "./data.js?v=20261031s";
+import { alertCard, emptyState, skeleton, tracks, mergeDays, lpSplit, dayLabel, fmt, usdcx, timeAgo, compact } from "./ui.js?v=20261031s";
+import { wireLinks, liveStatus } from "./common.js?v=20261031s";
+import * as platform from "./platform.js?v=20261031s";
+
+const SHOW_ALL = ' <button type="button" class="link" data-platform="all">Show all launchpads</button>';
 
 wireLinks();
+platform.mount();
+platform.on(() => {
+  shown = 10;
+  renderAlerts();
+  renderTracks();
+});
 
 const $ = (s) => document.querySelector(s);
 const listEl = $("[data-alerts]");
@@ -40,10 +49,16 @@ moreBtn.addEventListener("click", () => {
 
 function renderAlerts() {
   if (!feed) return;
-  const list = feed.alerts.filter((a) => filter === "all" || a.kind === filter);
+  const scoped = feed.alerts.filter(platform.inScope);
+  const list = scoped.filter((a) => filter === "all" || a.kind === filter);
   if (!list.length) {
+    const lp = platform.get();
+    const other = lp !== "all" && feed.alerts.length > scoped.length ? SHOW_ALL : "";
     listEl.innerHTML = emptyState(
-      filter === "all" ? "Quiet water. No alerts in the last few hours." : "Nothing in this category yet. The gator is still watching."
+      lp !== "all"
+        ? `No ${platform.label(lp)} alerts in the last few hours.`
+        : filter === "all" ? "Quiet water. No alerts in the last few hours." : "Nothing in this category yet. The gator is still watching.",
+      other
     );
   } else {
     listEl.innerHTML = list.slice(0, shown).map(alertCard).join("");
@@ -53,12 +68,14 @@ function renderAlerts() {
 
 function renderTracks() {
   if (!feed) return;
-  const opts = [];
-  if (feed.today && feed.today.trades) opts.push({ id: "today", label: "Today so far", d: feed.today });
-  for (const r of feed.recaps) opts.push({ id: r.key, label: dayLabel(r.key).replace(/,.*/, "") + " " + r.key.slice(5).replace("-", "/"), d: r });
+  const opts = dayOptions(feed, platform.get());
   if (!opts.length) {
     daysEl.innerHTML = "";
-    tracksEl.innerHTML = emptyState("Gator Tracks starts counting with the first trade of the day.");
+    const lp = platform.get();
+    tracksEl.innerHTML = emptyState(
+      lp !== "all" ? `No ${platform.label(lp)} trades counted yet today.` : "Gator Tracks starts counting with the first trade of the day.",
+      lp !== "all" ? SHOW_ALL : ""
+    );
     return;
   }
   if (!opts.find((o) => o.id === day)) day = opts[0].id;
@@ -72,7 +89,32 @@ function renderTracks() {
     })
   );
   const cur = opts.find((o) => o.id === day);
-  tracksEl.innerHTML = tracks(cur.d, feed.rate);
+  tracksEl.innerHTML = tracks(cur.d, feed.rate) + lpSplit(cur.parts, feed.rate, platform.get());
+}
+
+const dayName = (key) => dayLabel(key).replace(/,.*/, "") + " " + key.slice(5).replace("-", "/");
+
+/** Day tabs for the chosen launchpad scope. "All" folds Solada and Snek.fun into one tally per day. */
+export function dayOptions(feed, scope) {
+  const sol = { today: feed.today, recaps: feed.recaps || [] };
+  const snek = feed.snek || { today: null, recaps: [] };
+  const opts = [];
+  if (scope === "solada" || scope === "snek") {
+    const src = scope === "snek" ? snek : sol;
+    if (src.today && src.today.trades) opts.push({ id: "today", label: "Today so far", d: src.today });
+    for (const r of src.recaps) if (r.trades) opts.push({ id: r.key, label: dayName(r.key), d: r });
+    return opts;
+  }
+  const today = mergeDays(sol.today, snek.today);
+  if (today) opts.push({ id: "today", label: "Today so far", d: today, parts: { solada: sol.today, snek: snek.today } });
+  const keys = [...new Set([...sol.recaps.map((r) => r.key), ...snek.recaps.map((r) => r.key)])].sort().reverse();
+  for (const key of keys) {
+    const a = sol.recaps.find((r) => r.key === key);
+    const b = snek.recaps.find((r) => r.key === key);
+    const d = mergeDays(a, b);
+    if (d) opts.push({ id: key, label: dayName(key), d, parts: { solada: a, snek: b } });
+  }
+  return opts;
 }
 
 function renderGaey() {
