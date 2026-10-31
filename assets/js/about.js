@@ -1,22 +1,22 @@
 // How it works page. Alert rules are read from the live feed so this page
 // always matches what the bot is actually doing.
-import { subscribe, RULES_DEFAULT } from "./data.js?v=20261031z";
-import { wireLinks, liveStatus } from "./common.js?v=20261031z";
-import { esc, fmt } from "./ui.js?v=20261031z";
+import { subscribe, RULES_DEFAULT } from "./data.js?v=20261101a";
+import { wireLinks, liveStatus } from "./common.js?v=20261101a";
+import { esc, fmt } from "./ui.js?v=20261101a";
 
 wireLinks();
 
 const $ = (s) => document.querySelector(s);
-const hour = (h) => (h === 0 ? "12 AM" : h < 12 ? h + " AM" : h === 12 ? "12 PM" : h - 12 + " PM");
+const hour = (h, m = 0) => { const hh = h % 12 === 0 ? 12 : h % 12; return hh + (m ? ":" + String(m).padStart(2, "0") : "") + (h < 12 ? " AM" : " PM"); };
 
 function renderRules(r) {
   const rows = [
     ["k-whale", "Whale trade", `Any single trade worth $${fmt(r.bigUsd || 1000)} or more in ADA (about ${fmt(r.bigAda)} ADA at today's price), or a trade worth at least ${fmt(r.mcapPct)}% of a coin's market cap (minimum ${fmt(r.mcapMinAda)} ADA).`, "#whale-alerts"],
     ["k-spike", "Volume spike", `At least ${fmt(r.spikeMinAda)} ADA traded in ${fmt(r.spikeWindowMin)} minutes, at ${fmt(r.spikeMult)} times or more the coin's normal pace, from two or more wallets. One per coin per hour.`, "#whale-alerts"],
-    ["k-dev", "Creator sell", `The wallet that created a coin sells ${fmt(r.creatorMinAda)} ADA or more. Posted for transparency. Creators sell for lots of reasons.`, "#creator-sells"],
+    ["k-dev", "Creator sell", `The wallet that created a coin sells ${fmt(r.creatorMinAda || 500)} ADA or more, or at least ${fmt(r.creatorMcapPct || 5)}% of the coin's market cap (minimum ${fmt(r.mcapMinAda || 250)} ADA). Posted for transparency. Creators sell for lots of reasons.`, "#creator-sells"],
     ["k-launch", "Fast launch", `A new coin pulls in ${fmt(r.launchMinAda)} ADA of buys from ${fmt(r.launchMinBuyers)} or more wallets within its first ${fmt(r.launchWindowMin)} minutes.`, "#fast-launch"],
     ["k-whale", "Snek.fun whale trade", `Same line as Solada: any single Snek.fun trade worth $${fmt((r.snek && r.snek.bigUsd) || r.bigUsd || 1000)} or more in ADA (about ${fmt((r.snek && r.snek.bigAda) || r.bigAda)} ADA at today's price), or a trade worth at least ${fmt(r.mcapPct)}% of a coin's market cap. Snek.fun alerts post to their own channel.`, "#snek-alerts"],
-    ["k-tracks", "Gator Tracks", `Yesterday's recap at ${hour(r.recapHourET)} Eastern: volume, net flow, busiest hour, top venue, most traded coins, and where the money went.`, "#gator-tracks"],
+    ["k-tracks", "Gator Tracks", `The day's recap at ${hour(r.recapHourET, r.recapMinET)} Eastern, right after midnight: volume, net flow, busiest hour, top venue, most traded coins, and where the money went.`, "#gator-tracks"],
     ["k-gaey", "$GAEY trades", "Every buy and sell of $GAEY, the team's own token, in its own channel so it never crowds the others.", "#gaey-trades"],
   ];
   $("[data-rules]").innerHTML = rows

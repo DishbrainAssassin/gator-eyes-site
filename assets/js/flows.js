@@ -1,9 +1,9 @@
 // Flows dashboard. Reads the same feed as the home page through data.js.
-import { subscribe, coinUrl } from "./data.js?v=20261031z";
-import { alertCard, emptyState, skeleton, dayLabel, fmt, usdcx, usdcxSigned, rateNote, compact, clock, timeAgo, esc, mergeDays, lpSplit } from "./ui.js?v=20261031z";
-import { wireLinks, liveStatus } from "./common.js?v=20261031z";
-import * as platform from "./platform.js?v=20261031z";
-import { pill } from "./platform.js?v=20261031z";
+import { subscribe, coinUrl } from "./data.js?v=20261101a";
+import { alertCard, emptyState, skeleton, dayLabel, fmt, usdcx, usdcxSigned, rateNote, compact, clock, timeAgo, esc, mergeDays, lpSplit } from "./ui.js?v=20261101a";
+import { wireLinks, liveStatus } from "./common.js?v=20261101a";
+import * as platform from "./platform.js?v=20261101a";
+import { pill } from "./platform.js?v=20261101a";
 
 wireLinks();
 platform.mount();
@@ -239,7 +239,7 @@ function renderCoins(d, rate) {
 function renderWeek(opts) {
   const days = opts.slice(0, 7).reverse();
   if (days.length < 2) {
-    el.week.innerHTML = emptyState("The 7-day view fills in as daily recaps come in, one per day at 9 AM Eastern.");
+    el.week.innerHTML = emptyState("The 7-day view fills in as daily recaps come in, one per day at 12:01 AM Eastern.");
     return;
   }
   const max = Math.max(1, ...days.map((o) => o.d.volAda));

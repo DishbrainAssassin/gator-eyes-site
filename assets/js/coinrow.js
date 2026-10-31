@@ -1,10 +1,10 @@
 // One table row for a coin from /tokens. Shared by the Tokens page and the Watchlist
 // so both show the same numbers the same way.
-import { price, pct, signed, hours, age } from "./api.js?v=20261031z";
-import { coinUrl } from "./data.js?v=20261031z";
-import { esc, fmt, compact, usdcx } from "./ui.js?v=20261031z";
-import { pill } from "./platform.js?v=20261031z";
-import { starBtn } from "./watchlist.js?v=20261031z";
+import { price, pct, signed, hours, age } from "./api.js?v=20261101a";
+import { coinUrl } from "./data.js?v=20261101a";
+import { esc, fmt, compact, usdcx } from "./ui.js?v=20261101a";
+import { pill } from "./platform.js?v=20261101a";
+import { starBtn } from "./watchlist.js?v=20261101a";
 
 export const AL = { big: ["Whale", "var(--color-amber)"], spike: ["Spike", "var(--color-spike)"], launch: ["Fast launch", "var(--color-launch)"], dev: ["Creator sell", "var(--color-sell)"] };
 

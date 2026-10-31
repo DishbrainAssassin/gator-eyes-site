@@ -209,7 +209,7 @@ function renderCoins(d, rate) {
 function renderWeek(opts) {
   const days = opts.slice(0, 7).reverse();
   if (days.length < 2) {
-    el.week.innerHTML = emptyState("The 7-day view fills in as daily recaps come in, one per day at 9 AM Eastern.");
+    el.week.innerHTML = emptyState("The 7-day view fills in as daily recaps come in, one per day at 12:01 AM Eastern.");
     return;
   }
   const max = Math.max(1, ...days.map((o) => o.d.volAda));
