@@ -5,8 +5,8 @@ export const CONFIG = {
   ref: "6pxznt5n",
   solada: "https://www.solada.fun",
   discord: "https://discord.gg/8vq4NkAj6v",
-  x: "https://x.com/GatorEyesSolada",
-  xHandle: "@GatorEyesSolada",
+  x: "https://x.com/GatorEyesADA",
+  xHandle: "@GatorEyesADA",
   watchToken: "draft-gaey",
   // $GAEY's permanent Solada coin page (the old draft-gaey address only works because Solada forwards it).
   watchSlug: "7477b579ed8bd221dcbbd730f859b22ce9a7935635ab4ae8b70a660c",

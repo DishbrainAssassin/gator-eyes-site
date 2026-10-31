@@ -172,7 +172,7 @@ function draw(opt) {
   ctx.fillStyle = C.line;
   ctx.fillRect(P, H - 70, W - 2 * P, 1);
   text("Lurking so you don't have to", P, H - 32, { font: `800 18px ${F.d}`, color: C.text });
-  const right = [tv ? `Top venue: ${tv.name} ${tv.pct}%` : null, "@GatorEyesSolada", "Not financial advice"].filter(Boolean).join("  ·  ");
+  const right = [tv ? `Top venue: ${tv.name} ${tv.pct}%` : null, "@GatorEyesADA", "Not financial advice"].filter(Boolean).join("  ·  ");
   text(right, W - P, H - 32, { font: `500 14px ${F.b}`, color: C.muted, align: "right" });
 }
 
