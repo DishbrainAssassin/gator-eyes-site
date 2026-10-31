@@ -26,7 +26,42 @@ const ready = Promise.all([
   new Promise((r) => (avatar.complete ? r() : ((avatar.onload = r), (avatar.onerror = r)))),
 ]).catch(() => {});
 
-let data = null, coin = null, series = [], art = null, tainted = false;
+let data = null, coin = null, series = [], art = null, tainted = false, sol = null;
+
+// Solana side: Solada coins that also trade on Pump.fun/PumpSwap (kind "pump") can trade in SOL or USDC,
+// which the ADA tracker can't see. For those, the card uses DexScreener's 24h totals and GeckoTerminal's
+// hourly prices for the busiest Solana pool. Any error just leaves the card on the ADA numbers.
+const isSolSide = (c) => c && c.kind === "pump" && !((c.w.h24 || {}).n) && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(c.slug || "");
+const DEX = { pumpswap: "PumpSwap", pumpfun: "Pump.fun", raydium: "Raydium", meteora: "Meteora", orca: "Orca" };
+async function loadSol(c) {
+  if (!isSolSide(c)) return null;
+  try {
+    const r = await fetch("https://api.dexscreener.com/latest/dex/tokens/" + c.slug);
+    const j = r.ok ? await r.json() : null;
+    const ps = ((j && j.pairs) || []).filter((x) => x.chainId === "solana" && x.baseToken && x.baseToken.address === c.slug)
+      .sort((x, y) => ((y.volume && y.volume.h24) || 0) - ((x.volume && x.volume.h24) || 0));
+    const pr = ps[0];
+    if (!pr) return null;
+    const t = (pr.txns && pr.txns.h24) || {}, vUsd = (pr.volume && pr.volume.h24) || 0;
+    return { pair: pr.pairAddress, b: t.buys || 0, s: t.sells || 0, vUsd, vAda: data.adaUsd ? vUsd / data.adaUsd : null,
+      ch: pr.priceChange ? pr.priceChange.h24 : null, dex: DEX[pr.dexId] || pr.dexId, quote: (pr.quoteToken && pr.quoteToken.symbol) || "SOL",
+      priceUsd: Number(pr.priceUsd) || null, url: pr.url || null };
+  } catch { return null; }
+}
+// Hourly closes for the Solana pool, turned into ADA so the line matches the ADA price on the card.
+async function loadSolSeries(sw) {
+  if (!sw || !sw.pair || !data.adaUsd) return [];
+  try {
+    const r = await fetch(`https://api.geckoterminal.com/api/v2/networks/solana/pools/${sw.pair}/ohlcv/hour?aggregate=1&limit=48`);
+    const j = r.ok ? await r.json() : null;
+    const l = ((j && j.data && j.data.attributes && j.data.attributes.ohlcv_list) || []).map((k) => [k[0] * 1000, k[4] / data.adaUsd]).sort((a, b) => a[0] - b[0]);
+    const from = Date.now() - 864e5, prev = l.filter((p) => p[0] < from).pop();
+    const out = [...(prev ? [[from, prev[1]]] : []), ...l.filter((p) => p[0] >= from)];
+    if (out.length && sw.priceUsd) out.push([Date.now(), sw.priceUsd / data.adaUsd]);
+    return out;
+  } catch { return []; }
+}
+const usd = (n) => "$" + (n >= 100 ? Math.round(n).toLocaleString("en-US") : n.toFixed(2));
 
 function text(s, x, y, { font, color = C.text, align = "left", spacing = 0 } = {}) {
   ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = "alphabetic";
@@ -74,7 +109,7 @@ function draw() {
   if (avatar.naturalWidth) { ctx.save(); ctx.beginPath(); ctx.arc(P + 22, 62, 22, 0, Math.PI * 2); ctx.clip(); ctx.drawImage(avatar, P, 40, 44, 44); ctx.restore(); }
   text("GATOR EYES", P + 60, 70, { font: `800 20px ${F.d}`, color: C.amber, spacing: 4 });
   const now = new Date();
-  text("Last 24 hours on " + siteOf(c), W - P, 62, { font: `700 20px ${F.b}`, align: "right" });
+  text(sol ? "Last 24 hours on Solana · " + sol.dex : "Last 24 hours on " + siteOf(c), W - P, 62, { font: `700 20px ${F.b}`, align: "right" });
   text(now.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" }) + " ET", W - P, 86, { font: `500 15px ${F.b}`, color: C.muted, align: "right" });
 
   // coin identity
@@ -85,12 +120,18 @@ function draw() {
   text(fit(c.tk || "?", 520, `800 64px ${F.d}`), tx, iy + 58, { font: `800 64px ${F.d}` });
   text(fit(c.name || "", 520, `500 20px ${F.b}`), tx, iy + 90, { font: `500 20px ${F.b}`, color: C.muted });
   text(price(c.price) + " ADA", W - P, iy + 50, { font: `500 40px ${F.m}`, align: "right" });
-  const chCol = w.ch > 0 ? C.buy : w.ch < 0 ? C.sell : C.muted;
-  text((w.ch != null ? pct(w.ch) : "–") + " in 24h", W - P, iy + 86, { font: `700 20px ${F.b}`, color: chCol, align: "right" });
+  const chg = w.ch != null ? w.ch : sol && sol.ch != null ? sol.ch : null;
+  const chCol = chg > 0 ? C.buy : chg < 0 ? C.sell : C.muted;
+  text((chg != null ? pct(chg) : "–") + " in 24h", W - P, iy + 86, { font: `700 20px ${F.b}`, color: chCol, align: "right" });
 
   // KPI row
   const ky = 246, kh = 78, kw = (W - 2 * P - 3 * 12) / 4;
-  const kpis = [
+  const kpis = sol ? [
+    ["Traded", usd(sol.vUsd), C.text, sol.vAda ? `~${fmt(sol.vAda)} ADA` : ""],
+    ["Buys / sells", `${fmt(sol.b)} / ${fmt(sol.s)}`, sol.b > sol.s ? C.buy : sol.b < sol.s ? C.sell : C.text, "by number of trades"],
+    ["Trades", fmt(sol.b + sol.s), C.text, `${sol.dex} · ${sol.quote} pair`],
+    ["Market cap", c.mc ? compact(c.mc) + " ADA" : "–", C.text, c.hold ? `${fmt(c.hold)} holders` : ""],
+  ] : [
     ["Traded", compact(w.v) + " ADA", C.text, data.adaUsd ? `~${fmt(w.v * data.adaUsd)} USDCx` : ""],
     ["Net flow", signed(w.net) + " ADA", w.net > 0 ? C.buy : w.net < 0 ? C.sell : C.text, `${compact(w.b)} in · ${compact(w.s)} out`],
     ["Trades", fmt(w.n), C.text, `${fmt(w.wal)} wallets`],
@@ -114,7 +155,8 @@ function draw() {
     const lo = Math.min(...pts.map((s) => s[1])), hi = Math.max(...pts.map((s) => s[1]));
     const px = (t) => cx + 18 + ((t - t0) / (t1 - t0)) * (cw - 36);
     const py = (p) => cy + ch - 34 - (hi > lo ? (p - lo) / (hi - lo) : 0.5) * (ch - 84);
-    const col = pts[pts.length - 1][1] >= pts[0][1] ? C.buy : C.sell;
+    const up = sol && sol.ch != null ? sol.ch >= 0 : pts[pts.length - 1][1] >= pts[0][1];
+    const col = up ? C.buy : C.sell;
     ctx.beginPath();
     pts.forEach((s, i) => (i ? ctx.lineTo(px(s[0]), py(s[1])) : ctx.moveTo(px(Math.max(t0, s[0])), py(s[1]))));
     ctx.lineTo(px(t1), py(pts[pts.length - 1][1]));
@@ -158,6 +200,7 @@ function draw() {
   if (!al.length) text("None", rx + 18, y + 28, { font: `500 14px ${F.b}`, color: C.muted });
   al.slice(0, 3).forEach(([k, n], i) => text(`${n} ${AL[k] || k}${n > 1 ? " alerts" : " alert"}`, rx + 18, y + 28 + i * 24, { font: `500 14px ${F.b}`, color: C.muted }));
 
+  if (sol) text(fit("Solana data: DexScreener, GeckoTerminal", rw - 36, `500 12px ${F.b}`), rx + 18, cy + ch - 16, { font: `500 12px ${F.b}`, color: C.faint });
   ctx.fillStyle = C.line; ctx.fillRect(P, H - 70, W - 2 * P, 1);
   text("Lurking so you don't have to", P, H - 32, { font: `800 18px ${F.d}` });
   text("gatoreyes.fun  ·  @GatorEyesADA  ·  Not financial advice", W - P, H - 32, { font: `500 14px ${F.b}`, color: C.muted, align: "right" });
@@ -166,6 +209,10 @@ function draw() {
 function caption() {
   const c = coin, w = c.w.h24 || {};
   const link = linkOf(c);
+  if (sol) {
+    const chg = sol.ch != null ? pct(sol.ch) : "flat";
+    return [`$${c.tk} on Solana (${sol.dex}), last 24 hours`, `${fmt(sol.b + sol.s)} trades: ${fmt(sol.b)} buys, ${fmt(sol.s)} sells. About ${usd(sol.vUsd)} traded${sol.vAda ? ` (~${fmt(sol.vAda)} ADA)` : ""}. Price ${chg}.`, link].join("\n");
+  }
   const bits = [`$${c.tk} on ${siteOf(c)}, last 24 hours`, `${fmt(w.v || 0)} ADA traded by ${fmt(w.wal || 0)} wallets. Net flow ${signed(w.net || 0)} ADA. Price ${w.ch != null ? pct(w.ch) : "flat"}.`];
   if (c.cs === "open" && c.prog != null) bits.push(`${(c.prog / 100).toFixed(0)}% of the way to graduating.`);
   bits.push(link);
@@ -191,7 +238,11 @@ async function show(s) {
   coin = c;
   $("[data-coin]").value = c.tk || c.id;
   const u = new URL(location.href); u.searchParams.set("coin", c.id); history.replaceState(null, "", u);
-  const [im] = await Promise.all([loadImg(c.img), loadSeries(c)]);
+  sol = null;
+  const [im, , sw] = await Promise.all([loadImg(c.img), loadSeries(c), loadSol(c)]);
+  if (coin !== c) return;
+  sol = sw;
+  if (sol && series.length < 2) series = await loadSolSeries(sol);
   if (coin !== c) return;
   art = safeImage(im);
   await ready;
