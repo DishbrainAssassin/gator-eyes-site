@@ -162,6 +162,15 @@ const ADVICE = ["should i buy", "should i sell", "good buy", "will it pump", "wi
 
 const norm = (s) => " " + s.toLowerCase().replace(/[’']/g, "'").replace(/[^a-z0-9$.' -]+/g, " ").replace(/\s+/g, " ") + " ";
 
+function socialsAnswer(c) {
+  const L = c.links || {};
+  const names = { twitter: "X", website: "Website", telegram: "Telegram", discord: "Discord" };
+  const items = ["twitter", "website", "telegram", "discord"].filter((k) => L[k]).map((k) => `<li>${names[k]}: ${a(L[k], L[k].replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, ""), true)}</li>`);
+  const head = `<strong>${a(coinUrl(c.id), tk(c), true)}</strong>${c.name && c.name !== c.tk ? " (" + esc(c.name) + ")" : ""}`;
+  if (!items.length) return `${head} has no socials listed on Solada.fun. That's what the creator filled in, so nothing is hiding. ${a(coinUrl(c.id), "Check the coin page", true)} in case they add some.`;
+  return `${head} socials from Solada.fun:<ul>${items.join("")}</ul>These are whatever the creator listed. Make sure they're real before trusting them.`;
+}
+var SOCIAL_RE = /\b(social|socials|twitter|x account|x page|x link|x profile|website|web site|telegram|discord link|discord server)\b/;
 async function findCoin(q) {
   const d = await tokens().catch(() => null);
   if (!d) return null;
@@ -179,6 +188,10 @@ async function answer(raw) {
   if (/\b(thanks|thank you|thx|ty)\b/.test(q)) return "Happy to help. I'll be here, recalculating.";
   const advice = ADVICE.some((k) => q.includes(k));
   const coin = await findCoin(raw);
+  if (SOCIAL_RE.test(q) && !/\b(gator eyes|your|you)\b/.test(q)) {
+    if (coin) return socialsAnswer(coin);
+    if (!/\b(alert|graduat|net flow|holder|card|follow|embed|widget)\b/.test(q)) return `Which coin? Ask like <em>socials $MEPE</em> and I'll list what the creator put on Solada.fun.`;
+  }
   if (advice) return `I just crunch the numbers, I can't tell you what to buy or sell. Gator Eyes reports what traded, not what to do next.${coin ? " Here's what " + esc(tk(coin)) + " has been doing:<br><br>" + coinAnswer(coin) : ""}`;
   if (coin && (!/\b(what is|what's|how do|how does)\b/.test(q) || q.includes("$" + coin.tk.toLowerCase()) || new RegExp("\\b(of|for|about|on|with) \\$?" + coin.tk.toLowerCase() + "\\b").test(q))) return coinAnswer(coin);
 
