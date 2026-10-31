@@ -1,10 +1,10 @@
 // Ask Gator: a small helper that answers common questions about Gator Eyes and
 // Solada.fun. Answers are built in (no AI, no running cost). Live questions
 // about coins use the same /tokens data as the Tokens page.
-import { CONFIG } from "./config.js?v=20261031t";
-import { coinUrl, joinUrl } from "./data.js?v=20261031t";
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261031t";
-import { esc, fmt, compact } from "./ui.js?v=20261031t";
+import { CONFIG } from "./config.js?v=20261031v";
+import { coinUrl, joinUrl } from "./data.js?v=20261031v";
+import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261031v";
+import { esc, fmt, compact } from "./ui.js?v=20261031v";
 
 const DISCORD = CONFIG.discord;
 const a = (href, label, ext) => `<a href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(label)}</a>`;
@@ -141,6 +141,8 @@ const LIVE = [
 ];
 
 // ---------- built-in answers ----------
+// Questions about Quagmire himself ("do you like this picture of you?"), not about a tool.
+const ABOUT_ME = [" of you ", " of you?", "you like", "like you", "of yourself", "your picture", "your pic", "your face", "your look", "you look", "pic of you", "photo of you", "your avatar", "your art"];
 const FAQ = [
   { keys: ["what is gator eyes", "what's gator eyes", "what does gator eyes", "about gator eyes", "who are you", "what are you", "what is this site", "what is this"], a: () => `I'm Quagmire, resident data nerd at Gator Eyes. Gator Eyes is a free, automated tracker for Solada.fun. It reads every public trade every two minutes, adds up where the money moves, and posts what stands out to ${discord()} and X. No sign-up, no wallet connection.` },
   { keys: ["alerts mean", "types of alert", "what alerts", "alert types", "kinds of alert", "what triggers", "alert rules"], a: () => `Four kinds of alert:<ul><li><strong>Whale trade</strong>: a trade worth $500 or more in ADA, or one worth at least 5% of the coin's market cap.</li><li><strong>Volume spike</strong>: a coin trading 4 times its normal pace over 15 minutes, with at least 1,500 ADA moving.</li><li><strong>Fast launch</strong>: a new coin pulling in 1,000 ADA from 8 or more wallets in its first hour.</li><li><strong>Creator sell</strong>: the wallet that created a coin selling 100 ADA or more. Posted as a record, not a warning.</li></ul>More on the ${page("about.html", "How it works page")}.` },
@@ -156,7 +158,7 @@ const FAQ = [
   { keys: ["eta", "pace", "to go"], a: () => "The ETA on the Race page takes the last 6 hours of net buying on the curve and asks how long it would take to fill the rest at that pace. It changes fast and isn't a prediction. \"Not moving closer\" means more was sold than bought in that time." },
   { keys: ["follow-up", "follow up", "followup", "track record", "accurate", "do alerts work", "after an alert"], a: () => `The ${page("followup.html", "Follow-up page")} shows every alert and what the coin's price did 1 hour and 24 hours later. Good and bad, nothing hidden. It's there so you can judge the alerts yourself.` },
   { keys: ["holder", "airdrop", "snapshot", "csv"], a: () => `Use the ${page("holders.html", "Holder snapshot")}: type a ticker, then set rules. It leaves out the bonding curve, pools, locked tokens, other contracts and the creator wallet, and can group addresses by wallet. Add a minimum balance, top-N or a "hasn't sold since" date, then download the CSV.` },
-  { keys: ["share card", "coin card", "image of", "picture", "graphic"], a: () => `The ${page("coincard.html", "Coin share card")} makes a ready-to-post image of any coin's last 24 hours. Pick a coin, then tap Download PNG (or Save image on a phone) and Copy caption. For the whole market, use the ${page("card.html", "daily flow card")}.` },
+  { keys: ["share card", "coin card", "image of a coin", "image of $", "image for", "picture of a coin", "picture of $", "picture for", "make an image", "make a picture", "make a graphic", "coin image", "coin picture", "coin graphic", "post an image", "png"], not: ABOUT_ME, a: () => `The ${page("coincard.html", "Coin share card")} makes a ready-to-post image of any coin's last 24 hours. Pick a coin, then tap Download PNG (or Save image on a phone) and Copy caption. For the whole market, use the ${page("card.html", "daily flow card")}.` },
   { keys: ["tokens page", "tokens table", "table", "all coins", "list of coins"], a: () => `The ${page("tokens.html", "Tokens page")} lists every coin on Solada.fun with price, change, volume, trades, net flow, market cap, curve progress and alerts. Switch between Live (15 min), 1h, 6h and 24h, and click a column to sort.` },
   { keys: ["flows", "by hour", "venue"], a: () => `The ${page("flows.html", "Flows page")} shows where the ADA went today: money in and out by coin, by hour and by venue (Solada curve, Minswap, Splash, Pump.fun). Days run midnight to midnight Eastern.` },
   { keys: ["widget", "embed", "my site", "my website"], a: () => `Run a project? Put a live box with your coin's volume, net flow and latest alerts on your own site. The embed code is on the ${page("about.html#embed", "How it works page")}.` },
@@ -225,7 +227,7 @@ async function answer(raw) {
   let best = null, bestS = 0, live = null, liveS = 0;
   for (const it of LIVE) { const s = score(it.keys, it.not); if (s > liveS) { live = it; liveS = s; } }
   best = live; bestS = liveS;
-  for (const it of FAQ) { const s = score(it.keys); if (s > bestS) { best = it; bestS = s; } }
+  for (const it of FAQ) { const s = score(it.keys, it.not); if (s > bestS) { best = it; bestS = s; } }
   const listAsk = LIST_RE.test(q);
   const run = async (it) => {
     try { return it.run ? await it.run(q) : it.a(); }
