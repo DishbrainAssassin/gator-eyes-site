@@ -1,7 +1,7 @@
 // Site-wide coin search and beginner mode. Loaded on every page by common.js.
-import { getApi, price } from "./api.js?v=20261031z";
-import { coinUrl, joinUrl } from "./data.js?v=20261031z";
-import { esc, compact } from "./ui.js?v=20261031z";
+import { getApi, price } from "./api.js?v=20261101a";
+import { coinUrl, joinUrl } from "./data.js?v=20261101a";
+import { esc, compact } from "./ui.js?v=20261101a";
 
 const KEY = "ge-beginner";
 
@@ -153,9 +153,9 @@ const TERMS = [
   ["Graduation", /\bgraduat(?:es|ed|ing|ion)\b/i, "When a coin's bonding curve fills up, it graduates and trading moves to a regular Minswap pool."],
   ["Net flow", /\bnet (?:flow|buying)\b/i, "ADA bought minus ADA sold. Above zero means more money came in than went out."],
   ["Market cap", /\bmarket cap\b/i, "Price times total supply. A rough size of the coin, not cash anyone could take out."],
-  ["Whale trade", /\bwhales?\b/i, "Any single trade worth $1,000 or more in ADA, or a trade worth at least 5% of the coin's market cap."],
+  ["Whale trade", /\bwhales?\b/i, "Any single trade worth $1,000 or more in ADA, or a trade worth at least 7.5% of the coin's market cap (minimum 250 ADA)."],
   ["Volume spike", /\b(?:volume )?spikes?\b/i, "A coin trading four times its normal pace over 15 minutes, with at least 1,500 ADA moving."],
-  ["Creator sell", /\b(?:creator|dev) sells?\b/i, "The wallet that made the coin sold 100 ADA or more. It's posted as a record, not a warning. Creators sell for lots of reasons."],
+  ["Creator sell", /\b(?:creator|dev) sells?\b/i, "The wallet that made the coin sold 500 ADA or more, or at least 5% of its market cap. It's posted as a record, not a warning. Creators sell for lots of reasons."],
   ["Fast launch", /\bfast launch(?:es)?\b/i, "A new coin that pulls in 1,000 ADA from eight or more wallets in its first hour."],
   ["Volume", /\bvolume\b/i, "All the ADA traded, buys and sells added together."],
   ["Policy ID", /\bpolicy ID\b/i, "A Cardano token's unique ID. Anyone can copy a ticker, but not a policy ID, so it's the safe way to find the right coin."],
@@ -165,7 +165,7 @@ const TERMS = [
   ["USDCx", /\bUSDCx\b/, "A dollar-pegged stablecoin on Cardano. Gator Eyes uses it to show rough dollar values next to ADA."],
   ["Unlock", /\bunlocks?\b/i, "Some creators lock part of the supply until a set date. An unlock is when those tokens can be sold."],
   ["ADA", /\bADA\b/, "Cardano's coin. Prices, trades and volume on Gator Eyes are in ADA."],
-  ["Gator Tracks", /\bGator Tracks\b/, "The daily recap, posted at 9 AM Eastern: volume, most traded coins and where the money went."],
+  ["Gator Tracks", /\bGator Tracks\b/, "The daily recap, posted at 12:01 AM Eastern: volume, most traded coins and where the money went."],
 ];
 const SKIP = "a, button, input, textarea, select, script, style, code, kbd, svg, .gloss, .nav, .site-header, .site-footer, .nav-tip, .gloss-tip, .search-panel, .beginner-bar, .gator, [data-no-gloss], h1";
 
