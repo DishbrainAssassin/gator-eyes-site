@@ -1,7 +1,7 @@
 // Tokens table: every coin on Solada.fun with windowed volume, net flow,
 // price change, graduation progress and each coin's Gator Eyes alerts.
 import { getApi, price, pct, signed, hours, age } from "./api.js?v=20261031s";
-import { coinUrl } from "./data.js?v=20261031s";
+import { coinUrl, fetchFeed } from "./data.js?v=20261031s";
 import { esc, fmt, compact, usdcx, timeAgo } from "./ui.js?v=20261031s";
 import { wireLinks, liveStatus } from "./common.js?v=20261031s";
 import * as platform from "./platform.js?v=20261031t";
@@ -124,12 +124,19 @@ moreBtn.addEventListener("click", () => { st.all = true; render(); });
 
 rowsEl.innerHTML = Array.from({ length: 8 }, () => `<tr><td colspan="10"><div class="skel-block" style="min-height:36px"></div></td></tr>`).join("");
 
+// Which launchpads the worker watches, read once from the feed so the status line is right even on a quiet Snek.fun day.
+let srcCache = null;
+async function sources(coins) {
+  if (!srcCache) { try { srcCache = (await fetchFeed()).sources || null; } catch {} }
+  return srcCache || { snek: { on: (coins || []).some((c) => c.src === "snek") } };
+}
+
 async function load() {
   try {
     const j = await getApi("/tokens");
     st.data = j;
     notice.hidden = true;
-    liveStatus({ updatedAt: new Date(j.updatedAt), sources: { snek: { on: (j.coins || []).some((c) => c.src === "snek") } } });
+    liveStatus({ updatedAt: new Date(j.updatedAt), sources: await sources(j.coins) });
     render();
   } catch (e) {
     liveStatus(null, e);
