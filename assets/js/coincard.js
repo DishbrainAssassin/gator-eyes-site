@@ -1,10 +1,15 @@
-// Coin share card: one coin's last 24 hours on Solada.fun as a 1200x675 PNG.
+// Coin share card: one coin's last 24 hours on Solada.fun or Snek.fun as a 1200x675 PNG.
 import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261031s";
-import { coinUrl } from "./data.js?v=20261031s";
+import { coinUrl, fetchFeed } from "./data.js?v=20261031s";
 import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261031s";
 import { wireLinks, liveStatus } from "./common.js?v=20261031s";
+import * as platform from "./platform.js?v=20261031t";
 
 wireLinks();
+platform.mount();
+platform.on(() => fillList());
+const siteOf = (c) => (c && c.src === "snek" ? "Snek.fun" : "Solada.fun");
+const linkOf = (c) => coinUrl(c.src === "snek" ? c.id : c.slug || c.id);
 const $ = (s) => document.querySelector(s);
 const canvas = $("[data-card]");
 const ctx = canvas.getContext("2d");
@@ -69,7 +74,7 @@ function draw() {
   if (avatar.naturalWidth) { ctx.save(); ctx.beginPath(); ctx.arc(P + 22, 62, 22, 0, Math.PI * 2); ctx.clip(); ctx.drawImage(avatar, P, 40, 44, 44); ctx.restore(); }
   text("GATOR EYES", P + 60, 70, { font: `800 20px ${F.d}`, color: C.amber, spacing: 4 });
   const now = new Date();
-  text("Last 24 hours on Solada.fun", W - P, 62, { font: `700 20px ${F.b}`, align: "right" });
+  text("Last 24 hours on " + siteOf(c), W - P, 62, { font: `700 20px ${F.b}`, align: "right" });
   text(now.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" }) + " ET", W - P, 86, { font: `500 15px ${F.b}`, color: C.muted, align: "right" });
 
   // coin identity
@@ -139,8 +144,13 @@ function draw() {
     text(fit(`${fmt(pc.need)} ADA to go · ${pc.etaH != null ? hours(pc.etaH) + " at this pace" : "not moving closer"}`, rw - 36, `500 14px ${F.b}`), rx + 18, y + 50, { font: `500 14px ${F.b}`, color: C.muted });
     y += 86;
   } else if (c.cs === "graduated") {
-    text("Graduated to Minswap", rx + 18, y, { font: `700 15px ${F.b}` });
+    text(c.src === "snek" ? "Graduated to Splash" : "Graduated to Minswap", rx + 18, y, { font: `700 15px ${F.b}` });
     if (c.gAt) text(fit(c.born ? `Took ${span(c.gAt - c.born)} from launch` : "", rw - 36, `500 14px ${F.b}`), rx + 18, y + 26, { font: `500 14px ${F.b}`, color: C.muted });
+    y += 62;
+  } else if (c.cs === "open" && c.src === "snek") {
+    // Snek.fun doesn't publish curve progress, so just say where the coin is.
+    text("On the Snek.fun bonding curve", rx + 18, y, { font: `700 15px ${F.b}` });
+    text(fit(c.born ? `Launched ${span(Date.now() - c.born)} ago` : "", rw - 36, `500 14px ${F.b}`), rx + 18, y + 26, { font: `500 14px ${F.b}`, color: C.muted });
     y += 62;
   }
   text("Gator Eyes alerts, 24h", rx + 18, y, { font: `700 15px ${F.b}` });
@@ -155,8 +165,8 @@ function draw() {
 
 function caption() {
   const c = coin, w = c.w.h24 || {};
-  const link = coinUrl(c.slug || c.id);
-  const bits = [`$${c.tk} on Solada.fun, last 24 hours`, `${fmt(w.v || 0)} ADA traded by ${fmt(w.wal || 0)} wallets. Net flow ${signed(w.net || 0)} ADA. Price ${w.ch != null ? pct(w.ch) : "flat"}.`];
+  const link = linkOf(c);
+  const bits = [`$${c.tk} on ${siteOf(c)}, last 24 hours`, `${fmt(w.v || 0)} ADA traded by ${fmt(w.wal || 0)} wallets. Net flow ${signed(w.net || 0)} ADA. Price ${w.ch != null ? pct(w.ch) : "flat"}.`];
   if (c.cs === "open" && c.prog != null) bits.push(`${(c.prog / 100).toFixed(0)}% of the way to graduating.`);
   bits.push(link);
   return bits.join("\n");
@@ -164,16 +174,19 @@ function caption() {
 
 function resolve(s) {
   s = (s || "").trim().replace(/^\$/, "");
-  const m = s.match(/solada\.fun\/(?:coin|token|c)\/([A-Za-z0-9_-]+)/i);
+  // A Solada.fun or Snek.fun coin link, a ticker, or a coin id / slug.
+  const m = s.match(/solada\.fun\/(?:coin|token|c)\/([A-Za-z0-9_-]+)/i) || s.match(/snek\.fun\/(?:token|coin)\/([0-9a-f]{58,})/i);
   if (m) s = m[1];
   const l = s.toLowerCase();
-  return data.coins.find((c) => (c.tk || "").toLowerCase() === l) || data.coins.find((c) => c.id === s || c.slug === s);
+  // Tickers can repeat across launchpads: a coin in the chosen launchpad scope wins, then any coin.
+  const byTk = data.coins.filter((c) => (c.tk || "").toLowerCase() === l);
+  return byTk.find((c) => platform.inScope(c)) || byTk[0] || data.coins.find((c) => c.id === s || c.slug === s);
 }
 
 async function show(s) {
   const n = $("[data-notice]");
   const c = resolve(s);
-  if (!c) { n.hidden = false; n.innerHTML = "<strong>Coin not found.</strong> Pick one from the list, or paste its Solada.fun link."; return; }
+  if (!c) { n.hidden = false; n.innerHTML = "<strong>Coin not found.</strong> Pick one from the list, or paste its Solada.fun or Snek.fun link."; return; }
   n.hidden = true;
   coin = c;
   $("[data-coin]").value = c.tk || c.id;
@@ -237,37 +250,46 @@ async function loadSeries(c) {
   series = [];
   if (c.id === "SOLADA") return;
   const from = Date.now() - 864e5;
-  let before = "", list = [];
+  let before = "", list = [], dec = 6;
   try {
     for (let i = 0; i < 6; i++) {
       const j = await getApi("/coin-trades", { coin: c.slug || c.id, before });
       list.push(...j.trades);
+      if (j.dec != null) dec = Number(j.dec);
       const last = j.trades[j.trades.length - 1];
       if (!j.more || !last || last.at < from) break;
-      before = last.at;
+      // Solada pages by timestamp; Snek.fun pages by offset, handed back as `next`.
+      before = j.next != null ? j.next : last.at;
     }
   } catch {}
-  // Solada coins use 6 decimals, so price per token = ADA / (raw tokens / 1e6).
-  const pts = list.filter((t) => t.tokens && t.ada).map((t) => [t.at, t.ada / (Number(t.tokens) / 1e6)]).sort((a, b) => a[0] - b[0]);
+  // Price per token = ADA / (raw tokens / 10^decimals). Solada coins use 6 decimals, most Snek.fun coins none.
+  const pts = list.filter((t) => t.tokens && t.ada).map((t) => [t.at, t.ada / (Number(t.tokens) / 10 ** dec)]).sort((a, b) => a[0] - b[0]);
   const before24 = pts.filter((p) => p[0] < from).pop();
   series = [...(before24 ? [[from, before24[1]]] : []), ...pts.filter((p) => p[0] >= from)];
 }
 
 $("[data-pick]").addEventListener("submit", (e) => { e.preventDefault(); show($("[data-coin]").value); });
 
+function fillList() {
+  if (!data) return;
+  const seen = new Set();
+  $("[data-list]").innerHTML = data.coins.filter((c) => c.tk && platform.inScope(c) && !seen.has(c.tk + "|" + platform.srcOf(c)) && seen.add(c.tk + "|" + platform.srcOf(c)))
+    .map((c) => `<option value="${esc(c.tk)}">${esc(c.name || "")}${platform.get() === "all" && c.src === "snek" ? " · Snek.fun" : ""}</option>`).join("");
+}
+
 async function init() {
   try {
     data = await getApi("/tokens");
-    liveStatus({ updatedAt: new Date(data.updatedAt) });
+    let sources; try { sources = (await fetchFeed()).sources || undefined; } catch {}
+    liveStatus({ updatedAt: new Date(data.updatedAt), sources });
   } catch (e) {
     liveStatus(null, e);
     const n = $("[data-notice]"); n.hidden = false; n.innerHTML = "<strong>Can't reach the Gator Eyes feed right now.</strong> Try again in a minute.";
     return;
   }
-  const seen = new Set();
-  $("[data-list]").innerHTML = data.coins.filter((c) => c.tk && !seen.has(c.tk) && seen.add(c.tk)).map((c) => `<option value="${esc(c.tk)}">${esc(c.name || "")}</option>`).join("");
+  fillList();
   const pre = new URLSearchParams(location.search).get("coin");
-  const def = pre || ([...data.coins].sort((a, b) => ((b.w.h24 || {}).v || 0) - ((a.w.h24 || {}).v || 0))[0] || {}).id;
+  const def = pre || ([...data.coins].filter((c) => platform.inScope(c)).sort((a, b) => ((b.w.h24 || {}).v || 0) - ((a.w.h24 || {}).v || 0))[0] || {}).id;
   if (def) show(def);
 }
 init();

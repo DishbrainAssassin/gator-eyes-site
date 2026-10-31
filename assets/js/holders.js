@@ -1,11 +1,15 @@
-// Holder snapshot: every Cardano holder of a Solada.fun coin, filtered by rules,
+// Holder snapshot: every Cardano holder of a Solada.fun or Snek.fun coin, filtered by rules,
 // ready to download as a CSV for airdrops.
 import { getApi } from "./api.js?v=20261031s";
-import { coinUrl } from "./data.js?v=20261031s";
+import { coinUrl, fetchFeed } from "./data.js?v=20261031s";
 import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261031s";
 import { wireLinks, liveStatus } from "./common.js?v=20261031s";
+import * as platform from "./platform.js?v=20261031t";
+import { pill } from "./platform.js?v=20261031t";
 
 wireLinks();
+platform.mount();
+platform.on(() => fillList());
 const $ = (s) => document.querySelector(s);
 const R = (k) => document.querySelector(`[data-r="${k}"]`);
 const st = { coins: [], snap: null, trades: null, tradesKey: "", out: [], more: false, busy: 0 };
@@ -28,20 +32,29 @@ function notice(html) { const n = $("[data-notice]"); n.hidden = !html; n.innerH
 
 function resolve(input) {
   let s = (input || "").trim();
-  const m = s.match(/solada\.fun\/(?:coin|token|c)\/([A-Za-z0-9_-]+)/i);
+  // Accept a Solada.fun or Snek.fun coin link, a $ticker, or a coin id / slug.
+  const m = s.match(/solada\.fun\/(?:coin|token|c)\/([A-Za-z0-9_-]+)/i) || s.match(/snek\.fun\/(?:token|coin)\/([0-9a-f]{58,})/i);
   if (m) s = m[1];
   s = s.replace(/^\$/, "");
-  const hit = st.coins.find((c) => (c.tk || "").toLowerCase() === s.toLowerCase()) || st.coins.find((c) => c.id === s || c.slug === s);
+  // Tickers can repeat across launchpads: a coin in the chosen launchpad scope wins, then any coin.
+  const byTk = st.coins.filter((c) => (c.tk || "").toLowerCase() === s.toLowerCase());
+  const hit = byTk.find((c) => platform.inScope(c)) || byTk[0] || st.coins.find((c) => c.id === s || c.slug === s);
   return hit ? hit.slug || hit.id : s;
+}
+
+function fillList() {
+  const seen = new Set();
+  $("[data-list]").innerHTML = st.coins.filter((c) => c.tk && platform.inScope(c) && !seen.has(c.tk + "|" + platform.srcOf(c)) && seen.add(c.tk + "|" + platform.srcOf(c)))
+    .map((c) => `<option value="${esc(c.tk)}">${esc(c.name || "")}${platform.get() === "all" && c.src === "snek" ? " · Snek.fun" : ""}</option>`).join("");
 }
 
 async function loadList() {
   try {
     const j = await getApi("/tokens");
     st.coins = j.coins || [];
-    liveStatus({ updatedAt: new Date(j.updatedAt) });
-    const seen = new Set();
-    $("[data-list]").innerHTML = st.coins.filter((c) => c.tk && !seen.has(c.tk) && seen.add(c.tk)).map((c) => `<option value="${esc(c.tk)}">${esc(c.name || "")}</option>`).join("");
+    let sources; try { sources = (await fetchFeed()).sources || undefined; } catch {}
+    liveStatus({ updatedAt: new Date(j.updatedAt), sources });
+    fillList();
   } catch (e) { liveStatus(null, e); }
 }
 
@@ -60,18 +73,20 @@ async function loadCoin(e) {
     if (!dec && c.supply) dec = Math.max(0, Math.round(Math.log10(Number(c.supply))) - 9);
     st.dec = dec;
     const im = c.img ? `<img src="${esc(c.img)}" alt="" width="36" height="36">` : "";
-    $("[data-head]").innerHTML = `${im}<div><h2 class="panel-title"><a href="${esc(coinUrl(c.slug || c.id))}" target="_blank" rel="noopener">${esc(c.tk || "?")}</a> holders</h2><span class="cell-sub">${esc(c.name || "")} · ${fmt(j.holders.length)} addresses on Cardano</span></div>`;
+    const snek = c.src === "snek";
+    $("[data-head]").innerHTML = `${im}<div><h2 class="panel-title"><a href="${esc(coinUrl(snek ? c.id : c.slug || c.id))}" target="_blank" rel="noopener">${esc(c.tk || "?")}</a> holders ${pill(snek ? "snek" : "solada", { button: false })}</h2><span class="cell-sub">${esc(c.name || "")} · ${fmt(j.holders.length)} addresses on Cardano${snek ? " · Snek.fun has no address labels, so its curve and pool contracts fall under \"other contracts\"" : ""}</span></div>`;
     $("[data-taken]").textContent = "Snapshot taken " + new Date(j.at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" }) + " ET";
     $("[data-rules]").hidden = false;
     $("[data-result]").hidden = false;
     const u = new URL(location.href); u.searchParams.set("coin", c.tk || id); history.replaceState(null, "", u);
     await apply();
   } catch (err) {
-    notice(`<strong>Couldn't load holders.</strong> ${esc(err.message || err)}. Check the ticker or paste the coin link from Solada.fun.`);
+    notice(`<strong>Couldn't load holders.</strong> ${esc(err.message || err)}. Check the ticker or paste the coin link from Solada.fun or Snek.fun.`);
   } finally { btn.disabled = false; btn.textContent = "Load holders"; }
 }
 
-// Pages back through the coin's Solada trades until `stopAt` (or the start).
+// Pages back through the coin's launchpad trades until `stopAt` (or the start).
+// Solada pages by timestamp; Snek.fun pages by offset, which the worker hands back as `next`.
 async function tradesUntil(stopAt) {
   if (st.trades && st.trades.id === st.snap.coin.id && st.trades.reach <= stopAt) return st.trades.list;
   const list = [];
@@ -83,7 +98,7 @@ async function tradesUntil(stopAt) {
     list.push(...j.trades);
     pages++;
     more = j.more && j.trades.length;
-    if (j.trades.length) { reach = j.trades[j.trades.length - 1].at; before = reach; }
+    if (j.trades.length) { reach = j.trades[j.trades.length - 1].at; before = j.next != null ? j.next : reach; }
     prog.textContent = `Reading trade history… ${fmt(list.length)} trades so far`;
   }
   prog.hidden = true;
