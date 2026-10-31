@@ -80,14 +80,17 @@ function renderRows() {
   let list = live.filter(platform.inScope);
   list.sort((a, b) => (val(a, st.sort) - val(b, st.sort)) * st.dir || (val(b, "v") - val(a, "v")));
   const miss = missing.filter(platform.inScope);
-  let html = list.map((c) => coinRow(c, { win: st.win, rate: st.data.adaUsd, showPill: lp === "all", more: true })).join("") + miss.map((x) => missingRow(x)).join("");
+  const html = list.map((c) => coinRow(c, { win: st.win, rate: st.data.adaUsd, showPill: lp === "all", more: true })).join("") + miss.map((x) => missingRow(x)).join("");
+  const emptyEl = $("[data-empty]"), tableWrap = rowsEl.closest(".table-wrap");
   if (!html) {
     const msg = !saved.length ? "Nothing starred yet." : `None of your starred coins are on ${platform.label(lp)}.`;
     const hint = !saved.length
       ? ` Tap the star next to any coin on the <a href="./tokens.html">Tokens</a> page, or type a ticker in the box above. The list is saved in this browser, no sign-up.`
       : ` <button type="button" class="link" data-platform="all">Show all launchpads</button>.`;
-    html = `<tr><td colspan="11">${emptyState(msg, hint)}</td></tr>`;
+    emptyEl.innerHTML = emptyState(msg, hint);
   }
+  emptyEl.hidden = !!html;
+  tableWrap.hidden = !html;
   rowsEl.innerHTML = html;
   watchlist.wire();
   renderKpis(live);
