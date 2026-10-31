@@ -1,10 +1,10 @@
 // Ask Gator: a small helper that answers common questions about Gator Eyes and
 // Solada.fun. Answers are built in (no AI, no running cost). Live questions
 // about coins use the same /tokens data as the Tokens page.
-import { CONFIG } from "./config.js?v=20261031s";
-import { coinUrl, joinUrl } from "./data.js?v=20261031s";
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261031s";
-import { esc, fmt, compact } from "./ui.js?v=20261031s";
+import { CONFIG } from "./config.js?v=20261031t";
+import { coinUrl, joinUrl } from "./data.js?v=20261031t";
+import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261031t";
+import { esc, fmt, compact } from "./ui.js?v=20261031t";
 
 const DISCORD = CONFIG.discord;
 const a = (href, label, ext) => `<a href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(label)}</a>`;
@@ -46,6 +46,18 @@ function top(list, n, line) {
   return "<ol>" + list.slice(0, n).map((c) => `<li>${line(c)}</li>`).join("") + "</ol>";
 }
 const coinLink = (c) => `<strong>${a(coinUrl(c.id), tk(c), true)}</strong>`;
+
+// "5 newest", "top 3", "ten newest": how many items the person asked for.
+const NUMS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10 };
+function countIn(q, dflt) {
+  const m = (q || "").match(/\b(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten)\b/);
+  const n = m ? NUMS[m[1]] || parseInt(m[1], 10) : dflt;
+  return Math.max(1, Math.min(10, n || dflt));
+}
+// Asking for a list of coins rather than one coin.
+const LIST_RE = /\b(tokens|coins|launches|projects|newest|latest|recent|top \d+|top (three|five|ten)|which|list|ranking|rank|\d+ (new|top|best|most|biggest))\b/;
+// "on solada", "solada.fun", "how is solada": the platform, not the $SOLADA coin.
+const PLATFORM_RE = /\b(on|in|across|at|from|of|for) solada\b|solada\.fun|\bsolada (today|market|launchpad|platform|overall|right now)\b|\bhow('s| is) solada\b/;
 
 const LIVE = [
   {
@@ -95,12 +107,16 @@ const LIVE = [
     },
   },
   {
-    keys: ["new coin", "newest", "just launched", "new launch", "latest coin", "recent launch", "new token"],
-    run: async () => {
+    keys: ["new coin", "newest", "just launched", "new launch", "latest coin", "latest token", "latest launch", "recent launch", "recently launched", "new token", "newly launched", "launched today"],
+    run: async (q) => {
       const d = await tokens();
-      const l = d.coins.filter((c) => c.born && Date.now() - c.born < 2 * 864e5).sort((x, y) => y.born - x.born);
-      if (!l.length) return "No new coins in the last two days that have traded.";
-      return `Newest coins that have traded:${top(l, 5, (c) => `${coinLink(c)} ${esc(span(Date.now() - c.born))} old, ${fmt(h24(c).v)} ADA traded`)}Fast starters get posted in #fast-launch on ${discord()}.`;
+      const n = countIn(q, 5);
+      const all = d.coins.filter((c) => c.born && c.kind !== "solada").sort((x, y) => y.born - x.born);
+      if (!all.length) return "I don't have launch times right now. Give it a minute and ask again.";
+      const recent = all.filter((c) => Date.now() - c.born < 2 * 864e5);
+      const l = recent.length >= n ? recent : all;
+      const head = l === recent ? `The ${l.length === 1 ? "newest coin" : Math.min(n, l.length) + " newest coins"} on Solada.fun that have traded:` : `Not many new coins in the last two days, so here are the ${Math.min(n, l.length)} newest that have traded:`;
+      return `${head}${top(l, n, (c) => `${coinLink(c)}${c.name && c.name !== c.tk ? " (" + esc(c.name) + ")" : ""} launched ${esc(span(Date.now() - c.born))} ago, ${fmt(h24(c).v)} ADA traded in 24h`)}Sort by age on the ${page("tokens.html", "Tokens page")}. Fast starters get posted in #fast-launch on ${discord()}.`;
     },
   },
   {
@@ -176,10 +192,22 @@ async function findCoin(q) {
   if (!d) return null;
   const words = new Set(q.toUpperCase().match(/\$?[A-Z0-9]{2,12}/g)?.map((w) => w.replace("$", "")) || []);
   const skip = new Set(["THE", "IS", "IT", "ON", "TO", "OF", "AND", "HOW", "WHAT", "ADA", "ETA", "CSV", "API", "USD", "NET", "TOP", "NEW", "DEV", "BUY", "SELL", "SHOW", "FOR", "ME", "MY", "DO", "YOU", "ARE", "CAN", "TODAY", "COIN", "COINS", "X", "SITE", "DOING", "ABOUT", "TELL", "GATOR", "EYES"]);
+  // "Solada" on its own usually means the launchpad. Only treat it as the $SOLADA coin
+  // when written with a $ or when the question isn't about the platform or a list of coins.
+  const lq = norm(q);
+  if (!/\$solada\b/i.test(q) && (PLATFORM_RE.test(lq) || LIST_RE.test(lq))) skip.add("SOLADA");
   const hits = d.coins.filter((c) => c.tk && words.has(c.tk.toUpperCase()) && (!skip.has(c.tk.toUpperCase()) || q.includes("$" + c.tk)));
   if (!hits.length) return null;
   // Same ticker on more than one coin: take the busier one.
   return hits.sort((x, y) => h24(y).v - h24(x).v)[0];
+}
+
+// When the question isn't clear, say so and show what I can answer instead of guessing.
+const CAN_DO = ["5 newest coins", "Most traded today", "What's close to graduating?", "Biggest inflow today", "Top 10 by market cap", "How is Solada doing today?"];
+function notSure(coin) {
+  const opts = "<ul>" + CAN_DO.map((x) => `<li><em>${esc(x)}</em></li>`).join("") + "</ul>";
+  if (coin) return `I'm not sure what you're after. If you want ${esc(tk(coin))}'s numbers, ask <em>${esc(tk(coin))}</em> on its own. If you want a list, I can do:${opts}`;
+  return `Hmm, that's not in my notes yet. I can answer things like:${opts}Or try a coin ticker like $MEPE, or ask about the alerts, net flow, holder snapshots or share cards. For anything else, ask in ${discord()}.`;
 }
 
 async function answer(raw) {
@@ -193,18 +221,26 @@ async function answer(raw) {
     if (!/\b(alert|graduat|net flow|holder|card|follow|embed|widget)\b/.test(q)) return `Which coin? Ask like <em>socials $MEPE</em> and I'll list what the creator put on Solada.fun.`;
   }
   if (advice) return `I just crunch the numbers, I can't tell you what to buy or sell. Gator Eyes reports what traded, not what to do next.${coin ? " Here's what " + esc(tk(coin)) + " has been doing:<br><br>" + coinAnswer(coin) : ""}`;
-  if (coin && (!/\b(what is|what's|how do|how does)\b/.test(q) || q.includes("$" + coin.tk.toLowerCase()) || new RegExp("\\b(of|for|about|on|with) \\$?" + coin.tk.toLowerCase() + "\\b").test(q))) return coinAnswer(coin);
-
   const score = (keys, not = []) => (not.some((k) => q.includes(k)) ? 0 : keys.reduce((s, k) => s + (q.includes(k) ? k.length : 0), 0));
-  let best = null, bestS = 0;
-  for (const it of LIVE) { const s = score(it.keys, it.not); if (s > bestS) { best = it; bestS = s; } }
+  let best = null, bestS = 0, live = null, liveS = 0;
+  for (const it of LIVE) { const s = score(it.keys, it.not); if (s > liveS) { live = it; liveS = s; } }
+  best = live; bestS = liveS;
   for (const it of FAQ) { const s = score(it.keys); if (s > bestS) { best = it; bestS = s; } }
-  if (coin && !best) return coinAnswer(coin);
-  if (best) {
-    try { return best.run ? await best.run() : best.a(); }
+  const listAsk = LIST_RE.test(q);
+  const run = async (it) => {
+    try { return it.run ? await it.run(q) : it.a(); }
     catch { return "My data feed isn't answering right now. Give it a minute and ask again."; }
+  };
+  // A list question ("5 newest tokens", "top coins") beats a ticker that happens to be in it.
+  if (live && listAsk && (coin || best === live)) return run(live);
+  if (coin && (!/\b(what is|what's|how do|how does)\b/.test(q) || q.includes("$" + coin.tk.toLowerCase()) || new RegExp("\\b(of|for|about|on|with) \\$?" + coin.tk.toLowerCase() + "\\b").test(q))) {
+    // Looks like a list question we don't have an answer for: ask instead of guessing.
+    if (listAsk && !q.includes("$" + coin.tk.toLowerCase())) return notSure(coin);
+    return coinAnswer(coin);
   }
-  return `Hmm, that's not in my notes yet. Try a coin ticker like $MEPE, or ask about the alerts, graduation, net flow, holder snapshots or share cards. For anything else, ask in ${discord()}.`;
+  if (coin && !best) return listAsk ? notSure(coin) : coinAnswer(coin);
+  if (best) return run(best);
+  return notSure(null);
 }
 
 // ---------- widget ----------
