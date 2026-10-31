@@ -1,7 +1,7 @@
 // Site-wide coin search and beginner mode. Loaded on every page by common.js.
-import { getApi, price } from "./api.js?v=20261031w";
-import { coinUrl, joinUrl } from "./data.js?v=20261031w";
-import { esc, compact } from "./ui.js?v=20261031w";
+import { getApi, price } from "./api.js?v=20261031y";
+import { coinUrl, joinUrl } from "./data.js?v=20261031y";
+import { esc, compact } from "./ui.js?v=20261031y";
 
 const KEY = "ge-beginner";
 
@@ -153,7 +153,7 @@ const TERMS = [
   ["Graduation", /\bgraduat(?:es|ed|ing|ion)\b/i, "When a coin's bonding curve fills up, it graduates and trading moves to a regular Minswap pool."],
   ["Net flow", /\bnet (?:flow|buying)\b/i, "ADA bought minus ADA sold. Above zero means more money came in than went out."],
   ["Market cap", /\bmarket cap\b/i, "Price times total supply. A rough size of the coin, not cash anyone could take out."],
-  ["Whale trade", /\bwhales?\b/i, "Any single trade worth $500 or more in ADA, or a trade worth at least 5% of the coin's market cap."],
+  ["Whale trade", /\bwhales?\b/i, "Any single trade worth $1,000 or more in ADA, or a trade worth at least 5% of the coin's market cap."],
   ["Volume spike", /\b(?:volume )?spikes?\b/i, "A coin trading four times its normal pace over 15 minutes, with at least 1,500 ADA moving."],
   ["Creator sell", /\b(?:creator|dev) sells?\b/i, "The wallet that made the coin sold 100 ADA or more. It's posted as a record, not a warning. Creators sell for lots of reasons."],
   ["Fast launch", /\bfast launch(?:es)?\b/i, "A new coin that pulls in 1,000 ADA from eight or more wallets in its first hour."],

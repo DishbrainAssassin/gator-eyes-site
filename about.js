@@ -12,7 +12,7 @@ const hour = (h) => (h === 0 ? "12 AM" : h < 12 ? h + " AM" : h === 12 ? "12 PM"
 
 function renderRules(r) {
   const rows = [
-    ["k-whale", "Whale trade", `Any single trade of ${fmt(r.bigAda)} ADA or more, or a trade worth at least ${fmt(r.mcapPct)}% of a coin's market cap (minimum ${fmt(r.mcapMinAda)} ADA).`, "#whale-alerts"],
+    ["k-whale", "Whale trade", `Any single trade worth $${fmt(r.bigUsd || 1000)} or more in ADA (about ${fmt(r.bigAda)} ADA at today's price), or a trade worth at least ${fmt(r.mcapPct)}% of a coin's market cap (minimum ${fmt(r.mcapMinAda)} ADA).`, "#whale-alerts"],
     ["k-spike", "Volume spike", `At least ${fmt(r.spikeMinAda)} ADA traded in ${fmt(r.spikeWindowMin)} minutes, at ${fmt(r.spikeMult)} times or more the coin's normal pace, from two or more wallets. One per coin per hour.`, "#whale-alerts"],
     ["k-dev", "Creator sell", `The wallet that created a coin sells ${fmt(r.creatorMinAda)} ADA or more. Posted for transparency. Creators sell for lots of reasons.`, "#creator-sells"],
     ["k-launch", "Fast launch", `A new coin pulls in ${fmt(r.launchMinAda)} ADA of buys from ${fmt(r.launchMinBuyers)} or more wallets within its first ${fmt(r.launchWindowMin)} minutes.`, "#fast-launch"],
