@@ -33,6 +33,7 @@ const el = {
   split: $("[data-lp-split]"),
 };
 
+const SHOW_ALL = ' <button type="button" class="link" data-platform="all">Show all launchpads</button>';
 const VENUES = { curve: "Solada curve", minswap: "Minswap", splash: "Splash", pump: "Pump.fun", other: "Other", "snek-curve": "Snek.fun curve", "snek-splash": "Snek.fun splash" };
 const STALE_MS = 15 * 60000;
 
@@ -289,7 +290,7 @@ function renderAlerts() {
   const list = feed.alerts.filter(platform.inScope).slice(0, 6);
   el.alerts.innerHTML = list.length
     ? list.map(alertCard).join("")
-    : emptyState(lp === "all" ? "Quiet water. No alerts in the last few hours." : `No ${platform.label(lp)} alerts in the last few hours. <button type="button" class="link" data-platform="all">Show all launchpads</button>`);
+    : emptyState(lp === "all" ? "Quiet water. No alerts in the last few hours." : `No ${platform.label(lp)} alerts in the last few hours.`, lp === "all" ? "" : SHOW_ALL);
 }
 
 const body = document.querySelector(".dash-body");
@@ -304,8 +305,8 @@ function render() {
     el.days.innerHTML = "";
     el.kpis.innerHTML = "";
     const lp = platform.get();
-    const msg = lp === "all" ? "Counting starts with the first trade of the day." : `No ${platform.label(lp)} trades counted yet today. <button type="button" class="link" data-platform="all">Show all launchpads</button>`;
-    for (const t of [el.hours, el.venues, el.inflow, el.outflow, el.week]) t.innerHTML = emptyState(msg);
+    const msg = lp === "all" ? "Counting starts with the first trade of the day." : `No ${platform.label(lp)} trades counted yet today.`;
+    for (const t of [el.hours, el.venues, el.inflow, el.outflow, el.week]) t.innerHTML = emptyState(msg, lp === "all" ? "" : SHOW_ALL);
     el.coins.innerHTML = "";
     return;
   }

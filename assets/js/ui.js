@@ -98,8 +98,8 @@ export function alertCard(a) {
   </article>`;
 }
 
-export function emptyState(msg) {
-  return `<div class="empty"><p>${esc(msg)}</p></div>`;
+export function emptyState(msg, html = "") {
+  return `<div class="empty"><p>${esc(msg)}${html}</p></div>`;
 }
 
 export function skeleton(n = 4) {

@@ -3,6 +3,8 @@ import { alertCard, emptyState, skeleton, tracks, mergeDays, lpSplit, dayLabel, 
 import { wireLinks, liveStatus } from "./common.js?v=20261031s";
 import * as platform from "./platform.js?v=20261031s";
 
+const SHOW_ALL = ' <button type="button" class="link" data-platform="all">Show all launchpads</button>';
+
 wireLinks();
 platform.mount();
 platform.on(() => {
@@ -51,11 +53,12 @@ function renderAlerts() {
   const list = scoped.filter((a) => filter === "all" || a.kind === filter);
   if (!list.length) {
     const lp = platform.get();
-    const other = lp !== "all" && feed.alerts.length > scoped.length ? ` <button type="button" class="link" data-platform="all">Show all launchpads</button>` : "";
+    const other = lp !== "all" && feed.alerts.length > scoped.length ? SHOW_ALL : "";
     listEl.innerHTML = emptyState(
-      (lp !== "all"
+      lp !== "all"
         ? `No ${platform.label(lp)} alerts in the last few hours.`
-        : filter === "all" ? "Quiet water. No alerts in the last few hours." : "Nothing in this category yet. The gator is still watching.") + other
+        : filter === "all" ? "Quiet water. No alerts in the last few hours." : "Nothing in this category yet. The gator is still watching.",
+      other
     );
   } else {
     listEl.innerHTML = list.slice(0, shown).map(alertCard).join("");
@@ -70,9 +73,8 @@ function renderTracks() {
     daysEl.innerHTML = "";
     const lp = platform.get();
     tracksEl.innerHTML = emptyState(
-      lp !== "all"
-        ? `No ${platform.label(lp)} trades counted yet today. <button type="button" class="link" data-platform="all">Show all launchpads</button>`
-        : "Gator Tracks starts counting with the first trade of the day."
+      lp !== "all" ? `No ${platform.label(lp)} trades counted yet today.` : "Gator Tracks starts counting with the first trade of the day.",
+      lp !== "all" ? SHOW_ALL : ""
     );
     return;
   }
