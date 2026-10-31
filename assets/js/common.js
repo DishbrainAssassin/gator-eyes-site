@@ -18,7 +18,7 @@ export function wireLinks(root = document) {
     a.rel = "noopener";
   });
   navTips();
-  import("./gator.js?v=20261030m").then((m) => m.mountGator()).catch(() => {});
+  import("./gator.js?v=20261031a").then((m) => m.mountGator()).catch(() => {});
   import("./extras.js?v=20261030m").then((m) => m.mountExtras()).catch(() => {});
 }
 

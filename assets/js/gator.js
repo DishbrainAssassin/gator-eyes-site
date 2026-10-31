@@ -50,7 +50,7 @@ const coinLink = (c) => `<strong>${a(coinUrl(c.id), tk(c), true)}</strong>`;
 const LIVE = [
   {
     keys: ["graduat", "close to", "closest", "race", "bonding", "curve", "eta", "almost"],
-    not: ["what is", "what's a", "what does", "how does", "mean"],
+    not: ["what is graduat", "what's graduat", "what does graduat", "how does graduat", "graduation mean", "graduate mean", "bonding curve", "what is a bonding", "what's a bonding"],
     run: async () => {
       const d = await tokens();
       const open = d.coins.filter((c) => c.cs === "open" && c.prog != null).sort((x, y) => y.prog - x.prog);
