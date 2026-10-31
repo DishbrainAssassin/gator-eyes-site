@@ -60,6 +60,7 @@ const LIVE = [
   },
   {
     keys: ["most traded", "top volume", "highest volume", "busiest", "hot", "trending", "popular", "top coins", "biggest coins", "most volume"],
+    not: ["market cap", "marketcap", "mcap"],
     run: async () => {
       const d = await tokens();
       const l = [...d.coins].sort((x, y) => h24(y).v - h24(x).v);
@@ -82,6 +83,15 @@ const LIVE = [
       const l = d.coins.filter((c) => h24(c).net < 0).sort((x, y) => h24(x).net - h24(y).net);
       if (!l.length) return "No coin has more selling than buying in the last 24 hours.";
       return `Biggest net selling in the last 24 hours:${top(l, 5, (c) => `${coinLink(c)} ${esc(signed(h24(c).net))} ADA`)}`;
+    },
+  },
+  {
+    keys: ["market cap", "marketcap", "mcap", "biggest by", "largest coin", "largest token", "top 10", "top ten", "most valuable"],
+    run: async () => {
+      const d = await tokens();
+      const l = d.coins.filter((c) => c.mc && c.kind !== "solada").sort((x, y) => y.mc - x.mc);
+      if (!l.length) return "I don't have market caps right now. Give it a minute and ask again.";
+      return `Biggest by market cap right now:${top(l, 10, (c) => `${coinLink(c)} ${compact(c.mc)} ADA${c.hold ? ", " + fmt(c.hold) + " holders" : ""}`)}I only know today's numbers, not how long anyone has been up there. Sort by market cap on the ${page("tokens.html", "Tokens page")}.`;
     },
   },
   {
@@ -170,7 +180,7 @@ async function answer(raw) {
   const advice = ADVICE.some((k) => q.includes(k));
   const coin = await findCoin(raw);
   if (advice) return `I just crunch the numbers, I can't tell you what to buy or sell. Gator Eyes reports what traded, not what to do next.${coin ? " Here's what " + esc(tk(coin)) + " has been doing:<br><br>" + coinAnswer(coin) : ""}`;
-  if (coin && !/\b(what is|what's|how do|how does)\b/.test(q)) return coinAnswer(coin);
+  if (coin && (!/\b(what is|what's|how do|how does)\b/.test(q) || q.includes("$" + coin.tk.toLowerCase()) || new RegExp("\\b(of|for|about|on|with) \\$?" + coin.tk.toLowerCase() + "\\b").test(q))) return coinAnswer(coin);
 
   const score = (keys, not = []) => (not.some((k) => q.includes(k)) ? 0 : keys.reduce((s, k) => s + (q.includes(k) ? k.length : 0), 0));
   let best = null, bestS = 0;
