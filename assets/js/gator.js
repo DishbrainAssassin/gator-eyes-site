@@ -1,10 +1,10 @@
 // Ask Gator: a small helper that answers common questions about Gator Eyes and
 // Solada.fun. Answers are built in (no AI, no running cost). Live questions
 // about coins use the same /tokens data as the Tokens page.
-import { CONFIG } from "./config.js?v=20261031w";
-import { coinUrl, joinUrl } from "./data.js?v=20261031w";
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261031w";
-import { esc, fmt, compact } from "./ui.js?v=20261031w";
+import { CONFIG } from "./config.js?v=20261031y";
+import { coinUrl, joinUrl } from "./data.js?v=20261031y";
+import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261031y";
+import { esc, fmt, compact } from "./ui.js?v=20261031y";
 
 const DISCORD = CONFIG.discord;
 const a = (href, label, ext) => `<a href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(label)}</a>`;
@@ -191,8 +191,8 @@ const LIVE = [
 const ABOUT_ME = [" of you ", " of you?", "you like", "like you", "of yourself", "your picture", "your pic", "your face", "your look", "you look", "pic of you", "photo of you", "your avatar", "your art"];
 const FAQ = [
   { keys: ["what is gator eyes", "what's gator eyes", "what does gator eyes", "about gator eyes", "who are you", "what are you", "what is this site", "what is this"], a: () => `I'm Quagmire, resident data nerd at Gator Eyes. Gator Eyes is a free, automated tracker for Solada.fun. It reads every public trade every two minutes, adds up where the money moves, and posts what stands out to ${discord()} and X. No sign-up, no wallet connection.` },
-  { keys: ["alerts mean", "types of alert", "what alerts", "alert types", "kinds of alert", "what triggers", "alert rules"], a: () => `Four kinds of alert:<ul><li><strong>Whale trade</strong>: a trade worth $500 or more in ADA, or one worth at least 5% of the coin's market cap.</li><li><strong>Volume spike</strong>: a coin trading 4 times its normal pace over 15 minutes, with at least 1,500 ADA moving.</li><li><strong>Fast launch</strong>: a new coin pulling in 1,000 ADA from 8 or more wallets in its first hour.</li><li><strong>Creator sell</strong>: the wallet that created a coin selling 100 ADA or more. Posted as a record, not a warning.</li></ul>More on the ${page("about.html", "How it works page")}.` },
-  { keys: ["whale"], a: () => `A whale alert is any single trade worth $500 or more in ADA (the ADA amount moves with the price), or a trade worth at least 5% of the coin's market cap. They post in #whale-alerts on ${discord()}.` },
+  { keys: ["alerts mean", "types of alert", "what alerts", "alert types", "kinds of alert", "what triggers", "alert rules"], a: () => `Four kinds of alert:<ul><li><strong>Whale trade</strong>: a trade worth $1,000 or more in ADA, or one worth at least 5% of the coin's market cap.</li><li><strong>Volume spike</strong>: a coin trading 4 times its normal pace over 15 minutes, with at least 1,500 ADA moving.</li><li><strong>Fast launch</strong>: a new coin pulling in 1,000 ADA from 8 or more wallets in its first hour.</li><li><strong>Creator sell</strong>: the wallet that created a coin selling 100 ADA or more. Posted as a record, not a warning.</li></ul>More on the ${page("about.html", "How it works page")}.` },
+  { keys: ["whale"], a: () => `A whale alert is any single trade worth $1,000 or more in ADA (the ADA amount moves with the price), or a trade worth at least 5% of the coin's market cap. They post in #whale-alerts on ${discord()}.` },
   { keys: ["spike"], a: () => "A volume spike means a coin traded at 4 times its normal pace over 15 minutes, with at least 1,500 ADA moving. Each coin can spike at most once an hour so the channel doesn't flood." },
   { keys: ["fast launch"], a: () => `A fast launch is a new coin that pulls in 1,000 ADA from 8 or more different wallets in its first hour. They post in #fast-launch on ${discord()}.` },
   { keys: ["creator sell", "dev sell", "creator wallet", "dev wallet", "rug"], a: () => `A creator sell is the wallet that made a coin selling 100 ADA or more. It's posted for transparency, not as a warning. Creators sell for lots of reasons. Gator Eyes doesn't rate coins or call rugs. For a safety check, a tool like ${a("https://suriradar.fun/", "Suri Radar", true)} is built for that.` },

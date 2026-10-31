@@ -59,7 +59,7 @@ function neutral(a) {
   };
 }
 
-export const RULES_DEFAULT = { bigAda: 1000, mcapPct: 5, mcapMinAda: 250, spikeMinAda: 1500, spikeMult: 4, spikeWindowMin: 15, creatorMinAda: 100, launchMinAda: 1000, launchMinBuyers: 8, launchWindowMin: 60, recapHourET: 9, refreshMin: 2 };
+export const RULES_DEFAULT = { bigUsd: 1000, bigAda: 5200, mcapPct: 5, mcapMinAda: 250, spikeMinAda: 1500, spikeMult: 4, spikeWindowMin: 15, creatorMinAda: 100, launchMinAda: 1000, launchMinBuyers: 8, launchWindowMin: 60, recapHourET: 9, refreshMin: 2 };
 
 function normalize(j) {
   const rate = Number(j.adaUsd) || null;
