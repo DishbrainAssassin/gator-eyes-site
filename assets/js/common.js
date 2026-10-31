@@ -43,6 +43,7 @@ const NAV_TIPS = {
   "./race.html": ["Race", "Coins on the bonding curve, ranked by how close they are to graduating, with pace and a rough ETA."],
   "./flows.html": ["Flows", "Where the ADA went today: money in and out by coin, by hour and by venue."],
   "./followup.html": ["Follow-up", "What each alert's coin did 1 hour and 24 hours later. Every alert, good and bad."],
+  "./watchlist.html": ["Watchlist", "Star coins and see their price, flows, graduation progress and alerts in one place. Saved in your browser, no sign-up."],
   "./tools.html": ["Tools", "Free tools for projects: holder snapshot with CSV, coin share cards, daily flow card and an alerts widget."],
   "./gaey.html": ["$GAEY", "The Gator Eyes team token: live trades, holder rewards and the creator lock."],
   "./about.html": ["How it works", "What sets off each alert, where the data comes from and what each Discord channel is for."],
