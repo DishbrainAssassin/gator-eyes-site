@@ -1,7 +1,7 @@
-import { subscribe } from "./data.js?v=20261031v";
-import { alertCard, emptyState, skeleton, tracks, mergeDays, lpSplit, dayLabel, fmt, usdcx, timeAgo, compact } from "./ui.js?v=20261031v";
-import { wireLinks, liveStatus } from "./common.js?v=20261031v";
-import * as platform from "./platform.js?v=20261031v";
+import { subscribe } from "./data.js?v=20261031w";
+import { alertCard, emptyState, skeleton, tracks, mergeDays, lpSplit, dayLabel, fmt, usdcx, timeAgo, compact } from "./ui.js?v=20261031w";
+import { wireLinks, liveStatus } from "./common.js?v=20261031w";
+import * as platform from "./platform.js?v=20261031w";
 
 const SHOW_ALL = ' <button type="button" class="link" data-platform="all">Show all launchpads</button>';
 

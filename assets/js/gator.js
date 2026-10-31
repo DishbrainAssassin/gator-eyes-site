@@ -1,10 +1,10 @@
 // Ask Gator: a small helper that answers common questions about Gator Eyes and
 // Solada.fun. Answers are built in (no AI, no running cost). Live questions
 // about coins use the same /tokens data as the Tokens page.
-import { CONFIG } from "./config.js?v=20261031v";
-import { coinUrl, joinUrl } from "./data.js?v=20261031v";
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261031v";
-import { esc, fmt, compact } from "./ui.js?v=20261031v";
+import { CONFIG } from "./config.js?v=20261031w";
+import { coinUrl, joinUrl } from "./data.js?v=20261031w";
+import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261031w";
+import { esc, fmt, compact } from "./ui.js?v=20261031w";
 
 const DISCORD = CONFIG.discord;
 const a = (href, label, ext) => `<a href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(label)}</a>`;
@@ -22,13 +22,53 @@ async function tokens() {
 const h24 = (c) => c.w.h24 || { v: 0, n: 0, net: 0, wal: 0, ch: null };
 const tk = (c) => "$" + (c.tk || "?");
 
+const NON_ADA = { JUSTQ: "$JUSTQ trades on the Solana side (PumpSwap, paired with USDC), not in ADA, so Gator Eyes can't count those trades itself." };
+const noAda = (c) => NON_ADA[(c.tk || "").toUpperCase()] || null;
+const hasTrades = (c) => !!(c.w && c.w.h24 && c.w.h24.n);
+// Solana side: coins that also trade on Pump.fun/PumpSwap (kind "pump") can trade in SOL or USDC,
+// which the ADA tracker can't see. DexScreener has the last 24 hours for those pools. Short timeout so
+// Discord's 3-second limit is safe; on any error we just skip it.
+var SOL_CACHE = new Map();
+async function solSide(c, adaUsd) {
+  if (!c || c.kind !== "pump" || hasTrades(c) || !c.slug || !/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(c.slug)) return null;
+  var hit = SOL_CACHE.get(c.slug);
+  if (hit && Date.now() - hit.at < 60000) return hit.v;
+  var v = null;
+  try {
+    var ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 1500);
+    var r = await fetch("https://api.dexscreener.com/latest/dex/tokens/" + c.slug, { signal: ctl.signal });
+    clearTimeout(tm);
+    var j = r.ok ? await r.json() : null;
+    var ps = ((j && j.pairs) || []).filter((x) => x.chainId === "solana" && x.baseToken && x.baseToken.address === c.slug);
+    ps.sort((x, y) => ((y.volume && y.volume.h24) || 0) - ((x.volume && x.volume.h24) || 0));
+    var pr = ps[0];
+    if (pr) {
+      var t = (pr.txns && pr.txns.h24) || {}, vUsd = (pr.volume && pr.volume.h24) || 0;
+      v = { b: t.buys || 0, s: t.sells || 0, vUsd, vAda: adaUsd ? vUsd / adaUsd : null, ch: pr.priceChange ? pr.priceChange.h24 : null,
+        dex: { pumpswap: "PumpSwap", pumpfun: "Pump.fun", raydium: "Raydium", meteora: "Meteora", orca: "Orca" }[pr.dexId] || pr.dexId,
+        quote: (pr.quoteToken && pr.quoteToken.symbol) || "SOL", url: pr.url || null };
+    }
+  } catch (e) { v = null; }
+  SOL_CACHE.set(c.slug, { at: Date.now(), v });
+  if (SOL_CACHE.size > 200) SOL_CACHE.delete(SOL_CACHE.keys().next().value);
+  return v;
+}
+function solLine(sw) {
+  var n = sw.b + sw.s;
+  if (!n) return "No trades on the Solana side in the last 24 hours either";
+  var usd = sw.vUsd >= 100 ? Math.round(sw.vUsd).toLocaleString("en-US") : sw.vUsd.toFixed(2);
+  return `On Solana (${esc(sw.dex)}, paired with ${esc(sw.quote)}): ${fmt(n)} trades, ${fmt(sw.b)} buys and ${fmt(sw.s)} sells, about $${usd} traded${sw.vAda ? " (~" + fmt(sw.vAda) + " ADA)" : ""}`;
+}
 function coinAnswer(c) {
   const w = h24(c);
   const bits = [`<strong>${esc(tk(c))}</strong>${c.name ? " (" + esc(c.name) + ")" : ""}, last 24 hours:`];
   const list = [];
-  list.push(`Price ${esc(price(c.price))} ADA${w.ch != null ? ", " + esc(pct(w.ch)) : ""}`);
-  list.push(`${fmt(w.v)} ADA traded in ${fmt(w.n)} trades by ${fmt(w.wal)} wallets`);
-  list.push(`Net flow ${esc(signed(w.net))} ADA (${w.net >= 0 ? "more bought than sold" : "more sold than bought"})`);
+  var chg = w.ch != null ? w.ch : c.sol && c.sol.ch != null ? c.sol.ch : null;
+  list.push(`Price ${esc(price(c.price))} ADA${chg != null ? ", " + esc(pct(chg)) : ""}`);
+  if (w.n) list.push(`${fmt(w.v)} ADA traded in ${fmt(w.n)} trades by ${fmt(w.wal)} wallets`);
+  else if (c.sol) list.push(solLine(c.sol) + (c.sol.url ? " · " + a(c.sol.url, "DexScreener", true) : ""));
+  else if (noAda(c)) list.push(esc(noAda(c)));
+  list.push(w.n ? `Net flow ${esc(signed(w.net))} ADA (${w.net > 0 ? "more bought than sold" : w.net < 0 ? "more sold than bought" : "buys and sells even"})` : c.sol ? "No ADA trades on the Cardano side; the Solana trades above are counted by DexScreener, not Gator Eyes" : noAda(c) ? null : "No ADA trades seen in the last 24 hours (Gator Eyes only counts trades in ADA)");
   if (c.mc) list.push(`Market cap about ${compact(c.mc)} ADA${c.hold ? ", " + fmt(c.hold) + " holders" : ""}`);
   if (c.cs === "open" && c.prog != null) {
     const p = c.pace || {};
@@ -36,12 +76,18 @@ function coinAnswer(c) {
   } else if (c.cs === "graduated") list.push(`Graduated to Minswap${c.gAt && c.born ? " after " + esc(span(c.gAt - c.born)) : ""}`);
   const al = Object.entries(c.al || {}).map(([k, n]) => `${n} ${{ big: "whale", spike: "volume spike", launch: "fast launch", dev: "creator sell" }[k] || k}`);
   list.push(al.length ? `Alerts today: ${al.join(", ")}` : "No Gator Eyes alerts in the last 24 hours");
-  bits.push("<ul>" + list.map((x) => `<li>${x}</li>`).join("") + "</ul>");
+  bits.push("<ul>" + list.filter(Boolean).map((x) => `<li>${x}</li>`).join("") + "</ul>");
   bits.push(`${a(coinUrl(c.id), "Open on Solada.fun", true)} · ${page("coincard.html?coin=" + encodeURIComponent(c.id), "Share card")} · ${page("followup.html?coin=" + encodeURIComponent(c.tk || c.id), "Alert follow-up")} · ${page("holders.html?coin=" + encodeURIComponent(c.tk || c.id), "Holders")}`);
   bits.push(`<small>Just the numbers, not advice.</small>`);
   return bits.join("");
 }
 
+// "make a share card for $X", "holders of $X", "follow-up for $X": link straight to that tool for the coin.
+const COIN_TOOLS = [
+  { re: /\b(share card|coin card|card for|card of|image|picture|pic|graphic|png)\b/, run: (c) => `Here's the share card for <strong>${esc(tk(c))}</strong>: ${page("coincard.html?coin=" + encodeURIComponent(c.id), "Open the " + tk(c) + " share card")}. Tap Download PNG (or Save image on a phone) and Copy caption, then post it.${hasTrades(c) ? "" : " Heads up: the card only counts trades in ADA, so " + esc(tk(c)) + "'s volume will show as 0." + (c.sol ? " " + solLine(c.sol) + "." : noAda(c) ? " Its trades happen on the Solana side." : "")}` },
+  { re: /\b(holders?|holder list|snapshot|airdrop)\b/, run: (c) => `Here's the holder snapshot for <strong>${esc(tk(c))}</strong>: ${page("holders.html?coin=" + encodeURIComponent(c.tk || c.id), "Open " + tk(c) + " holders")}.${c.hold ? " It has about " + fmt(c.hold) + " holders right now." : ""} Set your rules there, then download the CSV.` },
+  { re: /\b(follow[- ]?up|track record|after the alert|alert history)\b/, run: (c) => `Here's the alert follow-up for <strong>${esc(tk(c))}</strong>: ${page("followup.html?coin=" + encodeURIComponent(c.tk || c.id), "Open " + tk(c) + " follow-up")}. It shows what the price did 1 hour and 24 hours after each alert.` },
+];
 function top(list, n, line) {
   return "<ol>" + list.slice(0, n).map((c) => `<li>${line(c)}</li>`).join("") + "</ol>";
 }
@@ -217,11 +263,16 @@ async function answer(raw) {
   if (/^ ?(hi|hey|hello|yo|sup|gm|howdy)\b/.test(q.trim()) && q.trim().split(" ").length <= 3) return "Oh, hi. <em>pushes up glasses</em> Ask me about the alerts, a coin by its ticker, what's close to graduating, or how to use the tools. I have data on all of it.";
   if (/\b(thanks|thank you|thx|ty)\b/.test(q)) return "Happy to help. I'll be here, recalculating.";
   const advice = ADVICE.some((k) => q.includes(k));
-  const coin = await findCoin(raw);
+  let coin = await findCoin(raw);
   if (SOCIAL_RE.test(q) && !/\b(gator eyes|your|you)\b/.test(q)) {
     if (coin) return socialsAnswer(coin);
     if (!/\b(alert|graduat|net flow|holder|card|follow|embed|widget)\b/.test(q)) return `Which coin? Ask like <em>socials $MEPE</em> and I'll list what the creator put on Solada.fun.`;
   }
+  if (coin && !hasTrades(coin) && coin.kind === "pump") {
+    var td = await tokens().catch(() => null);
+    coin = { ...coin, sol: await solSide(coin, td && td.adaUsd) };
+  }
+  if (coin && !advice) { for (const t of COIN_TOOLS) if (t.re.test(q)) return t.run(coin); }
   if (advice) return `I just crunch the numbers, I can't tell you what to buy or sell. Gator Eyes reports what traded, not what to do next.${coin ? " Here's what " + esc(tk(coin)) + " has been doing:<br><br>" + coinAnswer(coin) : ""}`;
   const score = (keys, not = []) => (not.some((k) => q.includes(k)) ? 0 : keys.reduce((s, k) => s + (q.includes(k) ? k.length : 0), 0));
   let best = null, bestS = 0, live = null, liveS = 0;
