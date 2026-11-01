@@ -786,7 +786,7 @@ button.link:hover { color: var(--color-amber-hover); }
 .supply-bar i { display: block; height: 100%; width: var(--w); min-width: 2px; background: var(--c); }
 .supply-bar i + i { border-left: 1px solid var(--color-surface); }
 .supply-keys { display: grid; grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr)); gap: var(--space-3); margin-bottom: var(--space-3); }
-.skey { display: grid; gap: 2px; text-align: left; padding: var(--space-3) var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-bg); color: var(--color-text-muted); font: inherit; cursor: pointer; transition: border-color var(--transition-interactive), background var(--transition-interactive); }
+.skey { display: grid; align-content: start; align-items: start; gap: 2px; text-align: left; padding: var(--space-3) var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-bg); color: var(--color-text-muted); font: inherit; cursor: pointer; transition: border-color var(--transition-interactive), background var(--transition-interactive); }
 .skey:hover:not(:disabled) { border-color: color-mix(in oklab, var(--c) 60%, var(--color-border)); }
 .skey.is-on { border-color: color-mix(in oklab, var(--c) 55%, var(--color-border)); background: color-mix(in oklab, var(--c) 6%, var(--color-bg)); color: var(--color-text); }
 .skey.is-empty { opacity: 0.45; cursor: default; }
