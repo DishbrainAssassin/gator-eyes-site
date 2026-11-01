@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
   <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/css/style.css?v=20261101b">
+  <link rel="stylesheet" href="./assets/css/style.css?v=20261101c">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -60,7 +60,7 @@
           <div>
             <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching Solada</span></p>
             <h1 id="dash-title">Holder snapshot</h1>
-            <p class="dash-lede">Every holder of a Solada.fun or Snek.fun coin on Cardano, ready for an airdrop list. Pick a coin, set your rules, then download a CSV. Free, no sign-up.</p>
+            <p class="dash-lede">See where a Solada.fun or Snek.fun coin's supply sits on Cardano: the curve, the pool, locks, the creator, and the wallets that actually hold it. Then turn those wallets into an airdrop list and download a CSV. Free, no sign-up.</p>
           </div>
           
         </div>
@@ -76,47 +76,50 @@
           <button class="btn btn-amber" type="submit" data-go>Load holders</button>
         </form>
       </article>
-      <article class="panel" data-rules hidden>
+      <article class="panel" data-story hidden>
         <header class="panel-head panel-head-wrap"><div class="snap-head" data-head></div><span class="updated" data-taken></span></header>
+        <p class="story" data-story-text></p>
+        <div class="supply-bar" data-bar role="img" aria-label="Where the supply sits"></div>
+        <div class="supply-keys" data-keys></div>
+        <p class="excl" data-keys-note>Click a group to put it in or take it out of the list. Groups that are out stay in the breakdown so you can still see where the supply sits.</p>
+      </article>
+      <article class="panel" data-rules hidden>
+        <header class="panel-head panel-head-wrap"><h2 class="panel-title">Airdrop rules</h2><span class="panel-meta">Optional. The list below updates as you type.</span></header>
         <div class="form-grid">
-          <div class="checks">
-            <label class="toggle"><input type="checkbox" data-r="curve" checked><span>Leave out the bonding curve and pools<small>Solada's curve and Minswap pool addresses. Snek.fun contracts count as "other contracts" below</small></span></label>
-            <label class="toggle"><input type="checkbox" data-r="locks" checked><span>Leave out locked tokens<small>Tokens sitting in a lock until a future date</small></span></label>
-            <label class="toggle"><input type="checkbox" data-r="script" checked><span>Leave out other contracts<small>Script addresses such as DEX orders and vaults</small></span></label>
-            <label class="toggle"><input type="checkbox" data-r="dev" checked><span>Leave out the creator wallet<small>The wallet that launched the coin</small></span></label>
-            <label class="toggle"><input type="checkbox" data-r="stake" checked><span>One row per wallet<small>Adds up addresses that share a stake key</small></span></label>
-          </div>
           <div class="checks">
             <label class="field"><span>Minimum balance (tokens)</span><input type="number" min="0" step="any" value="0" data-r="min"></label>
             <label class="field"><span>Top holders only (0 = everyone)</span><input type="number" min="0" step="1" value="0" data-r="top"></label>
-            <label class="field"><span>Leave out these addresses (one per line)</span><textarea data-r="skip" placeholder="addr1… or stake1…"></textarea></label>
+            <label class="toggle"><input type="checkbox" data-r="stake" checked><span>One row per wallet<small>Adds up addresses that share a stake key</small></span></label>
           </div>
           <div class="checks">
             <label class="field"><span>Bought on the launchpad before (optional)</span><input type="date" data-r="before"></label>
             <label class="field"><span>Hasn't sold since (optional)</span><input type="date" data-r="nosell"></label>
             <p class="excl">Date rules read the coin's trade history on its launchpad (Solada or Snek.fun), so they only see buys and sells made there, not wallet-to-wallet transfers. Times are midnight Eastern.</p>
           </div>
+          <div class="checks">
+            <label class="field"><span>Leave out these addresses (one per line)</span><textarea data-r="skip" placeholder="addr1… or stake1…"></textarea></label>
+          </div>
         </div>
       </article>
       <article class="panel" data-result hidden>
         <header class="panel-head panel-head-wrap">
-          <div class="kpis kpis-dash" style="flex:1" data-kpis></div>
+          <div class="kpis kpis-holders" style="flex:1" data-kpis></div>
         </header>
         <p class="progress-note" data-progress hidden></p>
-        <div class="cta-row" style="margin-bottom:var(--space-5)">
+        <div class="cta-row list-cta">
           <button class="btn btn-amber" data-csv>Download CSV</button>
           <button class="btn btn-ghost" data-copy>Copy addresses</button>
+          <span class="excl" data-left></span>
         </div>
         <div class="table-wrap">
-          <table class="coin-table">
-            <thead><tr><th scope="col">#</th><th scope="col">Wallet</th><th scope="col" class="num">Balance</th><th scope="col" class="num">Share</th><th scope="col" class="hide-sm">Notes</th></tr></thead>
+          <table class="coin-table holder-table">
+            <thead><tr><th scope="col">#</th><th scope="col">Wallet</th><th scope="col">What it is</th><th scope="col" class="num">Balance</th><th scope="col" class="num">Share of list</th></tr></thead>
             <tbody data-rows></tbody>
           </table>
         </div>
         <div class="list-foot"><button class="btn btn-ghost btn-sm" data-more hidden>Show all</button></div>
-        <p class="excl" data-left></p>
       </article>
-      <p class="dash-foot">Holder balances come from the Cardano blockchain through Koios, with Solada's own labels for the curve, pools, locks and creator wallet. Snek.fun coins get the creator wallet from the pool data and no other labels. Solana-side balances of dual-chain coins aren't included.</p>
+      <p class="dash-foot">Holder balances come from the Cardano blockchain through Koios, with Solada's own labels for the curve, pool, locks and creator wallet. Snek.fun coins get the creator wallet from the pool data and no other labels, so their curve and pool show up under "other contracts". Solana-side balances of dual-chain coins aren't included. Wallet links open Cardanoscan.</p>
     </section>
   </main>
   <footer class="site-footer">
@@ -125,6 +128,6 @@
       <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./tokens.html">Tokens</a><a href="./tools.html">Tools</a></nav>
     </div>
   </footer>
-  <script type="module" src="./assets/js/holders.js?v=20261031u"></script>
+  <script type="module" src="./assets/js/holders.js?v=20261101c"></script>
 </body>
 </html>
