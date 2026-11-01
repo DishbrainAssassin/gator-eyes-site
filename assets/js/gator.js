@@ -349,7 +349,7 @@ export function mountGator() {
         <input type="text" name="q" maxlength="200" placeholder="Ask about a coin, alerts, tools…" autocomplete="off" aria-label="Your question">
         <button type="submit" class="btn btn-amber btn-sm">Ask</button>
       </form>
-      <p class="gator-note" style="margin:0;padding:0 16px 10px;font-size:12px;color:var(--color-text-muted)">Questions are saved without names to help Quagmire learn. No names, IP addresses or wallets are stored.</p>
+      <p class="gator-note" style="margin:0;padding:0 16px 10px;font-size:12px;color:var(--color-text-muted)">Questions and answers are saved to help Quagmire learn. No account details, IP addresses or connected-wallet information are added to the log. Please don’t include personal information.</p>
     </section>`;
   document.body.appendChild(root);
   const btn = root.querySelector(".gator-launch"), panel = root.querySelector(".gator-panel");
