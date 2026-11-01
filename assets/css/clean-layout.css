@@ -36,6 +36,12 @@
 .home-market .alert-list { margin-top: var(--space-6); }
 .tracks-grid > *, .tracks-table { min-width: 0; }
 .tracks-table { overflow-x: auto; }
+.home-report-details { margin-top: var(--space-6); }
+.home-report-details > summary { width: fit-content; display: flex; align-items: center; gap: var(--space-3); min-height: 44px; cursor: pointer; color: var(--color-text); font-size: var(--text-sm); list-style: none; }
+.home-report-details > summary::-webkit-details-marker { display: none; }
+.home-report-details > summary::after { content: "+"; color: var(--color-amber); }
+.home-report-details[open] > summary::after { content: "−"; }
+.home-report-details .tracks-grid { margin-top: var(--space-6); }
 .alert-help { margin-top: var(--space-4); color: var(--color-text-muted); font-size: var(--text-sm); }
 .alert-help > summary { width: fit-content; cursor: pointer; min-height: 44px; display: flex; align-items: center; gap: var(--space-2); list-style: none; }
 .alert-help > summary::after { content: "+"; color: var(--color-amber); }
