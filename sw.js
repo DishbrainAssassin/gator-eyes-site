@@ -31,7 +31,7 @@ self.addEventListener("push", (e) => {
   const title = d.title || "Gator Eyes alert";
   const opts = {
     body: d.body || "",
-    icon: d.icon || ICON,
+    icon: ICON,
     badge: ICON,
     data: { url: d.url || "./index.html#alerts" },
   };
@@ -41,7 +41,10 @@ self.addEventListener("push", (e) => {
 
 self.addEventListener("notificationclick", (e) => {
   e.notification.close();
-  const url = new URL((e.notification.data && e.notification.data.url) || "./index.html#alerts", self.location.href).href;
+  let url = new URL((e.notification.data && e.notification.data.url) || "./index.html#alerts", self.location.href);
+  // Taps only ever open Gator Eyes itself, never another site.
+  if (url.origin !== self.location.origin) url = new URL("./index.html#alerts", self.location.href);
+  url = url.href;
   e.waitUntil((async () => {
     await badge();
     const wins = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
