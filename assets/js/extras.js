@@ -1,7 +1,7 @@
 // Site-wide coin search and beginner mode. Loaded on every page by common.js.
-import { getApi, price } from "./api.js?v=20261101b";
-import { coinUrl, joinUrl } from "./data.js?v=20261101b";
-import { esc, compact } from "./ui.js?v=20261101b";
+import { getApi, price } from "./api.js?v=20261101n";
+import { coinUrl, joinUrl } from "./data.js?v=20261101n";
+import { esc, compact } from "./ui.js?v=20261101n";
 
 const KEY = "ge-beginner";
 
@@ -52,7 +52,7 @@ function resultRow(c, i) {
       <a href="./coincard.html?coin=${encodeURIComponent(c.id)}">Card</a>
       <a href="./holders.html?coin=${encodeURIComponent(tk)}">Holders</a>
       ${al ? `<a href="./followup.html?coin=${encodeURIComponent(tk)}">Alerts</a>` : ""}
-      <a href="${esc(coinUrl(c.id))}" target="_blank" rel="noopener">Solada</a>
+      <a href="${esc(coinUrl(c.id))}" target="_blank" rel="noopener">${String(c.id || "").startsWith("snek:") ? "Snek.fun" : "Solada"}</a>
     </span>
   </li>`;
 }
@@ -79,7 +79,7 @@ function mountSearch(slot) {
       <button type="button" class="search-close" aria-label="Close search">Esc</button>
     </div>
     <ul class="sr-list" id="sr-list" role="listbox" data-sr></ul>
-    <p class="sr-hint" data-sh>Search every Solada.fun coin Gator Eyes tracks.</p>
+    <p class="sr-hint" data-sh>Search every Solada.fun and Snek.fun coin Gator Eyes tracks.</p>
   </div>`;
   document.body.appendChild(dlg);
   const input = dlg.querySelector("[data-sq]"), list = dlg.querySelector("[data-sr]"), hint = dlg.querySelector("[data-sh]");
@@ -98,7 +98,7 @@ function mountSearch(slot) {
     const q = input.value.trim().toLowerCase().replace(/^\$/, "");
     active = -1;
     input.removeAttribute("aria-activedescendant");
-    if (!q) { list.innerHTML = ""; input.setAttribute("aria-expanded", "false"); hint.textContent = "Search every Solada.fun coin Gator Eyes tracks."; return; }
+    if (!q) { list.innerHTML = ""; input.setAttribute("aria-expanded", "false"); hint.textContent = "Search every Solada.fun and Snek.fun coin Gator Eyes tracks."; return; }
     let all;
     try { all = await loadCoins(); } catch { hint.textContent = "Couldn't load coins right now. Try again in a minute."; return; }
     if (input.value.trim().toLowerCase().replace(/^\$/, "") !== q) return;

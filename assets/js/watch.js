@@ -1,12 +1,12 @@
 // Watchlist page: the coins saved in this browser, with their live numbers from
 // /tokens and every recent alert on them from /feed.
-import { getApi } from "./api.js?v=20261101b";
-import { fetchFeed } from "./data.js?v=20261101b";
-import { esc, fmt, usdcx, usdcxSigned, timeAgo, alertCard, emptyState, skeleton } from "./ui.js?v=20261101b";
-import { wireLinks, liveStatus } from "./common.js?v=20261101b";
-import * as platform from "./platform.js?v=20261101b";
-import * as watchlist from "./watchlist.js?v=20261101b";
-import { coinRow, missingRow } from "./coinrow.js?v=20261101b";
+import { getApi } from "./api.js?v=20261101n";
+import { fetchFeed } from "./data.js?v=20261101n";
+import { esc, fmt, usdcx, usdcxSigned, timeAgo, alertCard, emptyState, skeleton } from "./ui.js?v=20261101n";
+import { wireLinks, liveStatus } from "./common.js?v=20261101n";
+import * as platform from "./platform.js?v=20261101n";
+import * as watchlist from "./watchlist.js?v=20261101n";
+import { coinRow, missingRow } from "./coinrow.js?v=20261101n";
 
 wireLinks();
 platform.mount();
