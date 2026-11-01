@@ -1,6 +1,6 @@
 // Data layer. Everything the site shows comes through here, so a future
 // dashboard can add views without touching how data is fetched.
-import { CONFIG } from "./config.js?v=20261101n";
+import { CONFIG } from "./config.js?v=20261101p";
 
 const listeners = new Set();
 let last = null;
@@ -82,6 +82,9 @@ function normalize(j) {
     alerts,
     today: j.today || null,
     recaps: j.recaps || [],
+    // Last 40 trades, newest first (the running ticker) and the last few posted weeks.
+    tape: Array.isArray(j.tape) ? j.tape : [],
+    weeks: Array.isArray(j.weeks) ? j.weeks : [],
     watch: j.watch || null,
     lastFailAt: j.lastFailAt ? new Date(j.lastFailAt) : null,
     rules: { ...RULES_DEFAULT, ...(j.rules || {}), snek: { ...RULES_DEFAULT.snek, ...((j.rules && j.rules.snek) || {}) } },
