@@ -1,10 +1,10 @@
 // Ask Gator: a small helper that answers common questions about Gator Eyes and
-// Solada.fun. Answers are built in (no AI, no running cost). Live questions
+// the launchpads it tracks (Solada.fun and Snek.fun). Answers are built in (no AI, no running cost). Live questions
 // about coins use the same /tokens data as the Tokens page.
-import { CONFIG } from "./config.js?v=20261101b";
-import { coinUrl, joinUrl } from "./data.js?v=20261101b";
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261101b";
-import { esc, fmt, compact } from "./ui.js?v=20261101b";
+import { CONFIG } from "./config.js?v=20261101n";
+import { coinUrl, joinUrl } from "./data.js?v=20261101n";
+import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261101n";
+import { esc, fmt, compact } from "./ui.js?v=20261101n";
 
 const DISCORD = CONFIG.discord;
 const a = (href, label, ext) => `<a href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(label)}</a>`;
@@ -77,7 +77,7 @@ function coinAnswer(c) {
   const al = Object.entries(c.al || {}).map(([k, n]) => `${n} ${{ big: "whale", spike: "volume spike", launch: "fast launch", dev: "creator sell" }[k] || k}`);
   list.push(al.length ? `Alerts today: ${al.join(", ")}` : "No Gator Eyes alerts in the last 24 hours");
   bits.push("<ul>" + list.filter(Boolean).map((x) => `<li>${x}</li>`).join("") + "</ul>");
-  bits.push(`${a(coinUrl(c.id), "Open on Solada.fun", true)} · ${page("coincard.html?coin=" + encodeURIComponent(c.id), "Share card")} · ${page("followup.html?coin=" + encodeURIComponent(c.tk || c.id), "Alert follow-up")} · ${page("holders.html?coin=" + encodeURIComponent(c.tk || c.id), "Holders")}`);
+  bits.push(`${a(coinUrl(c.id), "Open on " + lpName(c), true)} · ${page("coincard.html?coin=" + encodeURIComponent(c.id), "Share card")} · ${page("followup.html?coin=" + encodeURIComponent(c.tk || c.id), "Alert follow-up")} · ${page("holders.html?coin=" + encodeURIComponent(c.tk || c.id), "Holders")}`);
   bits.push(`<small>Just the numbers, not advice.</small>`);
   return bits.join("");
 }
@@ -91,7 +91,8 @@ const COIN_TOOLS = [
 function top(list, n, line) {
   return "<ol>" + list.slice(0, n).map((c) => `<li>${line(c)}</li>`).join("") + "</ol>";
 }
-const coinLink = (c) => `<strong>${a(coinUrl(c.id), tk(c), true)}</strong>`;
+const coinLink = (c) => `<strong>${a(coinUrl(c.id), tk(c), true)}</strong>${String(c.id || "").startsWith("snek:") ? " <small>(Snek.fun)</small>" : ""}`;
+const lpName = (c) => String((c && c.id) || "").startsWith("snek:") ? "Snek.fun" : "Solada.fun";
 
 // "5 newest", "top 3", "ten newest": how many items the person asked for.
 const NUMS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10 };
@@ -161,7 +162,7 @@ const LIVE = [
       if (!all.length) return "I don't have launch times right now. Give it a minute and ask again.";
       const recent = all.filter((c) => Date.now() - c.born < 2 * 864e5);
       const l = recent.length >= n ? recent : all;
-      const head = l === recent ? `The ${l.length === 1 ? "newest coin" : Math.min(n, l.length) + " newest coins"} on Solada.fun that have traded:` : `Not many new coins in the last two days, so here are the ${Math.min(n, l.length)} newest that have traded:`;
+      const head = l === recent ? `The ${l.length === 1 ? "newest coin" : Math.min(n, l.length) + " newest coins"} that have traded:` : `Not many new coins in the last two days, so here are the ${Math.min(n, l.length)} newest that have traded:`;
       return `${head}${top(l, n, (c) => `${coinLink(c)}${c.name && c.name !== c.tk ? " (" + esc(c.name) + ")" : ""} launched ${esc(span(Date.now() - c.born))} ago, ${fmt(h24(c).v)} ADA traded in 24h`)}Sort by age on the ${page("tokens.html", "Tokens page")}. Fast starters get posted in #fast-launch on ${discord()}.`;
     },
   },
@@ -175,13 +176,15 @@ const LIVE = [
     },
   },
   {
-    keys: ["solada today", "volume today", "how is solada", "how's solada", "market today", "total volume", "overall"],
+    keys: ["solada today", "volume today", "how is solada", "how's solada", "launchpads doing", "launchpads today", "how are the launchpads", "snek today", "how is snek", "how's snek", "market today", "total volume", "overall"],
     not: ["inflow", "outflow", "which", "what coin", "what token", "who had", "most traded", "highest volume", "most volume"],
     run: async () => {
       const d = await tokens();
-      let v = 0, n = 0, net = 0;
-      for (const c of d.coins) { const w = h24(c); v += w.v; n += w.n; net += w.net; }
-      return `In the last 24 hours on Solada.fun: <strong>${fmt(v)} ADA</strong> traded${d.adaUsd ? ` (~${fmt(v * d.adaUsd)} USDCx)` : ""} across ${fmt(n)} trades. Net flow ${esc(signed(net))} ADA. Today's full picture is on the ${page("flows.html", "Flows page")}.`;
+      const by = { "Solada.fun": { v: 0, n: 0, net: 0 }, "Snek.fun": { v: 0, n: 0, net: 0 } };
+      for (const c of d.coins) { const w = h24(c), b = by[lpName(c)]; b.v += w.v; b.n += w.n; b.net += w.net; }
+      const v = by["Solada.fun"].v + by["Snek.fun"].v, n = by["Solada.fun"].n + by["Snek.fun"].n, net = by["Solada.fun"].net + by["Snek.fun"].net;
+      const rows = Object.keys(by).filter((k) => by[k].n).map((k) => `<li>${k}: ${fmt(by[k].v)} ADA, ${fmt(by[k].n)} trades, net flow ${esc(signed(by[k].net))} ADA</li>`).join("");
+      return `In the last 24 hours across Solada.fun and Snek.fun: <strong>${fmt(v)} ADA</strong> traded${d.adaUsd ? ` (~${fmt(v * d.adaUsd)} USDCx)` : ""} across ${fmt(n)} trades. Net flow ${esc(signed(net))} ADA.${rows ? `<ul>${rows}</ul>` : ""} Today's full picture is on the ${page("flows.html", "Flows page")}.`;
     },
   },
 ];
@@ -190,13 +193,13 @@ const LIVE = [
 // Questions about Quagmire himself ("do you like this picture of you?"), not about a tool.
 const ABOUT_ME = [" of you ", " of you?", "you like", "like you", "of yourself", "your picture", "your pic", "your face", "your look", "you look", "pic of you", "photo of you", "your avatar", "your art"];
 const FAQ = [
-  { keys: ["what is gator eyes", "what's gator eyes", "what does gator eyes", "about gator eyes", "who are you", "what are you", "what is this site", "what is this"], a: () => `I'm Quagmire, resident data nerd at Gator Eyes. Gator Eyes is a free, automated tracker for Solada.fun. It reads every public trade on Solada.fun and Snek.fun every minute, adds up where the money moves, and posts what stands out to ${discord()} and X. No sign-up, no wallet connection.` },
+  { keys: ["what is gator eyes", "what's gator eyes", "what does gator eyes", "about gator eyes", "who are you", "what are you", "what is this site", "what is this"], a: () => `I'm Quagmire, resident data nerd at Gator Eyes. Gator Eyes is a free, automated tracker for Cardano launchpads, starting with Solada.fun and Snek.fun. It reads every public trade on Solada.fun and Snek.fun every minute, adds up where the money moves, and posts what stands out to ${discord()} and X. No sign-up, no wallet connection.` },
   { keys: ["alerts mean", "types of alert", "what alerts", "alert types", "kinds of alert", "what triggers", "alert rules"], a: () => `Four kinds of alert:<ul><li><strong>Whale trade</strong>: a trade worth $1,000 or more in ADA, or one worth at least 7.5% of the coin's market cap (minimum 250 ADA).</li><li><strong>Volume spike</strong>: a coin trading 4 times its normal pace over 15 minutes, with at least 1,500 ADA moving.</li><li><strong>Fast launch</strong>: a new coin pulling in 1,000 ADA from 8 or more wallets in its first hour.</li><li><strong>Creator sell</strong>: the wallet that created a coin selling 500 ADA or more, or at least 5% of the coin's market cap. Posted as a record, not a warning.</li></ul>More on the ${page("about.html", "How it works page")}.` },
   { keys: ["whale"], a: () => `A whale alert is any single trade worth $1,000 or more in ADA (the ADA amount moves with the price), or a trade worth at least 7.5% of the coin's market cap (minimum 250 ADA). They post in #whale-alerts on ${discord()}.` },
   { keys: ["spike"], a: () => "A volume spike means a coin traded at 4 times its normal pace over 15 minutes, with at least 1,500 ADA moving. Each coin can spike at most once an hour so the channel doesn't flood." },
   { keys: ["fast launch"], a: () => `A fast launch is a new coin that pulls in 1,000 ADA from 8 or more different wallets in its first hour. They post in #fast-launch on ${discord()}.` },
   { keys: ["creator sell", "dev sell", "creator wallet", "dev wallet", "rug"], a: () => `A creator sell is the wallet that made a coin selling 500 ADA or more, or at least 5% of the coin's market cap. It's posted for transparency, not as a warning. Creators sell for lots of reasons. Gator Eyes doesn't rate coins or call rugs. For a safety check, a tool like ${a("https://suriradar.fun/", "Suri Radar", true)} is built for that.` },
-  { keys: ["gator tracks", "daily recap", "recap"], a: () => `Gator Tracks is the daily recap: volume, most traded coins and where the money went, for the previous day midnight to midnight Eastern. It posts at 12:01 AM Eastern, right after the day closes, in #gator-tracks and on ${a(CONFIG.x, "X", true)}. Make your own day image with the ${page("card.html", "daily flow card")}.` },
+  { keys: ["gator tracks", "daily recap", "recap"], a: () => `Gator Tracks is the daily recap: one post with volume, most traded coins and where the money went, split by launchpad (Solada.fun and Snek.fun) with a combined total, for the previous day midnight to midnight Eastern. It posts at 12:01 AM Eastern, right after the day closes, in #gator-tracks and on ${a(CONFIG.x, "X", true)}. Make your own day image with the ${page("card.html", "daily flow card")}.` },
   { keys: ["pulse", "every 4 hours", "x posts", "twitter"], a: () => `On ${a(CONFIG.x, "X (@GatorEyesADA)", true)} Gator Eyes posts a Launchpad Pulse every 4 hours (12, 4 and 8, AM and PM Eastern): volume, most traded, biggest inflow, spikes, fast starts, new coins and the biggest trade. Instant alerts stay on Discord.` },
   { keys: ["discord", "channel", "join", "community"], a: () => `${discord("Join the Discord")} for instant alerts. Channels: #whale-alerts (big trades and volume spikes), #fast-launch, #creator-sells, #gator-tracks (daily recap) and #gaey-trades. #alerts-overview explains them all.` },
   { keys: ["net flow", "netflow", "inflow mean"], a: () => "Net flow is ADA bought minus ADA sold. +500 means buyers put in 500 ADA more than sellers took out. It shows direction, not price, and big trades can swing it." },
@@ -205,8 +208,8 @@ const FAQ = [
   { keys: ["follow-up", "follow up", "followup", "track record", "accurate", "do alerts work", "after an alert"], a: () => `The ${page("followup.html", "Follow-up page")} shows every alert and what the coin's price did 1 hour and 24 hours later. Good and bad, nothing hidden. It's there so you can judge the alerts yourself.` },
   { keys: ["holder", "airdrop", "snapshot", "csv"], a: () => `Use the ${page("holders.html", "Holder snapshot")}: type a ticker and it shows where the supply sits, split into the bonding curve, liquidity pool, locked tokens, the creator, other contracts and ordinary wallets. Each group is labelled in the list and can be put in or left out with a click. Add a minimum balance, top-N or a "hasn't sold since" date, then download the CSV.` },
   { keys: ["share card", "coin card", "image of a coin", "image of $", "image for", "picture of a coin", "picture of $", "picture for", "make an image", "make a picture", "make a graphic", "coin image", "coin picture", "coin graphic", "post an image", "png"], not: ABOUT_ME, a: () => `The ${page("coincard.html", "Coin share card")} makes a ready-to-post image of any coin's last 24 hours. Pick a coin, then tap Download PNG (or Save image on a phone) and Copy caption. For the whole market, use the ${page("card.html", "daily flow card")}.` },
-  { keys: ["tokens page", "tokens table", "table", "all coins", "list of coins"], a: () => `The ${page("tokens.html", "Tokens page")} lists every coin on Solada.fun with price, change, volume, trades, net flow, market cap, curve progress and alerts. Switch between Live (15 min), 1h, 6h and 24h, and click a column to sort.` },
-  { keys: ["flows", "by hour", "venue"], a: () => `The ${page("flows.html", "Flows page")} shows where the ADA went today: money in and out by coin, by hour and by venue (Solada curve, Minswap, Splash, Pump.fun). Days run midnight to midnight Eastern.` },
+  { keys: ["tokens page", "tokens table", "table", "all coins", "list of coins"], a: () => `The ${page("tokens.html", "Tokens page")} lists every coin Gator Eyes tracks on Solada.fun and Snek.fun with price, change, volume, trades, net flow, market cap, curve progress and alerts. Switch between Live (15 min), 1h, 6h and 24h, and click a column to sort.` },
+  { keys: ["flows", "by hour", "venue"], a: () => `The ${page("flows.html", "Flows page")} shows where the ADA went today: money in and out by coin, by hour and by venue (Solada curve, Minswap, Splash, Pump.fun, the Snek.fun curve and Splash pools). Days run midnight to midnight Eastern.` },
   { keys: ["widget", "embed", "my site", "my website"], a: () => `Run a project? Put a live box with your coin's volume, net flow and latest alerts on your own site. The embed code is on the ${page("about.html#embed", "How it works page")}.` },
   { keys: ["api", "json", "feed url", "data for", "builder", "developer"], a: () => `Gator Eyes' data feed only powers this site. To show live Solada numbers on your own site, use the embed widget on the ${page("about.html#embed", "How it works page")}.` },
   { keys: ["gaey", "your token", "team token"], a: () => `$GAEY is the Gator Eyes team's own token. It trades on Solada.fun until it bonds, not on Snek.fun. Holder rewards are paid in ADA, and the creator locked 4.94M GAEY until Nov 26. Every trade posts in #gaey-trades. See the ${page("gaey.html", "$GAEY page")}.` },
@@ -251,7 +254,7 @@ async function findCoin(q) {
 }
 
 // When the question isn't clear, say so and show what I can answer instead of guessing.
-const CAN_DO = ["5 newest coins", "Most traded today", "What's close to graduating?", "Biggest inflow today", "Top 10 by market cap", "How is Solada doing today?"];
+const CAN_DO = ["5 newest coins", "Most traded today", "What's close to graduating?", "Biggest inflow today", "Top 10 by market cap", "How are the launchpads doing today?"];
 function notSure(coin) {
   const opts = "<ul>" + CAN_DO.map((x) => `<li><em>${esc(x)}</em></li>`).join("") + "</ul>";
   if (coin) return `I'm not sure what you're after. If you want ${esc(tk(coin))}'s numbers, ask <em>${esc(tk(coin))}</em> on its own. If you want a list, I can do:${opts}`;
@@ -311,7 +314,7 @@ export function mountGator() {
     <section class="gator-panel" id="gator-panel" role="dialog" aria-label="Ask Quagmire" hidden>
       <header class="gator-head">
         <img src="./assets/img/gator-nerd-head-160.webp" alt="" width="40" height="40">
-        <div><strong>Quagmire</strong><span>Answers about Gator Eyes and Solada.fun</span></div>
+        <div><strong>Quagmire</strong><span>Answers about Gator Eyes, Solada.fun and Snek.fun</span></div>
         <button type="button" class="gator-x" aria-label="Close">×</button>
       </header>
       <div class="gator-log" aria-live="polite"></div>
@@ -338,7 +341,7 @@ export function mountGator() {
     if (keep) { hist.push([who, html]); save(); }
     return m;
   };
-  const greet = () => add("gator", "Hi, I'm Quagmire, the Gator Eyes gator. I read every trade on Solada.fun so you don't have to. I've got numbers on everything. Ask me about a coin (try its ticker), the alerts, or how to use the tools.", false);
+  const greet = () => add("gator", "Hi, I'm Quagmire, the Gator Eyes gator. I read every trade on Solada.fun and Snek.fun so you don't have to. I've got numbers on everything. Ask me about a coin (try its ticker), the alerts, or how to use the tools.", false);
   greet();
   for (const [w, h] of hist) add(w, h, false);
   chips.innerHTML = SUGGEST.map((s) => `<button type="button" class="gator-chip">${esc(s)}</button>`).join("");
