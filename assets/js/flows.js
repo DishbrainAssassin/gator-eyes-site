@@ -1,9 +1,9 @@
 // Flows dashboard. Reads the same feed as the home page through data.js.
-import { subscribe, coinUrl } from "./data.js?v=20261101q";
-import { alertCard, emptyState, skeleton, dayLabel, fmt, usdcx, usdcxSigned, rateNote, compact, clock, timeAgo, esc, mergeDays, lpSplit } from "./ui.js?v=20261101q";
-import { wireLinks, liveStatus } from "./common.js?v=20261101q";
-import * as platform from "./platform.js?v=20261101q";
-import { pill } from "./platform.js?v=20261101q";
+import { subscribe, coinUrl } from "./data.js?v=20261101r";
+import { alertCard, emptyState, skeleton, dayLabel, fmt, usdcx, usdcxSigned, rateNote, compact, clock, timeAgo, esc, mergeDays, lpSplit } from "./ui.js?v=20261101r";
+import { wireLinks, liveStatus } from "./common.js?v=20261101r";
+import * as platform from "./platform.js?v=20261101r";
+import { pill } from "./platform.js?v=20261101r";
 
 wireLinks();
 platform.mount();
