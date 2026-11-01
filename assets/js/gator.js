@@ -82,9 +82,26 @@ function coinAnswer(c) {
   return bits.join("");
 }
 
+function walletAnswer(c) {
+  const w = h24(c), h1 = (c.w && c.w.h1) || {};
+  const list = [];
+  if (w.n) {
+    list.push(`${fmt(w.wal)} different wallets made ${fmt(w.n)} trades`);
+    list.push(`Bought ${fmt(w.b)} ADA, sold ${fmt(w.s)} ADA: net ${esc(signed(w.net))} ADA (${w.net > 0 ? "more bought than sold" : w.net < 0 ? "more sold than bought" : "buys and sells even"})`);
+    if (h1.n) list.push(`Last hour: ${fmt(h1.wal)} wallets, ${fmt(h1.n)} trades, net ${esc(signed(h1.net))} ADA`);
+  } else if (c.sol) list.push(solLine(c.sol) + ". DexScreener doesn't say how many wallets");
+  else list.push(noAda(c) ? esc(noAda(c)) : "No ADA trades in the last 24 hours");
+  if (c.hold) list.push(`${fmt(c.hold)} wallets hold it right now`);
+  const al = c.al || {};
+  list.push(al.dev ? `${fmt(al.dev)} creator sell${al.dev > 1 ? "s" : ""} flagged today` : "No creator sells flagged today");
+  if (al.big) list.push(`${fmt(al.big)} whale trade${al.big > 1 ? "s" : ""} flagged today`);
+  return `<strong>${esc(tk(c))}</strong> wallets, last 24 hours:<ul>${list.map((x) => `<li>${x}</li>`).join("")}</ul>To see where the supply sits (creator, pool, biggest wallets): ${page("holders.html?coin=" + encodeURIComponent(c.tk || c.id), "Open " + tk(c) + " holders")}. Gator Eyes doesn't rate coins. For a safety check, ${a("https://suriradar.fun/", "Suri Radar", true)} is built for that.<br><small>Just the numbers, not advice.</small>`;
+}
+
 // "make a share card for $X", "holders of $X", "follow-up for $X": link straight to that tool for the coin.
 const COIN_TOOLS = [
   { re: /\b(share card|coin card|card for|card of|image|picture|pic|graphic|png)\b/, run: (c) => `Here's the share card for <strong>${esc(tk(c))}</strong>: ${page("coincard.html?coin=" + encodeURIComponent(c.id), "Open the " + tk(c) + " share card")}. Tap Download PNG (or Save image on a phone) and Copy caption, then post it.${hasTrades(c) ? "" : c.sol ? " The card shows its Solana trades. " + solLine(c.sol) + "." : noAda(c) ? " Its trades happen on the Solana side, so the card may show 0 ADA traded." : " No ADA trades in the last 24 hours, so the card will show 0."}` },
+  { re: /\b(wallets?|whales?|buyers?|sellers?|bundl\w*|insiders?|who(?:'s| is) (?:buying|selling))\b/, run: walletAnswer },
   { re: /\b(holders?|holder list|snapshot|airdrop)\b/, run: (c) => `Here's the holder snapshot for <strong>${esc(tk(c))}</strong>: ${page("holders.html?coin=" + encodeURIComponent(c.tk || c.id), "Open " + tk(c) + " holders")}.${c.hold ? " It has about " + fmt(c.hold) + " holders right now." : ""} Set your rules there, then download the CSV.` },
   { re: /\b(follow[- ]?up|track record|after the alert|alert history)\b/, run: (c) => `Here's the alert follow-up for <strong>${esc(tk(c))}</strong>: ${page("followup.html?coin=" + encodeURIComponent(c.tk || c.id), "Open " + tk(c) + " follow-up")}. It shows what the price did 1 hour and 24 hours after each alert.` },
 ];
