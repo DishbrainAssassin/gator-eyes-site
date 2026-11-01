@@ -1,10 +1,10 @@
 // Alert follow-up: what each alert's coin did 1 hour and 24 hours later.
-import { getApi, price, pct } from "./api.js?v=20261101n";
-import { coinUrl, isSnek, fetchFeed } from "./data.js?v=20261101n";
-import { esc, fmt, timeAgo } from "./ui.js?v=20261101n";
-import { wireLinks, liveStatus } from "./common.js?v=20261101n";
-import * as platform from "./platform.js?v=20261101n";
-import { pill } from "./platform.js?v=20261101n";
+import { getApi, price, pct } from "./api.js?v=20261101p";
+import { coinUrl, isSnek, fetchFeed } from "./data.js?v=20261101p";
+import { esc, fmt, timeAgo } from "./ui.js?v=20261101p";
+import { wireLinks, liveStatus } from "./common.js?v=20261101p";
+import * as platform from "./platform.js?v=20261101p";
+import { pill } from "./platform.js?v=20261101p";
 
 wireLinks();
 platform.mount();

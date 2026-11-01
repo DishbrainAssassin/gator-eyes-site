@@ -1,12 +1,13 @@
-import { subscribe } from "./data.js?v=20261101n";
-import { alertCard, emptyState, skeleton, tracks, mergeDays, lpSplit, dayLabel, fmt, usdcx, timeAgo, compact } from "./ui.js?v=20261101n";
-import { wireLinks, liveStatus } from "./common.js?v=20261101n";
-import * as platform from "./platform.js?v=20261101n";
+import { subscribe } from "./data.js?v=20261101p";
+import { alertCard, emptyState, skeleton, tracks, mergeDays, lpSplit, dayLabel, fmt, usdcx, timeAgo, compact } from "./ui.js?v=20261101p";
+import { wireLinks, liveStatus } from "./common.js?v=20261101p";
+import * as platform from "./platform.js?v=20261101p";
 
 const SHOW_ALL = ' <button type="button" class="link" data-platform="all">Show all launchpads</button>';
 
 wireLinks();
 platform.mount();
+import("./since.js?v=20261101p").then((m) => m.mountSince()).catch(() => {});
 platform.on(() => {
   shown = 10;
   renderAlerts();

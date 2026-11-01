@@ -1,9 +1,9 @@
 // Flows dashboard. Reads the same feed as the home page through data.js.
-import { subscribe, coinUrl } from "./data.js?v=20261101n";
-import { alertCard, emptyState, skeleton, dayLabel, fmt, usdcx, usdcxSigned, rateNote, compact, clock, timeAgo, esc, mergeDays, lpSplit } from "./ui.js?v=20261101n";
-import { wireLinks, liveStatus } from "./common.js?v=20261101n";
-import * as platform from "./platform.js?v=20261101n";
-import { pill } from "./platform.js?v=20261101n";
+import { subscribe, coinUrl } from "./data.js?v=20261101p";
+import { alertCard, emptyState, skeleton, dayLabel, fmt, usdcx, usdcxSigned, rateNote, compact, clock, timeAgo, esc, mergeDays, lpSplit } from "./ui.js?v=20261101p";
+import { wireLinks, liveStatus } from "./common.js?v=20261101p";
+import * as platform from "./platform.js?v=20261101p";
+import { pill } from "./platform.js?v=20261101p";
 
 wireLinks();
 platform.mount();
@@ -236,6 +236,25 @@ function renderCoins(d, rate) {
   el.coinsMore.textContent = `Show all ${list.length} coins`;
 }
 
+// "This week so far": Sunday to Saturday, Eastern, matching the weekly Gator Tracks post.
+function weekSummary(opts) {
+  const todayKey = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
+  const dow = new Date(todayKey + "T12:00:00Z").getUTCDay();
+  const sunday = new Date(Date.parse(todayKey + "T12:00:00Z") - dow * 864e5).toISOString().slice(0, 10);
+  const days = opts.filter((o) => o.d && o.d.key >= sunday);
+  if (!days.length) return "";
+  let vol = 0, trades = 0, net = 0, busiest = null;
+  for (const o of days) {
+    vol += o.d.volAda || 0;
+    trades += o.d.trades || 0;
+    net += (o.d.buyAda || 0) - (o.d.sellAda || 0);
+    if (!busiest || o.d.volAda > busiest.d.volAda) busiest = o;
+  }
+  const last = (feed.weeks || []).filter((w) => w.src !== "snek").slice(-1)[0];
+  const vs = last && last.vol && days.length >= 7 ? ` <span class="${vol >= last.vol ? "pos" : "neg"}">(${vol >= last.vol ? "+" : "−"}${Math.round(Math.abs(vol - last.vol) / last.vol * 100)}% vs last week)</span>` : "";
+  return `<p class="week-sum"><span>This week so far (Sun–Sat, ET): <b>${fmt(vol)} ADA</b>${vs}</span><span>Trades <b>${fmt(trades)}</b></span><span>Net <b class="${net >= 0 ? "pos" : "neg"}">${shortSigned(net)}</b></span>${busiest && days.length > 1 ? `<span>Busiest <b>${busiest.live ? "today" : esc(dayLabel(busiest.d.key).slice(0, 3))}</b></span>` : ""}${last ? `<span>Last week <b>${fmt(last.vol)} ADA</b></span>` : ""}</p>`;
+}
+
 function renderWeek(opts) {
   const days = opts.slice(0, 7).reverse();
   if (days.length < 2) {
@@ -243,7 +262,7 @@ function renderWeek(opts) {
     return;
   }
   const max = Math.max(1, ...days.map((o) => o.d.volAda));
-  el.week.innerHTML = `<div class="wchart">${days
+  el.week.innerHTML = weekSummary(opts) + `<div class="wchart">${days
     .map((o) => {
       const d = o.d;
       const net = d.buyAda - d.sellAda;

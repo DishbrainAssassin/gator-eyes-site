@@ -1,8 +1,8 @@
 // Graduation race: open bonding curves ranked by progress, with pace and ETA.
-import { getApi, hours, span, signed } from "./api.js?v=20261101n";
-import { coinUrl } from "./data.js?v=20261101n";
-import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261101n";
-import { wireLinks, liveStatus } from "./common.js?v=20261101n";
+import { getApi, hours, span, signed } from "./api.js?v=20261101p";
+import { coinUrl } from "./data.js?v=20261101p";
+import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261101p";
+import { wireLinks, liveStatus } from "./common.js?v=20261101p";
 
 wireLinks();
 const $ = (s) => document.querySelector(s);
