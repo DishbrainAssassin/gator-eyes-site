@@ -1,10 +1,10 @@
 // Ask Gator: a small helper that answers common questions about Gator Eyes and
 // the launchpads it tracks (Solada.fun and Snek.fun). Answers are built in (no AI, no running cost). Live questions
 // about coins use the same /tokens data as the Tokens page.
-import { CONFIG } from "./config.js?v=20261101-nav1";
-import { coinUrl, joinUrl } from "./data.js?v=20261101-nav1";
-import { API, getApi, price, pct, signed, hours, span } from "./api.js?v=20261101-nav1";
-import { esc, fmt, compact } from "./ui.js?v=20261101-nav1";
+import { CONFIG } from "./config.js?v=20261101-sol1";
+import { coinUrl, joinUrl } from "./data.js?v=20261101-sol1";
+import { API, getApi, price, pct, signed, hours, span } from "./api.js?v=20261101-sol1";
+import { esc, fmt, compact } from "./ui.js?v=20261101-sol1";
 
 const DISCORD = CONFIG.discord;
 const a = (href, label, ext) => `<a href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(label)}</a>`;
@@ -29,17 +29,19 @@ const hasTrades = (c) => !!(c.w && c.w.h24 && c.w.h24.n);
 // which the ADA tracker can't see. DexScreener has the last 24 hours for those pools. Short timeout so
 // Discord's 3-second limit is safe; on any error we just skip it.
 var SOL_CACHE = new Map();
+var solMint = (c) => c && (c.mint || (/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(c.slug || "") ? c.slug : null)) || null;
 async function solSide(c, adaUsd) {
-  if (!c || c.kind !== "pump" || hasTrades(c) || !c.slug || !/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(c.slug)) return null;
-  var hit = SOL_CACHE.get(c.slug);
+  var mint = solMint(c);
+  if (!c || c.kind !== "pump" || hasTrades(c) || !mint) return null;
+  var hit = SOL_CACHE.get(mint);
   if (hit && Date.now() - hit.at < 60000) return hit.v;
   var v = null;
   try {
     var ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 1500);
-    var r = await fetch("https://api.dexscreener.com/latest/dex/tokens/" + c.slug, { signal: ctl.signal });
+    var r = await fetch("https://api.dexscreener.com/latest/dex/tokens/" + mint, { signal: ctl.signal });
     clearTimeout(tm);
     var j = r.ok ? await r.json() : null;
-    var ps = ((j && j.pairs) || []).filter((x) => x.chainId === "solana" && x.baseToken && x.baseToken.address === c.slug);
+    var ps = ((j && j.pairs) || []).filter((x) => x.chainId === "solana" && x.baseToken && x.baseToken.address === mint);
     ps.sort((x, y) => ((y.volume && y.volume.h24) || 0) - ((x.volume && x.volume.h24) || 0));
     var pr = ps[0];
     if (pr) {
@@ -49,7 +51,7 @@ async function solSide(c, adaUsd) {
         quote: (pr.quoteToken && pr.quoteToken.symbol) || "SOL", url: pr.url || null };
     }
   } catch (e) { v = null; }
-  SOL_CACHE.set(c.slug, { at: Date.now(), v });
+  SOL_CACHE.set(mint, { at: Date.now(), v });
   if (SOL_CACHE.size > 200) SOL_CACHE.delete(SOL_CACHE.keys().next().value);
   return v;
 }

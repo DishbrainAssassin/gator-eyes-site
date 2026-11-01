@@ -1,11 +1,11 @@
 // Holder snapshot: where a Solada.fun or Snek.fun coin's supply sits on Cardano, then a filtered
 // holder list ready to filter and download as a CSV.
-import { getApi } from "./api.js?v=20261101-nav1";
-import { coinUrl, fetchFeed } from "./data.js?v=20261101-nav1";
-import { esc, fmt, compact } from "./ui.js?v=20261101-nav1";
-import { wireLinks, liveStatus } from "./common.js?v=20261101-nav1";
-import * as platform from "./platform.js?v=20261101-nav1";
-import { pill } from "./platform.js?v=20261101-nav1";
+import { getApi } from "./api.js?v=20261101-sol1";
+import { coinUrl, fetchFeed } from "./data.js?v=20261101-sol1";
+import { esc, fmt, compact } from "./ui.js?v=20261101-sol1";
+import { wireLinks, liveStatus } from "./common.js?v=20261101-sol1";
+import * as platform from "./platform.js?v=20261101-sol1";
+import { pill } from "./platform.js?v=20261101-sol1";
 
 wireLinks();
 platform.mount();
@@ -229,7 +229,17 @@ function renderStory() {
   if (g.burn.qty) text += " These supply percentages include the burn address; they are not circulating-supply percentages.";
   const bigNoStake = st.snap.holders.filter((h) => h.group === "nostake").sort((a, b) => Number(b.qty) - Number(a.qty))[0];
   if (bigNoStake && total && Number(bigNoStake.qty) / total > 0.2) text += ` One payment-only address holds ${pct((Number(bigNoStake.qty) / total) * 100)} on its own and ${snek ? "Snek.fun" : "Solada"} doesn't label it. Open it on Cardanoscan before you decide whether to include it in your filtered list.`;
-  $("[data-story-text]").textContent = text;
+  // Pump coins also live on Solana. Solada doesn't publish those holders; GeckoTerminal gives the count and
+  // how much the top wallets own, which the worker passes along as `sol`.
+  let solHtml = "";
+  if (c.kind === "pump") {
+    const sh = st.snap.sol;
+    const link = c.mint ? ` <a href="https://solscan.io/token/${esc(c.mint)}#holders" target="_blank" rel="noopener">Solana holders on Solscan</a>.` : "";
+    solHtml = sh && sh.count != null
+      ? ` ${esc(tk)} is a Solada Pump coin, so it also has holders on Solana: ${plural(sh.count, "wallet")} there${sh.top10Pct != null ? `, the top 10 holding ${pct(sh.top10Pct)}` : ""}${sh.at ? ` (GeckoTerminal, as of ${esc(dateET(sh.at))})` : ""}. Those Solana wallets aren't in the Cardano list below.${link}`
+      : ` ${esc(tk)} is a Solada Pump coin, so it also has holders on Solana that aren't in this Cardano list.${link}`;
+  }
+  $("[data-story-text]").innerHTML = esc(text) + solHtml;
 }
 
 // Pages back through the coin's launchpad trades until `stopAt` (or the start).
