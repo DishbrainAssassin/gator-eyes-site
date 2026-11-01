@@ -51,6 +51,7 @@ function resultRow(c, i) {
     <span class="sr-acts">
       <a href="./coincard.html?coin=${encodeURIComponent(c.id)}">Card</a>
       <a href="./holders.html?coin=${encodeURIComponent(tk)}">Holders</a>
+      <a href="./trades.html?coin=${encodeURIComponent(tk)}">Trades</a>
       ${al ? `<a href="./followup.html?coin=${encodeURIComponent(tk)}">Alerts</a>` : ""}
       <a href="${esc(coinUrl(c.id))}" target="_blank" rel="noopener">${String(c.id || "").startsWith("snek:") ? "Snek.fun" : "Solada"}</a>
     </span>

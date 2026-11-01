@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gator Eyes | Trade history for Solada.fun and Snek.fun coins</title>
+  <meta name="description" content="Every buy and sell for any Solada.fun or Snek.fun coin, newest first: time, side, ADA, tokens, price and wallet. Filter by side, size or wallet and download the CSV. Free, no sign-up.">
+  <meta property="og:title" content="Gator Eyes | Lurking so you don't have to">
+  <meta property="og:description" content="Free, live tracker for Solada.fun and Snek.fun: whale buys, volume spikes, new launches, money flows and holder checks. No sign-up, no wallet. Just ask Quagmire the gator.">
+  <meta property="og:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta property="og:url" content="https://www.gatoreyes.fun/trades.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Gator Eyes">
+  <link rel="canonical" href="https://www.gatoreyes.fun/trades.html">
+  <meta name="twitter:site" content="@GatorEyesADA">
+  <meta name="theme-color" content="#06090a">
+  <link rel="icon" href="./assets/img/favicon-64.png">
+  <link rel="apple-touch-icon" href="./assets/img/apple-touch-icon.png">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Gator Eyes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/style.css?v=20261101-nav1">
+  <link rel="stylesheet" href="./assets/css/clean-layout.css?v=20261101-nav1">
+  <style>
+    .th-filters { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+    .th-filters .search input { width: min(13rem, 42vw); }
+    .th-filters .search input[type="number"] { width: 7rem; }
+    .trade-table td.th-when { white-space: nowrap; font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-text-muted); }
+    .trade-table td.th-when time { display: block; }
+    .trade-table td a.mono { white-space: nowrap; }
+    .trade-table td a.mono { font-family: var(--font-mono); font-size: var(--text-xs); text-decoration: none; color: var(--color-text-muted); }
+    .trade-table td a.mono:hover { color: var(--color-amber); }
+    .trade-table tr.is-buy td:first-child { box-shadow: inset 3px 0 0 var(--color-buy); }
+    .trade-table tr.is-sell td:first-child { box-shadow: inset 3px 0 0 var(--color-sell); }
+    .trade-table .cell-sub a, .trade-table a.cell-sub { color: var(--color-text-muted); }
+    .th-kpis .kpi-value.pos { color: var(--color-buy); } .th-kpis .kpi-value.neg { color: var(--color-sell); }
+    .trade-table .w-short { display: none; }
+    @media (max-width: 760px) { .trade-table .w-long { display: none; } .trade-table .w-short { display: inline; } .trade-table td, .trade-table th { padding-inline: 5px; } }
+    .list-cta .btn[disabled] { opacity: 0.45; cursor: default; }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./index.html" aria-label="Gator Eyes home">
+        <img src="./assets/img/avatar-256.webp" alt="" width="32" height="32">
+        <span>Gator Eyes</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="./tokens.html">Tokens</a>
+        <a href="./watchlist.html">Watchlist</a>
+        <details class="tools-menu">
+          <summary>Tools <span aria-hidden="true">⌄</span></summary>
+          <div class="tools-dropdown"><a href="./race.html">Graduation race</a><a href="./flows.html">Flows</a><a href="./unlocks.html">Unlock calendar</a><a href="./followup.html">Alert follow-up</a><a href="./holders.html">Holder snapshot</a><a href="./trades.html" aria-current="page">Trade history</a><a href="./coincard.html">Coin share card</a><a href="./card.html">Daily flow card</a><a href="./tools.html">All tools</a><a href="./about.html">How it works</a><a href="./gaey.html">$GAEY</a></div>
+        </details>
+        <button type="button" class="nav-ask" data-ask aria-haspopup="dialog" aria-controls="gator-panel"><img src="./assets/img/gator-nerd-head-160.webp" alt="" width="28" height="28"><span>Ask Quagmire</span></button>
+      </nav>
+      <a class="btn btn-sm btn-ghost header-discord" data-link="discord" href="#">Join Discord</a>
+    </div>
+  </header>
+  <div data-platform-bar></div>
+
+    <main id="main" class="dash">
+    <section class="dash-top" aria-labelledby="dash-title">
+      <div class="wrap">
+        <div class="dash-head">
+          <div>
+            <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching Solada and Snek.fun</span></p>
+            <h1 id="dash-title">Trade history</h1>
+            <p class="dash-lede">Every buy and sell for a Solada.fun or Snek.fun coin, newest first: when it happened, which way, how much ADA, how many tokens, the price paid and the wallet. Filter by side, size or wallet and download the CSV. Free, no sign-up.</p>
+          </div>
+        </div>
+        <div class="notice" data-notice hidden role="status"></div>
+      </div>
+    </section>
+
+    <section class="wrap dash-body" aria-label="Trade history">
+      <article class="panel">
+        <form class="coin-pick" data-pick>
+          <label class="field"><span>Coin: ticker, Solada or Snek.fun coin link, or coin ID</span><input name="coin" list="coin-list" placeholder="e.g. MEPE" autocomplete="off" required data-coin></label>
+          <datalist id="coin-list" data-list></datalist>
+          <button class="btn btn-amber" type="submit" data-go>Show trades</button>
+        </form>
+      </article>
+      <article class="panel" data-result hidden>
+        <header class="panel-head panel-head-wrap"><div class="snap-head" data-head></div><span class="updated" data-range></span></header>
+        <div class="kpis kpis-6 th-kpis" data-kpis></div>
+        <p class="excl">Totals cover the trades loaded below, after your filters. Load older trades to extend them.</p>
+      </article>
+      <article class="panel" data-table hidden>
+        <header class="panel-head panel-head-wrap">
+          <div class="chips" style="margin:0" role="group" aria-label="Side" data-sides>
+            <button class="chip is-on" type="button" data-side="">All trades</button>
+            <button class="chip" type="button" data-side="buy">Buys</button>
+            <button class="chip" type="button" data-side="sell">Sells</button>
+          </div>
+          <div class="th-filters">
+            <label class="search"><span class="sr-only">Minimum ADA</span><input type="number" min="0" step="any" inputmode="decimal" placeholder="Min ADA" data-min autocomplete="off"></label>
+            <label class="search"><span class="sr-only">Wallet</span><input type="search" placeholder="Wallet addr1…" data-wallet autocomplete="off"></label>
+          </div>
+        </header>
+        <p class="progress-note" data-progress hidden></p>
+        <div class="cta-row list-cta">
+          <button class="btn btn-ghost" type="button" data-older>Load older trades</button>
+          <button class="btn btn-ghost" type="button" data-all>Load everything</button>
+          <button class="btn btn-amber" type="button" data-csv>Download CSV</button>
+          <span class="excl" data-count></span>
+        </div>
+        <div class="table-wrap">
+          <table class="coin-table trade-table">
+            <thead><tr>
+              <th scope="col">When</th><th scope="col">Side</th>
+              <th scope="col" class="num">ADA</th><th scope="col" class="num">Tokens</th>
+              <th scope="col" class="num hide-sm">Price</th><th scope="col">Wallet</th><th scope="col" class="hide-sm">Where</th>
+            </tr></thead>
+            <tbody data-rows></tbody>
+          </table>
+        </div>
+        <div class="list-foot"><button class="btn btn-ghost btn-sm" type="button" data-more hidden>Show more</button></div>
+      </article>
+      <article class="panel">
+        <header class="panel-head"><h2 class="panel-title">How to read this</h2></header>
+        <div class="method">
+          <div><h3>Where the trades come from</h3><p>Solada coins: the trades Solada reports, on its bonding curve before graduation and on the Minswap pool after. Snek.fun coins: trades on its Splash curve and pool. Wallet-to-wallet transfers and trades on other DEXs are not included.</p></div>
+          <div><h3>Price</h3><p>ADA paid per token in that single trade (ADA divided by tokens), so it includes slippage and fees. It may not match the chart price at that moment.</p></div>
+          <div><h3>How far back</h3><p>The newest trades load first. Load older trades a batch at a time, or load everything, up to the most recent 5,000 trades. Times are Eastern.</p></div>
+        </div>
+      </article>
+      <p class="dash-foot">Trades are read live from the coin's launchpad when you load the page. Wallet links open Cardanoscan. Gator Eyes doesn't rate coins or wallets. Information, not financial advice.</p>
+    </section>
+  
+</main>
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>Gator Eyes is free and will never charge for access. It's an automated tracker for <a data-link="join" href="#">Solada</a> and Snek.fun. Alerts are not financial advice. $GAEY is the Gator Eyes team's token. Links to Solada include our referral code (6pxznt5n), which may earn the team referral rewards at no extra cost to you. <a href="./about.html#disclosures">Disclosures</a>.</p>
+      <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./tokens.html">Tokens</a><a href="./tools.html">Tools</a><a href="./app.html">Get the app</a></nav>
+    </div>
+  </footer>
+  <script type="module" src="./assets/js/trades.js?v=20261101-nav1"></script>
+</body>
+</html>
