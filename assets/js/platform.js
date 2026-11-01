@@ -38,8 +38,11 @@ function paint() {
     b.setAttribute("aria-pressed", String(on));
   });
   // Carry the choice into same-site page links so moving between pages keeps the view.
-  document.querySelectorAll('a[href^="./"][href*=".html"]').forEach((a) => {
-    const u = new URL(a.getAttribute("href"), location.href);
+  document.querySelectorAll("a[href]").forEach((a) => {
+    const raw = a.getAttribute("href");
+    if (!raw || raw.startsWith("#")) return;
+    const u = new URL(raw, location.href);
+    if (u.origin !== location.origin || !u.pathname.endsWith(".html")) return;
     if (cur === "all") u.searchParams.delete("lp");
     else u.searchParams.set("lp", cur);
     a.setAttribute("href", u.pathname.split("/").pop() + u.search + u.hash);
@@ -55,7 +58,8 @@ export function set(v) {
   const u = new URL(location.href);
   if (v === "all") u.searchParams.delete("lp");
   else u.searchParams.set("lp", v);
-  history.replaceState(null, "", u);
+  // The embedded preview may have an opaque origin; filtering still works there.
+  try { history.replaceState(null, "", u); } catch {}
   paint();
   subs.forEach((f) => f(v));
 }
@@ -66,19 +70,18 @@ export function on(f) {
   return () => subs.delete(f);
 }
 
-/** Render the platform bar into [data-platform-bar]. Safe to call when the host is missing. */
+/** Keep only the launchpad selector, inline with the site's top navigation. */
 export function mount(host = document.querySelector("[data-platform-bar]")) {
   if (!host) return;
-  host.innerHTML = `<div class="platform-bar">
-    <div class="wrap platform-inner">
-      <span class="platform-label">Launchpad</span>
-      <div class="seg" role="group" aria-label="Filter the site by launchpad">
+  const header = document.querySelector(".site-header .header-inner");
+  if (header) {
+    host.className = "header-platform";
+    header.insertBefore(host, header.querySelector(".nav"));
+  }
+  host.innerHTML = `<div class="seg" role="group" aria-label="Filter the site by launchpad">
         <button type="button" data-platform="all" aria-pressed="false">All</button>
         <button type="button" class="lp-solada" data-platform="solada" aria-pressed="false"><i></i>Solada</button>
         <button type="button" class="lp-snek" data-platform="snek" aria-pressed="false"><i></i>Snek.fun</button>
-      </div>
-      <span class="platform-hint" data-platform-hint></span>
-    </div>
   </div>`;
   paint();
 }

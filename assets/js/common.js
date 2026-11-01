@@ -1,6 +1,6 @@
-import { CONFIG } from "./config.js?v=20261101-clean1";
-import { joinUrl, coinUrl } from "./data.js?v=20261101-clean1";
-import { timeAgo } from "./ui.js?v=20261101-clean1";
+import { CONFIG } from "./config.js?v=20261101-clean2";
+import { joinUrl, coinUrl } from "./data.js?v=20261101-clean2";
+import { timeAgo } from "./ui.js?v=20261101-clean2";
 
 /** Fill every [data-link] with the right URL so links live in one place (config.js). */
 export function wireLinks(root = document) {
@@ -20,9 +20,9 @@ export function wireLinks(root = document) {
   });
   navTips();
   wireToolsMenu();
-  import("./gator.js?v=20261101-clean1").then((m) => m.mountGator()).catch(() => {});
-  import("./extras.js?v=20261101-clean1").then((m) => m.mountExtras()).catch(() => {});
-  import("./tape.js?v=20261101-clean1").then((m) => m.mountTape()).catch(() => {});
+  import("./gator.js?v=20261101-clean2").then((m) => m.mountGator()).catch(() => {});
+  import("./extras.js?v=20261101-clean2").then((m) => m.mountExtras()).catch(() => {});
+  import("./tape.js?v=20261101-clean2").then((m) => m.mountTape()).catch(() => {});
   import("./pwa.js?v=20261101s").then((m) => m.mountPwa()).catch(() => {});
 }
 
@@ -31,6 +31,18 @@ function wireToolsMenu() {
   if (!menu || menu.dataset.wired) return;
   menu.dataset.wired = "true";
   const summary = menu.querySelector("summary");
+  const dropdown = menu.querySelector(".tools-dropdown");
+  const mobileLinks = document.createElement("div");
+  mobileLinks.className = "mobile-nav-extra";
+  mobileLinks.innerHTML = `<a href="./tokens.html">Tokens</a><a href="./watchlist.html">Watchlist</a><button type="button" class="menu-action" data-menu-ask>Ask Quagmire</button><button type="button" class="menu-action" data-menu-search>Search coins</button>`;
+  dropdown.prepend(mobileLinks);
+  mobileLinks.addEventListener("click", (event) => {
+    const action = event.target.closest("[data-menu-ask], [data-menu-search]");
+    if (!action) return;
+    menu.open = false;
+    summary.focus();
+    document.querySelector(action.hasAttribute("data-menu-ask") ? ".nav-ask" : ".hdr-search")?.click();
+  });
   summary.setAttribute("aria-expanded", String(menu.open));
   menu.addEventListener("toggle", () => summary.setAttribute("aria-expanded", String(menu.open)));
   document.addEventListener("click", (event) => {
