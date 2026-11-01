@@ -1,9 +1,9 @@
 // Coin share card: one coin's last 24 hours on Solada.fun or Snek.fun as a 1200x675 PNG.
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261101p";
-import { coinUrl, fetchFeed } from "./data.js?v=20261101p";
-import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261101p";
-import { wireLinks, liveStatus } from "./common.js?v=20261101p";
-import * as platform from "./platform.js?v=20261101p";
+import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261101q";
+import { coinUrl, fetchFeed } from "./data.js?v=20261101q";
+import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261101q";
+import { wireLinks, liveStatus } from "./common.js?v=20261101q";
+import * as platform from "./platform.js?v=20261101q";
 
 wireLinks();
 platform.mount();
