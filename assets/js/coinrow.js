@@ -40,8 +40,9 @@ export function actionsCell(c, { more = false } = {}) {
   if (more) {
     a.push(`<a class="icon-btn" href="./followup.html?coin=${encodeURIComponent(c.tk || c.id)}" title="Follow-up on ${esc(c.tk || "")} alerts">Follow-up</a>`);
     a.push(`<a class="icon-btn" href="./holders.html?coin=${encodeURIComponent(c.tk || c.id)}" title="Holder snapshot for ${esc(c.tk || "")}">Holders</a>`);
+    a.push(`<a class="icon-btn" href="./trades.html?coin=${encodeURIComponent(c.tk || c.id)}" title="Every ${esc(c.tk || "")} trade">Trades</a>`);
   }
-  // The ticker already opens the coin's own page, so the Watchlist (more=true) stops at Follow-up and Holders.
+  // The ticker already opens the coin's own page, so the Watchlist (more=true) stops at Follow-up, Holders and Trades.
   if (more) return `<span class="row-actions">${a.join("")}</span>`;
   if (c.src === "snek") a.push(`<a class="icon-btn" href="${esc(coinUrl(c.id))}" target="_blank" rel="noopener" title="Open ${esc(c.tk || "")} on Snek.fun">Snek.fun</a>`);
   else a.push(`<a class="icon-btn" href="./coincard.html?coin=${encodeURIComponent(c.id)}" title="Make a share card for ${esc(c.tk || "")}">Card</a>`);

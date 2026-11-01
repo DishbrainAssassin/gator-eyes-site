@@ -26,7 +26,7 @@ const LINKS = [
   { k: "home", label: "Home", href: "./index.html", match: ["", "index.html"] },
   { k: "tokens", label: "Tokens", href: "./tokens.html", match: ["tokens.html"] },
   { k: "watch", label: "Watchlist", href: "./watchlist.html", match: ["watchlist.html"] },
-  { k: "tools", label: "Tools", href: "./tools.html", match: ["tools.html", "race.html", "flows.html", "unlocks.html", "followup.html", "holders.html", "coincard.html", "card.html", "about.html", "gaey.html", "app.html"] },
+  { k: "tools", label: "Tools", href: "./tools.html", match: ["tools.html", "race.html", "flows.html", "unlocks.html", "followup.html", "holders.html", "trades.html", "coincard.html", "card.html", "about.html", "gaey.html", "app.html"] },
 ];
 
 function page() {
