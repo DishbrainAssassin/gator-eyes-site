@@ -1,6 +1,6 @@
-import { CONFIG } from "./config.js?v=20261101-clean2";
-import { joinUrl, coinUrl } from "./data.js?v=20261101-clean2";
-import { timeAgo } from "./ui.js?v=20261101-clean2";
+import { CONFIG } from "./config.js?v=20261101-clean3";
+import { joinUrl, coinUrl } from "./data.js?v=20261101-clean3";
+import { timeAgo } from "./ui.js?v=20261101-clean3";
 
 /** Fill every [data-link] with the right URL so links live in one place (config.js). */
 export function wireLinks(root = document) {
@@ -20,9 +20,9 @@ export function wireLinks(root = document) {
   });
   navTips();
   wireToolsMenu();
-  import("./gator.js?v=20261101-clean2").then((m) => m.mountGator()).catch(() => {});
-  import("./extras.js?v=20261101-clean2").then((m) => m.mountExtras()).catch(() => {});
-  import("./tape.js?v=20261101-clean2").then((m) => m.mountTape()).catch(() => {});
+  import("./gator.js?v=20261101-clean3").then((m) => m.mountGator()).catch(() => {});
+  import("./extras.js?v=20261101-clean3").then((m) => m.mountExtras()).catch(() => {});
+  import("./tape.js?v=20261101-clean3").then((m) => m.mountTape()).catch(() => {});
   import("./pwa.js?v=20261101s").then((m) => m.mountPwa()).catch(() => {});
 }
 
