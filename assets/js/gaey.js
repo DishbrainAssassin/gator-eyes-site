@@ -1,7 +1,7 @@
-import { CONFIG } from "./config.js?v=20261101-clean3";
-import { subscribe } from "./data.js?v=20261101-clean3";
-import { alertCard, emptyState, skeleton, fmt, usdcx, compact, timeAgo } from "./ui.js?v=20261101-clean3";
-import { wireLinks, liveStatus } from "./common.js?v=20261101-clean3";
+import { CONFIG } from "./config.js?v=20261101-nav1";
+import { subscribe } from "./data.js?v=20261101-nav1";
+import { alertCard, emptyState, skeleton, fmt, usdcx, compact, timeAgo } from "./ui.js?v=20261101-nav1";
+import { wireLinks, liveStatus } from "./common.js?v=20261101-nav1";
 
 wireLinks();
 const $ = (s) => document.querySelector(s);

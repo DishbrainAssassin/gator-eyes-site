@@ -79,9 +79,6 @@
 .gaey-teaser .teaser-img { width: 72px; height: 72px; }
 .gaey-teaser .section-title { font-size: var(--text-lg); }
 .gaey-teaser p { font-size: var(--text-sm); }
-.tape-toggle { flex: none; min-width: 76px; padding-inline: var(--space-3); border: 0; border-left: 1px solid var(--color-divider); color: var(--color-text-muted); background: var(--color-surface); font: 500 var(--text-xs) var(--font-body); cursor: pointer; }
-.tape-toggle:hover { color: var(--color-amber); }
-.tape.is-paused .tape-track { animation-play-state: paused; }
 .gator-panel { bottom: 0; }
 @media (max-width: 1000px) {
   .header-inner { gap: var(--space-3); }
@@ -141,6 +138,20 @@
   .header-platform .seg button { padding-inline: 6px; gap: 5px; font-size: 11px; }
   .header-platform .seg { gap: 0; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .tape-track { animation: none; }
-}
+
+/* Installed phone app: bottom navigation bar (Back, Home, Tokens, Watchlist, Tools, Ask). */
+:root { --app-nav-h: 60px; }
+.app-nav { display: none; }
+html.is-app .app-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 75; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); padding: 0 max(var(--space-2), env(safe-area-inset-right)) env(safe-area-inset-bottom) max(var(--space-2), env(safe-area-inset-left)); background: color-mix(in oklab, var(--color-bg) 92%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--color-divider); }
+.app-nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: var(--app-nav-h); padding: var(--space-1) 2px; border: 0; background: none; color: var(--color-text-muted); font: 500 11px/1.1 var(--font-body); text-decoration: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.app-nav-item span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.app-nav-item img { width: 24px; height: 24px; object-fit: contain; }
+.app-nav-item:hover, .app-nav-item:active { color: var(--color-text); }
+.app-nav-item.is-on { color: var(--color-amber); }
+.app-nav-item:focus-visible { outline: 2px solid var(--color-amber); outline-offset: -4px; border-radius: var(--radius-sm); }
+.app-nav-item[disabled] { opacity: .35; cursor: default; }
+html.is-app body { padding-bottom: calc(var(--app-nav-h) + env(safe-area-inset-bottom)); }
+html.is-app .gator { bottom: calc(var(--app-nav-h) + env(safe-area-inset-bottom) + var(--space-3)); }
+html.is-app .gator-panel { height: min(72vh, 600px, calc(100dvh - var(--app-nav-h) - env(safe-area-inset-bottom) - 96px)); }
+html.is-app .toast { bottom: calc(var(--app-nav-h) + env(safe-area-inset-bottom) + var(--space-3)); }
+html.is-app .app-nudge { bottom: calc(var(--app-nav-h) + env(safe-area-inset-bottom) + var(--space-3)); }

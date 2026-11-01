@@ -819,12 +819,13 @@ button.link:hover { color: var(--color-amber-hover); }
 .form-grid .checks { align-content: start; }
 .form-grid .field { align-self: start; align-content: start; }
 
-/* Live trade tape (ticker under the header, every page) */
+/* Live trade tape (static strip under the header, every page). Newest trade on the left;
+   it never moves on its own, people can swipe or scroll sideways for older trades. */
 .tape { display: flex; align-items: stretch; border-bottom: 1px solid var(--color-divider); background: var(--color-surface); font-size: var(--text-xs); overflow: hidden; }
 .tape-label { display: flex; align-items: center; gap: var(--space-2); padding: 0 var(--space-4); border-right: 1px solid var(--color-divider); color: var(--color-text-muted); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; flex: none; }
-.tape-view { flex: 1; min-width: 0; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
-.tape-track { display: flex; width: max-content; animation: tape-scroll var(--tape-dur, 60s) linear infinite; will-change: transform; }
-.tape:hover .tape-track, .tape:focus-within .tape-track { animation-play-state: paused; }
+.tape-view { flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; -webkit-mask-image: linear-gradient(90deg, #000 92%, transparent); mask-image: linear-gradient(90deg, #000 92%, transparent); }
+.tape-view::-webkit-scrollbar { display: none; }
+.tape-track { display: flex; width: max-content; }
 .tape-set { display: flex; }
 .tape-item { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 34px; padding: var(--space-1) var(--space-4); color: var(--color-text); text-decoration: none; white-space: nowrap; border-right: 1px solid var(--color-divider); font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .tape-item img { width: 16px; height: 16px; border-radius: var(--radius-full); object-fit: cover; background: var(--color-surface-2); }
@@ -835,12 +836,6 @@ button.link:hover { color: var(--color-amber-hover); }
 .tape-item:hover b, .tape-item:focus-visible b { color: var(--color-amber); }
 .tape-item:focus-visible { outline-offset: -2px; }
 .tape-lp { width: 7px; height: 7px; border-radius: var(--radius-full); background: var(--lp, var(--lp-snek)); flex: none; }
-@keyframes tape-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-@media (prefers-reduced-motion: reduce) {
-  .tape-track { animation: none; width: auto; }
-  .tape-view { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
-  .tape-set[aria-hidden] { display: none; }
-}
 @media (max-width: 640px) { .tape-label { padding: 0 var(--space-3); } .tape-label span + * { display: none; } }
 
 /* Since you last looked (home) */

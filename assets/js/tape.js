@@ -1,11 +1,10 @@
-// Live trade tape: a stock-ticker strip under the header on every page. Reads the last
-// 40 trades from /feed (both launchpads), newest first, and scrolls them sideways.
-// Pauses on hover and focus. With reduced motion it becomes a plain side-scrolling row.
-import { subscribe } from "./data.js?v=20261101-clean3";
-import * as platform from "./platform.js?v=20261101-clean3";
-import { fmt, esc } from "./ui.js?v=20261101-clean3";
+// Live trade tape: a static strip of recent trades under the header on every page. Reads the
+// last 40 trades from /feed (both launchpads), newest first. It does not move on its own;
+// the newest trade is always on the left and people can swipe or scroll sideways for older ones.
+import { subscribe } from "./data.js?v=20261101-nav1";
+import * as platform from "./platform.js?v=20261101-nav1";
+import { fmt, esc } from "./ui.js?v=20261101-nav1";
 
-const PX_PER_SEC = 55; // scroll speed
 let host, track, lastKey = "", items = [];
 
 function ago(ms) {
@@ -38,19 +37,17 @@ function render() {
   if (key === lastKey) {
     // Same trades: only refresh the ages so the strip doesn't jump.
     track.querySelectorAll(".tape-item").forEach((el, i) => {
-      const t = rows[i % rows.length];
+      const t = rows[i];
       const s = el.querySelector("small");
       if (s && t) s.textContent = ago(t.at);
     });
     return;
   }
   lastKey = key;
-  track.innerHTML = `<div class="tape-set">${html}</div><div class="tape-set" aria-hidden="true" inert>${html}</div>`;
-  // Speed scales with content so short and long strips move at the same pace.
-  requestAnimationFrame(() => {
-    const w = track.firstElementChild ? track.firstElementChild.scrollWidth : 0;
-    track.style.setProperty("--tape-dur", Math.max(20, Math.round(w / PX_PER_SEC)) + "s");
-  });
+  track.innerHTML = `<div class="tape-set">${html}</div>`;
+  // New trades arrive on the left. Stay put if someone has swiped along to older trades.
+  const view = track.parentElement;
+  if (view.scrollLeft < 40) view.scrollLeft = 0;
 }
 
 export function mountTape() {
@@ -61,16 +58,9 @@ export function mountTape() {
   host.hidden = true;
   host.setAttribute("role", "region");
   host.setAttribute("aria-label", "Live trade tape");
-  host.innerHTML = `<div class="tape-label"><span class="live-dot is-live" aria-hidden="true"></span>Live</div><div class="tape-view"><div class="tape-track"></div></div><button type="button" class="tape-toggle" aria-label="Pause trade ticker" aria-pressed="false">Pause</button>`;
+  host.innerHTML = `<div class="tape-label"><span class="live-dot is-live" aria-hidden="true"></span>Live</div><div class="tape-view"><div class="tape-track"></div></div>`;
   header.after(host);
   track = host.querySelector(".tape-track");
-  const toggle = host.querySelector(".tape-toggle");
-  toggle.addEventListener("click", () => {
-    const paused = host.classList.toggle("is-paused");
-    toggle.textContent = paused ? "Resume" : "Pause";
-    toggle.setAttribute("aria-label", paused ? "Resume trade ticker" : "Pause trade ticker");
-    toggle.setAttribute("aria-pressed", String(paused));
-  });
   subscribe((feed) => {
     if (!feed) return;
     items = Array.isArray(feed.tape) ? feed.tape : [];
