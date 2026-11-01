@@ -43,6 +43,8 @@
     .th-kpis .kpi-value.pos { color: var(--color-buy); } .th-kpis .kpi-value.neg { color: var(--color-sell); }
     .trade-table .w-short { display: none; }
     @media (max-width: 760px) { .trade-table .w-long { display: none; } .trade-table .w-short { display: inline; } .trade-table td, .trade-table th { padding-inline: 5px; } }
+    .trade-table td .badge + .cell-sub { font-family: var(--font-body); }
+    .trade-table tr.is-mirror td { opacity: 0.55; }
     .list-cta .btn[disabled] { opacity: 0.45; cursor: default; }
   </style>
 </head>
@@ -102,6 +104,11 @@
             <button class="chip" type="button" data-side="buy">Buys</button>
             <button class="chip" type="button" data-side="sell">Sells</button>
           </div>
+          <div class="chips" style="margin:0" role="group" aria-label="Chain" data-chains hidden>
+            <button class="chip is-on" type="button" data-chain="">Both chains</button>
+            <button class="chip" type="button" data-chain="ada">Cardano</button>
+            <button class="chip" type="button" data-chain="sol">Solana</button>
+          </div>
           <div class="th-filters">
             <label class="search"><span class="sr-only">Minimum ADA</span><input type="number" min="0" step="any" inputmode="decimal" placeholder="Min ADA" data-min autocomplete="off"></label>
             <label class="search"><span class="sr-only">Wallet</span><input type="search" placeholder="Wallet addr1…" data-wallet autocomplete="off"></label>
@@ -118,7 +125,7 @@
           <table class="coin-table trade-table">
             <thead><tr>
               <th scope="col">When</th><th scope="col">Side</th>
-              <th scope="col" class="num">ADA</th><th scope="col" class="num">Tokens</th>
+              <th scope="col" class="num" title="Solana trades are converted to ADA at today's rate and marked ~">ADA</th><th scope="col" class="num">Tokens</th>
               <th scope="col" class="num hide-sm">Price</th><th scope="col">Wallet</th><th scope="col" class="hide-sm">Where</th>
             </tr></thead>
             <tbody data-rows></tbody>
@@ -129,7 +136,7 @@
       <article class="panel">
         <header class="panel-head"><h2 class="panel-title">How to read this</h2></header>
         <div class="method">
-          <div><h3>Where the trades come from</h3><p>Solada coins: the trades Solada reports, on its bonding curve before graduation and on the Minswap pool after. Snek.fun coins: trades on its Splash curve and pool. Wallet-to-wallet transfers and trades on other DEXs are not included. Solada Pump coins also trade on Solana (Pump.fun), and Solada only publishes their ADA-side trades, so those lists are shorter and a note points to the Solana side.</p></div>
+          <div><h3>Where the trades come from</h3><p>Solada coins: the trades Solada reports, on its bonding curve before graduation and on the Minswap pool after. Snek.fun coins: trades on its Splash curve and pool. Wallet-to-wallet transfers and trades on other DEXs are not included. Solada Pump coins also trade on Solana (Pump.fun or PumpSwap): Solada only publishes their ADA-side trades, so for those coins the page adds the Solana pool's last 24 hours of trades from GeckoTerminal, marked Solana, with amounts converted to ADA (~) at today's rate.</p></div>
           <div><h3>Price</h3><p>ADA paid per token in that single trade (ADA divided by tokens), so it includes slippage and fees. It may not match the chart price at that moment.</p></div>
           <div><h3>How far back</h3><p>The newest trades load first. Load older trades a batch at a time, or load everything, up to the most recent 5,000 trades. Times are Eastern.</p></div>
         </div>
