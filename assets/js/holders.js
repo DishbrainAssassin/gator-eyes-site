@@ -38,14 +38,16 @@ const plural = (n, one, many) => `${fmt(n)} ${n === 1 ? one : many || one + "s"}
 // The groups every address falls into, in the order they're checked. An address lands in the first
 // group that matches, so a creator-owned lock counts as locked, and a creator-owned contract as creator.
 const GROUPS = {
-  curve: { name: "Bonding curve", color: "var(--color-amber)", on: false, what: "Tokens still for sale on Solada's curve. They have no owner yet." },
-  pool: { name: "Liquidity pool", color: "var(--color-spike)", on: false, what: "Tokens in the Minswap pool that opened at graduation." },
+  curve: { name: "Bonding curve", color: "var(--color-amber)", on: false, what: "Tokens held at the launchpad's bonding-curve address, not an ordinary holder wallet." },
+  pool: { name: "Liquidity pools", color: "var(--color-spike)", on: false, what: "Tokens held in verified liquidity-pool contracts, not ordinary holder wallets." },
   locked: { name: "Locked", color: "var(--color-launch)", on: false, what: "Tokens sitting in a lock until a future date." },
+  lockcontract: { name: "Lock contracts", color: "#b697d4", on: false, what: "Tokens still held in the Spectrum/Splash locking contract. A passed unlock date does not mean they have been withdrawn." },
+  burn: { name: "Burn address", color: "#d18c6b", on: false, what: "Tokens sent to the published $burnsnek burn address. Kept in the supply breakdown, but left out of airdrops by default." },
   dev: { name: "Creator", color: "var(--color-sell)", on: false, what: "The wallet that launched the coin, plus anything Solada labels as the creator's." },
   solada: { name: "Solada's wallets", color: "#5fd3b8", on: false, what: "Solada's own wallets, named on its proof-of-reserves page: the reserve that keeps Pump coins until someone buys them, the orders wallet and the pool wallet." },
   script: { name: "Other contracts", color: "var(--color-text-faint)", on: false, what: "Script addresses such as DEX orders, vaults and bots." },
   nostake: { name: "No stake key", color: "#c9a26b", on: true, what: "Payment-only addresses with no stake key. Exchanges and services often use these. They can't be grouped into a wallet." },
-  wallet: { name: "Wallets", color: "var(--color-buy)", on: true, what: "Everyone else: ordinary Cardano wallets holding the coin." }
+  wallet: { name: "Wallets", color: "var(--color-buy)", on: true, what: "Wallet addresses not assigned to the categories above. This is not a count of individual people." }
 };
 
 function notice(html) { const n = $("[data-notice]"); n.hidden = !html; n.innerHTML = html || ""; }
@@ -79,6 +81,8 @@ async function loadList() {
 }
 
 function groupOf(h, c, now) {
+  if (h.label === "burn") return "burn";
+  if (h.label === "lock") return "lockcontract";
   if (h.label === "curve" || (c.curveAddress && h.addr === c.curveAddress)) return "curve";
   if (h.label === "pool") return "pool";
   if (h.lockedUntilMs && h.lockedUntilMs > now) return "locked";
@@ -144,9 +148,27 @@ const SOLADA_WORDS = {
 function soladaWords(rows) {
   const names = [...new Set(rows.map((h) => h.name).filter(Boolean))];
   // Only Pump coins have Cardano copies waiting in the reserve. For a Cardano-only coin (one with a curve) it's just Solada's operating wallet.
-  if (names.length === 1 && names[0] === "Solada reserve" && st.snap.coin.curveAddress) return "Solada's reserve wallet (the platform's own operating wallet)";
+  if (names.length === 1 && names[0] === "Solada reserve" && (st.snap.coin.src === "snek" || st.snap.coin.curveAddress)) return "Solada's reserve wallet (the platform's own operating wallet)";
   if (names.length === 1) return SOLADA_WORDS[names[0]] || `Solada's own "${names[0]}" wallet`;
   return "Solada's own wallets (" + names.map((n) => n.replace(/^Solada /, "")).join(", ") + ")";
+}
+
+function lockExplanation(rows) {
+  const now = Date.now(), div = 10 ** st.dec;
+  let active = 0, matured = 0, unknown = 0, earliest = Infinity, latest = 0;
+  for (const h of rows) {
+    if (!h.lockDatesVerified || !Array.isArray(h.lockSchedule)) { unknown += Number(h.qty); continue; }
+    for (const l of h.lockSchedule) {
+      if (l.untilMs > now) {
+        active += Number(l.qty); earliest = Math.min(earliest, l.untilMs); latest = Math.max(latest, l.untilMs);
+      } else matured += Number(l.qty);
+    }
+  }
+  const sentences = [];
+  if (active) sentences.push(`${amt(active / div)} tokens are still time-locked, with unlock dates ${earliest === latest ? dateET(earliest) : dateET(earliest) + " to " + dateET(latest)}.`);
+  if (matured) sentences.push(`${amt(matured / div)} tokens are past their unlock date but remain in the contract.`);
+  if (unknown) sentences.push(`Unlock dates for ${amt(unknown / div)} tokens could not be verified; contract custody does not prove an active lock.`);
+  return sentences.join(" ") || "Spectrum/Splash locking contract. Unlock dates are not verified.";
 }
 
 // The supply bar, the group cards and the one-paragraph story above them.
@@ -160,9 +182,14 @@ function renderStory() {
   $("[data-keys]").innerHTML = keys.map((k) => {
     const G = GROUPS[k], x = g[k], on = st.on[k];
     let what = G.what;
-    if (k === "script" && snek) what = "Script addresses. Snek.fun doesn't label its curve or pool, so they're in here too.";
+    if (k === "script") what = "Script addresses we haven't identified. These may include orders, vaults or unrecognized contracts; no purpose is assumed.";
     if (k === "locked" && x.n) what = `Tokens in a lock until ${x.lockMin === x.lockMax ? dateET(x.lockMin) : dateET(x.lockMin) + " to " + dateET(x.lockMax)}${x.dev ? ", including the creator's" : ""}.`;
-    if (k === "curve" && c.cs === "graduated") what = "The coin graduated, so the curve is empty and trading moved to the pool.";
+    if (k === "curve" && c.cs === "graduated") what = "Balance still at the bonding-curve address after graduation. Not an ordinary holder wallet.";
+    if (k === "pool") {
+      const venues = [...new Set(st.snap.holders.filter((h) => h.group === "pool").map((h) => h.venue || (snek ? "unidentified venue" : "Minswap")))];
+      what = `Tokens in ${venues.join(" and ")} liquidity-pool contracts. Not ordinary holder wallets.`;
+    }
+    if (k === "lockcontract") what = lockExplanation(st.snap.holders.filter((h) => h.group === k));
     if (k === "solada" && x.n) { const w = soladaWords(st.snap.holders.filter((h) => h.group === "solada")); what = w.charAt(0).toUpperCase() + w.slice(1) + ". Named on Solada's proof-of-reserves page; not a holder."; }
     const empty = !x.n;
     return `<button type="button" class="skey${on ? " is-on" : ""}${empty ? " is-empty" : ""}" data-key="${k}" aria-pressed="${on}" ${empty ? "disabled" : ""} style="--c:${G.color}">
@@ -178,12 +205,14 @@ function renderStory() {
   const tk = c.tk || "this coin";
   const parts = [];
   const shows = (k) => share(k) >= 0.05;
-  if (shows("curve")) parts.push(`${pct(share("curve"))} is still on the bonding curve, waiting to be bought`);
-  if (shows("pool")) parts.push(`${pct(share("pool"))} sits in the liquidity pool`);
+  if (shows("curve")) parts.push(`${pct(share("curve"))} is at the bonding-curve address`);
+  if (shows("pool")) parts.push(`${pct(share("pool"))} sits in liquidity pools`);
   if (shows("locked")) parts.push(`${pct(share("locked"))} is locked across ${plural(g.locked.n, "address", "addresses")}${g.locked.dev ? ", the creator's included" : ""}`);
+  if (shows("lockcontract")) parts.push(`${pct(share("lockcontract"))} remains in lock contracts`);
+  if (shows("burn")) parts.push(`${pct(share("burn"))} is at the burn address`);
   if (shows("dev")) parts.push(`${pct(share("dev"))} is with the creator`);
   if (shows("solada")) parts.push(`${pct(share("solada"))} is in ${soladaWords(st.snap.holders.filter((h) => h.group === "solada"))}`);
-  if (shows("script")) parts.push(`${pct(share("script"))} is in ${snek ? "contracts, including Snek.fun's own" : "other contracts"}`);
+  if (shows("script")) parts.push(`${pct(share("script"))} is in unidentified contracts`);
   if (shows("nostake")) parts.push(`${pct(share("nostake"))} is in ${plural(g.nostake.n, "payment-only address", "payment-only addresses")} with no stake key`);
   const w = g.wallet;
   const walletShare = share("wallet");
@@ -193,9 +222,11 @@ function renderStory() {
   const sorted = [...byStake.values()].sort((a, b) => b - a);
   const biggest = sorted[0] || 0, top10 = sorted.slice(0, 10).reduce((a, b) => a + b, 0);
   let text = `Of ${tk}'s ${amt(total / div)} tokens on Cardano, ` + (parts.length ? parts.join(", ").replace(/, ([^,]*)$/, " and $1") + ". " : "nothing sits in the curve, pool, locks or contracts. ");
-  text += `The other ${pct(walletShare)} is spread across ${plural(byStake.size, "wallet")}${parts.length < keys.filter((k) => k !== "wallet" && g[k].qty).length ? " (tiny leftovers under 0.1% aren't listed)" : ""}`;
+  text += `${pct(walletShare)} is in ${plural(byStake.size, "wallet")} not assigned to the categories above`;
   if (biggest && w.qty) text += `; the biggest holds ${pct((biggest / w.qty) * 100)} of that and the top ten hold ${pct((top10 / w.qty) * 100)}.`;
   else text += ".";
+  if (g.lockcontract.qty) text += " " + lockExplanation(st.snap.holders.filter((h) => h.group === "lockcontract"));
+  if (g.burn.qty) text += " These supply percentages include the burn address; they are not circulating-supply percentages.";
   const bigNoStake = st.snap.holders.filter((h) => h.group === "nostake").sort((a, b) => Number(b.qty) - Number(a.qty))[0];
   if (bigNoStake && total && Number(bigNoStake.qty) / total > 0.2) text += ` One payment-only address holds ${pct((Number(bigNoStake.qty) / total) * 100)} on its own and ${snek ? "Snek.fun" : "Solada"} doesn't label it. Open it on Cardanoscan before you decide whether it belongs in an airdrop.`;
   $("[data-story-text]").textContent = text;
@@ -238,7 +269,7 @@ async function apply() {
     const q = Number(h.qty);
     // Curve, pool and contract addresses stay as their own rows even when grouping by wallet.
     const solo = h.group !== "wallet" && h.group !== "dev";
-    rows.push({ key: rules.stake && h.stake && !solo ? h.stake : h.addr, addr: h.addr, stake: h.stake, qty: q, addrs: [h.addr], group: h.group, groups: new Set([h.group]), lockedUntilMs: h.lockedUntilMs || 0, name: h.name || null });
+    rows.push({ key: rules.stake && h.stake && !solo ? h.stake : h.addr, addr: h.addr, stake: h.stake, qty: q, addrs: [h.addr], group: h.group, groups: new Set([h.group]), lockedUntilMs: h.lockedUntilMs || 0, name: h.name || null, venue: h.venue || null, lockSchedule: h.lockSchedule, lockDatesVerified: h.lockDatesVerified });
   }
   if (rules.stake) {
     const m = new Map();
@@ -287,9 +318,9 @@ async function apply() {
   const top10 = rows.slice(0, 10).reduce((a, r) => a + r.share, 0);
   const onlyWallets = onNames.length === 1 && onNames[0] === "wallets";
   $("[data-kpis]").innerHTML = [
-    [rules.stake ? "Wallets in the list" : "Addresses in the list", fmt(rows.length), onlyWallets ? "ordinary wallets only" : "includes " + onNames.join(", ")],
+    [onlyWallets && rules.stake ? "Wallets in the list" : "Rows in the list", fmt(rows.length), onlyWallets ? "wallets only" : "includes " + onNames.join(", ")],
     ["Tokens they hold", amt(kept / div), total ? pct((kept / total) * 100) + " of supply" : ""],
-    ["Biggest holder", rows.length ? pct(rows[0].share) : "–", "of the list"],
+    ["Largest balance", rows.length ? pct(rows[0].share) : "–", "of the list"],
     ["Top 10 hold", rows.length ? pct(top10) : "–", "of the list"]
   ].map(([l, v, sub]) => `<div class="kpi"><span class="kpi-label">${esc(l)}</span><span class="kpi-value">${esc(v)}</span>${sub ? `<span class="kpi-sub">${esc(sub)}</span>` : ""}</div>`).join("");
 
@@ -306,7 +337,9 @@ function typeCell(r) {
   const G = GROUPS[r.group];
   let extra = "";
   if (r.group === "locked" && r.lockedUntilMs) extra = `until ${dateET(r.lockedUntilMs)}`;
-  else if (r.group === "pool") extra = "Minswap";
+  else if (r.group === "pool") extra = r.venue || (st.snap.coin.src === "snek" ? "Venue not identified" : "Minswap");
+  else if (r.group === "lockcontract") extra = lockExplanation([r]);
+  else if (r.group === "burn") extra = "$burnsnek";
   else if (r.group === "solada") return `<span class="gtag" style="--c:${G.color}"><i></i>${esc(r.name || G.name)}</span><span class="cell-sub">Solada's own wallet · proof of reserves</span>`;
   else if (r.addrs.length > 1) extra = `${r.addrs.length} addresses`;
   return `<span class="gtag" style="--c:${G.color}"><i></i>${esc(G.name)}</span>${extra ? `<span class="cell-sub">${esc(extra)}</span>` : ""}`;
@@ -334,8 +367,9 @@ function renderRows() {
 function csv() {
   const div = 10 ** st.dec;
   const c = st.snap.coin;
-  const lines = ["rank,address,stake_address,balance,share_pct,addresses,type"];
-  st.out.forEach((r, i) => lines.push([i + 1, r.addr, r.stake || "", (r.qty / div).toFixed(st.dec), r.share.toFixed(6), r.addrs.length, r.group].join(",")));
+  const lines = ["rank,address,stake_address,balance,share_pct,addresses,type,venue,contract_name,lock_dates_verified"];
+  const cell = (x) => '"' + String(x ?? "").replace(/"/g, '""') + '"';
+  st.out.forEach((r, i) => lines.push([i + 1, r.addr, r.stake || "", (r.qty / div).toFixed(st.dec), r.share.toFixed(6), r.addrs.length, r.group, r.venue, r.name, r.group === "lockcontract" ? !!r.lockDatesVerified : ""].map(cell).join(",")));
   const blob = new Blob([lines.join("\n") + "\n"], { type: "text/csv" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);

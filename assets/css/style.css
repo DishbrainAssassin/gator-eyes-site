@@ -790,13 +790,13 @@ button.link:hover { color: var(--color-amber-hover); }
 .skey:hover:not(:disabled) { border-color: color-mix(in oklab, var(--c) 60%, var(--color-border)); }
 .skey.is-on { border-color: color-mix(in oklab, var(--c) 55%, var(--color-border)); background: color-mix(in oklab, var(--c) 6%, var(--color-bg)); color: var(--color-text); }
 .skey.is-empty { opacity: 0.45; cursor: default; }
-.skey-top { display: flex; align-items: center; gap: 6px; font-size: var(--text-xs); }
+.skey-top { display: flex; align-items: center; gap: 6px; min-height: 2.8em; font-size: var(--text-xs); }
 .skey-top i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); flex: none; }
 .skey-top b { color: var(--color-text); }
 .skey-big { display: flex; align-items: baseline; gap: var(--space-2); font-family: var(--font-mono); font-size: var(--text-lg); font-weight: 500; color: var(--color-text); font-variant-numeric: tabular-nums; }
 .skey-big em { margin-left: auto; font-family: var(--font-body); font-style: normal; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-text-faint); white-space: nowrap; }
 .skey.is-on .skey-big em { color: var(--color-buy); }
-.skey-sub { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--color-text-faint); }
+.skey-sub { min-height: 3em; font-family: var(--font-mono); font-size: 0.6875rem; color: var(--color-text-faint); }
 .skey-what { font-size: var(--text-xs); color: var(--color-text-muted); margin-top: var(--space-1); line-height: 1.45; }
 .list-cta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-bottom: var(--space-5); }
 .list-cta .excl { flex: 1 1 14rem; }
@@ -810,7 +810,10 @@ button.link:hover { color: var(--color-amber-hover); }
 .holder-table tr[class^="is-"] td { background: color-mix(in oklab, var(--color-text) 2%, transparent); }
 @media (max-width: 720px) {
   .supply-keys { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .skey-what { display: none; }
+  .skey { padding: var(--space-3); }
+  .skey-big { flex-wrap: wrap; }
+  .skey-big em { margin-left: 0; }
+  .skey-what { display: block; }
 }
 .kpis-holders .kpi { background: var(--color-surface); }
 .form-grid .checks { align-content: start; }
