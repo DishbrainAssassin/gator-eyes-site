@@ -1,10 +1,10 @@
 // Ask Gator: a small helper that answers common questions about Gator Eyes and
 // Solada.fun. Answers are built in (no AI, no running cost). Live questions
 // about coins use the same /tokens data as the Tokens page.
-import { CONFIG } from "./config.js?v=20261101a";
-import { coinUrl, joinUrl } from "./data.js?v=20261101a";
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261101a";
-import { esc, fmt, compact } from "./ui.js?v=20261101a";
+import { CONFIG } from "./config.js?v=20261101b";
+import { coinUrl, joinUrl } from "./data.js?v=20261101b";
+import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261101b";
+import { esc, fmt, compact } from "./ui.js?v=20261101b";
 
 const DISCORD = CONFIG.discord;
 const a = (href, label, ext) => `<a href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(label)}</a>`;
@@ -190,7 +190,7 @@ const LIVE = [
 // Questions about Quagmire himself ("do you like this picture of you?"), not about a tool.
 const ABOUT_ME = [" of you ", " of you?", "you like", "like you", "of yourself", "your picture", "your pic", "your face", "your look", "you look", "pic of you", "photo of you", "your avatar", "your art"];
 const FAQ = [
-  { keys: ["what is gator eyes", "what's gator eyes", "what does gator eyes", "about gator eyes", "who are you", "what are you", "what is this site", "what is this"], a: () => `I'm Quagmire, resident data nerd at Gator Eyes. Gator Eyes is a free, automated tracker for Solada.fun. It reads every public trade every two minutes, adds up where the money moves, and posts what stands out to ${discord()} and X. No sign-up, no wallet connection.` },
+  { keys: ["what is gator eyes", "what's gator eyes", "what does gator eyes", "about gator eyes", "who are you", "what are you", "what is this site", "what is this"], a: () => `I'm Quagmire, resident data nerd at Gator Eyes. Gator Eyes is a free, automated tracker for Solada.fun. It reads every public trade on Solada.fun and Snek.fun every minute, adds up where the money moves, and posts what stands out to ${discord()} and X. No sign-up, no wallet connection.` },
   { keys: ["alerts mean", "types of alert", "what alerts", "alert types", "kinds of alert", "what triggers", "alert rules"], a: () => `Four kinds of alert:<ul><li><strong>Whale trade</strong>: a trade worth $1,000 or more in ADA, or one worth at least 7.5% of the coin's market cap (minimum 250 ADA).</li><li><strong>Volume spike</strong>: a coin trading 4 times its normal pace over 15 minutes, with at least 1,500 ADA moving.</li><li><strong>Fast launch</strong>: a new coin pulling in 1,000 ADA from 8 or more wallets in its first hour.</li><li><strong>Creator sell</strong>: the wallet that created a coin selling 500 ADA or more, or at least 5% of the coin's market cap. Posted as a record, not a warning.</li></ul>More on the ${page("about.html", "How it works page")}.` },
   { keys: ["whale"], a: () => `A whale alert is any single trade worth $1,000 or more in ADA (the ADA amount moves with the price), or a trade worth at least 7.5% of the coin's market cap (minimum 250 ADA). They post in #whale-alerts on ${discord()}.` },
   { keys: ["spike"], a: () => "A volume spike means a coin traded at 4 times its normal pace over 15 minutes, with at least 1,500 ADA moving. Each coin can spike at most once an hour so the channel doesn't flood." },
@@ -212,7 +212,7 @@ const FAQ = [
   { keys: ["gaey", "your token", "team token"], a: () => `$GAEY is the Gator Eyes team's own token. It trades on Solada.fun until it bonds, not on Snek.fun. Holder rewards are paid in ADA, and the creator locked 4.94M GAEY until Nov 26. Every trade posts in #gaey-trades. See the ${page("gaey.html", "$GAEY page")}.` },
   { keys: ["referral", "6pxznt5n", "ref code"], a: () => "Solada.fun links from Gator Eyes include our referral code, 6pxznt5n. It may earn the team referral rewards and costs you nothing extra." },
   { keys: ["usdcx", "usd", "dollar"], a: () => "The ~USDCx figures are approximate. They use the latest ADA to USDCx rate Gator Eyes saw, so treat them as a rough guide." },
-  { keys: ["how often", "update", "refresh", "delay", "real time", "realtime", "live"], a: () => "Gator Eyes checks Solada.fun every two minutes. Alerts usually land within a few minutes of the trade. If Solada is down or updating, alerts pause and the site says so at the top." },
+  { keys: ["how often", "update", "refresh", "delay", "real time", "realtime", "live"], a: () => "Gator Eyes checks Solada.fun and Snek.fun every minute. Alerts usually land within a minute or two of the trade. If either site starts refusing requests, Gator Eyes automatically slows down for a bit and catches up. If Solada is down or updating, alerts pause and the site says so at the top." },
   { keys: ["cost", "free", "price of gator", "pay", "subscription", "premium", "charge", "paywall", "how much", "fee", "pro version", "token gate", "need to hold"], a: () => "Gator Eyes is free, and it always will be. We will never charge for access: no paywall, no subscriptions, no premium alerts, no token gate. You don't need to hold $GAEY to use anything. No sign-up or wallet connection either. Trust me, I ran the numbers on this one." },
   { keys: ["wallet", "connect", "safe to use", "private key", "seed"], a: () => "Gator Eyes never asks you to connect a wallet and can't trade for you. Never share your seed phrase with anyone, including bots in Discord DMs." },
   { keys: ["what is solada", "solada.fun", "how to buy", "how do i buy", "start trading", "how do i trade"], a: () => `Solada.fun is a launchpad for meme coins on Cardano, with some coins also on Solana. You buy and sell on Solada.fun itself; Gator Eyes just watches. ${a(joinUrl(), "Start on Solada.fun", true)}.` },

@@ -1,6 +1,6 @@
-import { CONFIG } from "./config.js?v=20261101a";
-import { joinUrl, coinUrl } from "./data.js?v=20261101a";
-import { timeAgo } from "./ui.js?v=20261101a";
+import { CONFIG } from "./config.js?v=20261101b";
+import { joinUrl, coinUrl } from "./data.js?v=20261101b";
+import { timeAgo } from "./ui.js?v=20261101b";
 
 /** Fill every [data-link] with the right URL so links live in one place (config.js). */
 export function wireLinks(root = document) {
@@ -18,8 +18,8 @@ export function wireLinks(root = document) {
     a.rel = "noopener";
   });
   navTips();
-  import("./gator.js?v=20261101a").then((m) => m.mountGator()).catch(() => {});
-  import("./extras.js?v=20261101a").then((m) => m.mountExtras()).catch(() => {});
+  import("./gator.js?v=20261101b").then((m) => m.mountGator()).catch(() => {});
+  import("./extras.js?v=20261101b").then((m) => m.mountExtras()).catch(() => {});
 }
 
 export function liveStatus(feed, err) {
@@ -31,7 +31,7 @@ export function liveStatus(feed, err) {
   dot.classList.toggle("is-stale", !fresh);
   const pads = feed && feed.sources && feed.sources.snek && feed.sources.snek.on ? "Solada and Snek.fun" : "Solada";
   if (err && !feed) txt.textContent = "Live feed reconnecting";
-  else if (fresh) txt.textContent = `Watching ${pads} · checks every 2 min`;
+  else if (fresh) txt.textContent = `Watching ${pads} · checks every minute`;
   else if (feed && feed.updatedAt) txt.textContent = "Feed paused · last update " + timeAgo(feed.updatedAt.getTime());
   else txt.textContent = `Watching ${pads}`;
 }
