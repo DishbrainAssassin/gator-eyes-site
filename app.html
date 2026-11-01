@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gator Eyes | Phone alerts app</title>
+  <meta name="description" content="Add Gator Eyes to your home screen and get whale trades, volume spikes, creator sells and fast launches on Solada.fun and Snek.fun as phone notifications. Free, no account, no app store.">
+  <meta property="og:title" content="Gator Eyes | Lurking so you don't have to">
+  <meta property="og:description" content="Free, live tracker for Solada.fun and Snek.fun: whale buys, volume spikes, new launches, money flows and holder checks. No sign-up, no wallet. Just ask Quagmire the gator.">
+  <meta property="og:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta property="og:url" content="https://www.gatoreyes.fun/app.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Gator Eyes">
+  <link rel="canonical" href="https://www.gatoreyes.fun/app.html">
+  <meta name="twitter:site" content="@GatorEyesADA">
+  <meta name="theme-color" content="#06090a">
+  <link rel="icon" href="./assets/img/favicon-64.png">
+  <link rel="apple-touch-icon" href="./assets/img/apple-touch-icon.png">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Gator Eyes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/style.css?v=20261101r">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <aside class="suri-bar" aria-label="Paid features from Suri">
+    <div class="wrap suri-bar-inner">
+      <p>Safety checks on new coins, wallet profiles, and copy trading take a paid tool, we point you to Suri instead of building a paywall.</p>
+      <a class="suri-bar-link" href="https://suriradar.fun/" target="_blank" rel="noopener">See Suri's tiers <span aria-hidden="true">&rarr;</span></a>
+    </div>
+  </aside>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./index.html" aria-label="Gator Eyes home">
+        <img src="./assets/img/avatar-256.webp" alt="" width="32" height="32">
+        <span>Gator Eyes</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="./index.html#alerts">Alerts</a>
+        <a href="./tokens.html">Tokens</a>
+        <a href="./race.html">Race</a>
+        <a href="./flows.html">Flows</a>
+        <a href="./followup.html">Follow-up</a>
+        <a href="./watchlist.html">Watchlist</a>
+        <a href="./tools.html">Tools</a>
+        <a href="./gaey.html">$GAEY</a>
+        <a href="./about.html">How it works</a>
+      </nav>
+      <a class="btn btn-sm btn-amber" data-link="discord" href="#">Join Discord</a>
+    </div>
+  </header>
+
+    <main id="main" class="dash">
+    <section class="dash-top" aria-labelledby="dash-title">
+      <div class="wrap">
+        <div class="dash-head">
+          <div>
+            <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching Solada and Snek.fun</span></p>
+            <h1 id="dash-title">Gator Eyes on your phone</h1>
+            <p class="dash-lede">Add Gator Eyes to your home screen and get the same alerts as our Discord as phone notifications. Free, no account, no app store and no wallet.</p>
+          </div>
+        </div>
+        <div class="notice" data-notice hidden role="status"></div>
+      </div>
+    </section>
+
+    <section class="wrap dash-body" aria-label="Set up the app">
+      <article class="panel app-step" data-step-install>
+        <header class="panel-head"><h2 class="panel-title"><span class="app-num">1</span> Add it to your home screen</h2><span class="panel-meta" data-install-state></span></header>
+        <div data-install></div>
+      </article>
+
+      <article class="panel app-step" data-step-alerts>
+        <header class="panel-head"><h2 class="panel-title"><span class="app-num">2</span> Pick your alerts</h2><span class="panel-meta" data-alert-state></span></header>
+        <div class="app-blocked" data-alerts-blocked hidden></div>
+        <form class="app-form" data-form>
+          <fieldset class="checks">
+            <legend class="app-legend">What should buzz your phone</legend>
+            <div data-kinds class="checks"></div>
+          </fieldset>
+          <fieldset class="checks">
+            <legend class="app-legend">Launchpads</legend>
+            <label class="toggle"><input type="checkbox" name="src" value="solada" checked><span>Solada.fun</span></label>
+            <label class="toggle"><input type="checkbox" name="src" value="snek" checked><span>Snek.fun</span></label>
+            <legend class="app-legend app-legend-gap">Coins</legend>
+            <label class="toggle"><input type="checkbox" name="watchOnly"><span>Only coins on my watchlist<small data-watch-count>Star coins on the Tokens page to build your watchlist.</small></span></label>
+            <p class="excl">Fast launches are brand-new coins, so they still come through with this on.</p>
+          </fieldset>
+          <div class="app-actions">
+            <button type="submit" class="btn btn-amber" data-on>Turn on alerts</button>
+            <button type="button" class="btn btn-ghost" data-test hidden>Send a test alert</button>
+            <button type="button" class="btn btn-ghost" data-off hidden>Turn off alerts</button>
+          </div>
+          <p class="app-status" data-status aria-live="polite"></p>
+        </form>
+      </article>
+
+      <article class="panel">
+        <header class="panel-head"><h2 class="panel-title">Good to know</h2></header>
+        <ul class="app-notes">
+          <li>Alerts come from the same checks as Discord, every minute, with the same rules. If several land in the same minute, they arrive as one notification.</li>
+          <li>Tap a notification to open the live alerts list.</li>
+          <li>To pause, turn alerts off here, or mute Gator Eyes in your phone's notification settings.</li>
+          <li>Nothing personal is kept. Your phone gives us an anonymous delivery address from Apple, Google or your browser, and we store it with the choices above. Turning alerts off deletes it.</li>
+          <li>On iPhone this needs iOS 16.4 or newer, and alerts only work from the home screen icon, not inside Safari.</li>
+          <li>Alerts are information, not financial advice.</li>
+        </ul>
+      </article>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>Gator Eyes is free and will never charge for access. It's an automated tracker for <a data-link="join" href="#">Solada</a> and Snek.fun. Alerts are not financial advice. $GAEY is the Gator Eyes team's token. Links to Solada include our referral code (6pxznt5n), which may earn the team referral rewards at no extra cost to you. <a href="./about.html#disclosures">Disclosures</a>.</p>
+      <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./tokens.html">Tokens</a><a href="./tools.html">Tools</a><a href="./app.html">Get the app</a></nav>
+    </div>
+  </footer>
+  
+  <script type="module" src="./assets/js/app.js?v=20261101r"></script>
+</body>
+</html>
