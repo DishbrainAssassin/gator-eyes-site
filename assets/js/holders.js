@@ -1,5 +1,5 @@
 // Holder snapshot: where a Solada.fun or Snek.fun coin's supply sits on Cardano, then a filtered
-// holder list ready to download as a CSV for airdrops.
+// holder list ready to filter and download as a CSV.
 import { getApi } from "./api.js?v=20261101b";
 import { coinUrl, fetchFeed } from "./data.js?v=20261101b";
 import { esc, fmt, compact } from "./ui.js?v=20261101b";
@@ -42,7 +42,7 @@ const GROUPS = {
   pool: { name: "Liquidity pools", color: "var(--color-spike)", on: false, what: "Tokens held in verified liquidity-pool contracts, not ordinary holder wallets." },
   locked: { name: "Locked", color: "var(--color-launch)", on: false, what: "Tokens sitting in a lock until a future date." },
   lockcontract: { name: "Lock contracts", color: "#b697d4", on: false, what: "Tokens still held in the Spectrum/Splash locking contract. A passed unlock date does not mean they have been withdrawn." },
-  burn: { name: "Burn address", color: "#d18c6b", on: false, what: "Tokens sent to the published $burnsnek burn address. Kept in the supply breakdown, but left out of airdrops by default." },
+  burn: { name: "Burn address", color: "#d18c6b", on: false, what: "Tokens sent to the published $burnsnek burn address. Kept in the supply breakdown, but left out of the holder list by default." },
   dev: { name: "Creator", color: "var(--color-sell)", on: false, what: "The wallet that launched the coin, plus anything Solada labels as the creator's." },
   solada: { name: "Solada's wallets", color: "#5fd3b8", on: false, what: "Solada's own wallets, named on its proof-of-reserves page: the reserve that keeps Pump coins until someone buys them, the orders wallet and the pool wallet." },
   script: { name: "Other contracts", color: "var(--color-text-faint)", on: false, what: "Script addresses such as DEX orders, vaults and bots." },
@@ -228,7 +228,7 @@ function renderStory() {
   if (g.lockcontract.qty) text += " " + lockExplanation(st.snap.holders.filter((h) => h.group === "lockcontract"));
   if (g.burn.qty) text += " These supply percentages include the burn address; they are not circulating-supply percentages.";
   const bigNoStake = st.snap.holders.filter((h) => h.group === "nostake").sort((a, b) => Number(b.qty) - Number(a.qty))[0];
-  if (bigNoStake && total && Number(bigNoStake.qty) / total > 0.2) text += ` One payment-only address holds ${pct((Number(bigNoStake.qty) / total) * 100)} on its own and ${snek ? "Snek.fun" : "Solada"} doesn't label it. Open it on Cardanoscan before you decide whether it belongs in an airdrop.`;
+  if (bigNoStake && total && Number(bigNoStake.qty) / total > 0.2) text += ` One payment-only address holds ${pct((Number(bigNoStake.qty) / total) * 100)} on its own and ${snek ? "Snek.fun" : "Solada"} doesn't label it. Open it on Cardanoscan before you decide whether to include it in your filtered list.`;
   $("[data-story-text]").textContent = text;
 }
 
