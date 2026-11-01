@@ -1,8 +1,8 @@
-// Holder snapshot: every Cardano holder of a Solada.fun or Snek.fun coin, filtered by rules,
-// ready to download as a CSV for airdrops.
+// Holder snapshot: where a Solada.fun or Snek.fun coin's supply sits on Cardano, then a filtered
+// holder list ready to download as a CSV for airdrops.
 import { getApi } from "./api.js?v=20261101b";
 import { coinUrl, fetchFeed } from "./data.js?v=20261101b";
-import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261101b";
+import { esc, fmt, compact } from "./ui.js?v=20261101b";
 import { wireLinks, liveStatus } from "./common.js?v=20261101b";
 import * as platform from "./platform.js?v=20261101b";
 import { pill } from "./platform.js?v=20261101b";
@@ -12,10 +12,12 @@ platform.mount();
 platform.on(() => fillList());
 const $ = (s) => document.querySelector(s);
 const R = (k) => document.querySelector(`[data-r="${k}"]`);
-const st = { coins: [], snap: null, trades: null, tradesKey: "", out: [], more: false, busy: 0 };
+const st = { coins: [], snap: null, trades: null, out: [], more: false, busy: 0, groups: null, on: null };
 
 const short = (a) => (a && a.length > 24 ? a.slice(0, 12) + "…" + a.slice(-8) : a || "");
 const isScript = (a) => /^addr1[zxw]/.test(a || "");
+// Payment-only address: no stake part, so it can't be grouped with a wallet's other addresses.
+const noStake = (a, stake) => !stake && /^addr1v/.test(a || "");
 const etMidnight = (v) => {
   if (!v) return null;
   const [y, m, d] = v.split("-").map(Number);
@@ -26,6 +28,23 @@ const etMidnight = (v) => {
     if (h === 0) return t;
   }
   return Date.UTC(y, m - 1, d, 5);
+};
+const dateET = (ms) => new Date(ms).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" });
+const pct = (n, d = 1) => (!isFinite(n) ? "–" : n > 0 && n < 0.05 ? "<0.1%" : n.toFixed(d) + "%");
+// Token amounts: 1.0B, 54.7M, 12.3k.
+const amt = (n) => (Math.abs(n) >= 1e9 ? (n / 1e9).toFixed(2).replace(/\.?0+$/, "") + "B" : compact(n));
+const plural = (n, one, many) => `${fmt(n)} ${n === 1 ? one : many || one + "s"}`;
+
+// The groups every address falls into, in the order they're checked. An address lands in the first
+// group that matches, so a creator-owned lock counts as locked, and a creator-owned contract as creator.
+const GROUPS = {
+  curve: { name: "Bonding curve", color: "var(--color-amber)", on: false, what: "Tokens still for sale on Solada's curve. They have no owner yet." },
+  pool: { name: "Liquidity pool", color: "var(--color-spike)", on: false, what: "Tokens in the Minswap pool that opened at graduation." },
+  locked: { name: "Locked", color: "var(--color-launch)", on: false, what: "Tokens sitting in a lock until a future date." },
+  dev: { name: "Creator", color: "var(--color-sell)", on: false, what: "The wallet that launched the coin, plus anything Solada labels as the creator's." },
+  script: { name: "Other contracts", color: "var(--color-text-faint)", on: false, what: "Script addresses such as DEX orders, vaults and bots." },
+  nostake: { name: "No stake key", color: "#c9a26b", on: true, what: "Payment-only addresses with no stake key. Exchanges and services often use these. They can't be grouped into a wallet." },
+  wallet: { name: "Wallets", color: "var(--color-buy)", on: true, what: "Everyone else: ordinary Cardano wallets holding the coin." }
 };
 
 function notice(html) { const n = $("[data-notice]"); n.hidden = !html; n.innerHTML = html || ""; }
@@ -58,6 +77,32 @@ async function loadList() {
   } catch (e) { liveStatus(null, e); }
 }
 
+function groupOf(h, c, now) {
+  if (h.label === "curve" || (c.curveAddress && h.addr === c.curveAddress)) return "curve";
+  if (h.label === "pool") return "pool";
+  if (h.lockedUntilMs && h.lockedUntilMs > now) return "locked";
+  if (h.label === "dev" || (c.launcher && (h.addr === c.launcher || h.stake === c.launcher))) return "dev";
+  if (isScript(h.addr)) return "script";
+  if (noStake(h.addr, h.stake)) return "nostake";
+  return "wallet";
+}
+
+// Sorts every address into a group once per snapshot. Toggles and rules work from this.
+function classify() {
+  const s = st.snap, c = s.coin, now = Date.now();
+  const total = s.holders.reduce((a, h) => a + Number(h.qty), 0);
+  const g = {};
+  for (const k of Object.keys(GROUPS)) g[k] = { n: 0, qty: 0, lockMin: Infinity, lockMax: 0, dev: 0 };
+  for (const h of s.holders) {
+    const k = groupOf(h, c, now);
+    h.group = k;
+    g[k].n++; g[k].qty += Number(h.qty);
+    if (k === "locked") { g[k].lockMin = Math.min(g[k].lockMin, h.lockedUntilMs); g[k].lockMax = Math.max(g[k].lockMax, h.lockedUntilMs); if (h.label === "dev" || (c.launcher && (h.addr === c.launcher || h.stake === c.launcher))) g[k].dev++; }
+  }
+  st.groups = { total, g };
+  if (!st.on) st.on = Object.fromEntries(Object.entries(GROUPS).map(([k, v]) => [k, v.on]));
+}
+
 async function loadCoin(e) {
   if (e) e.preventDefault();
   const id = resolve($("[data-coin]").value);
@@ -67,22 +112,75 @@ async function loadCoin(e) {
   notice("");
   try {
     const j = await getApi("/holders", { coin: id });
-    st.snap = j; st.trades = null; st.more = false;
+    st.snap = j; st.trades = null; st.more = false; st.on = null;
     const c = j.coin;
     let dec = Number(c.decimals) || 0;
     if (!dec && c.supply) dec = Math.max(0, Math.round(Math.log10(Number(c.supply))) - 9);
     st.dec = dec;
+    classify();
     const im = c.img ? `<img src="${esc(c.img)}" alt="" width="36" height="36">` : "";
     const snek = c.src === "snek";
-    $("[data-head]").innerHTML = `${im}<div><h2 class="panel-title"><a href="${esc(coinUrl(snek ? c.id : c.slug || c.id))}" target="_blank" rel="noopener">${esc(c.tk || "?")}</a> holders ${pill(snek ? "snek" : "solada", { button: false })}</h2><span class="cell-sub">${esc(c.name || "")} · ${fmt(j.holders.length)} addresses on Cardano${snek ? " · Snek.fun has no address labels, so its curve and pool contracts fall under \"other contracts\"" : ""}</span></div>`;
+    $("[data-head]").innerHTML = `${im}<div><h2 class="panel-title">Where <a href="${esc(coinUrl(snek ? c.id : c.slug || c.id))}" target="_blank" rel="noopener">${esc(c.tk || "?")}</a>'s supply sits ${pill(snek ? "snek" : "solada", { button: false })}</h2><span class="cell-sub">${esc(c.name || "")} · ${plural(j.holders.length, "address", "addresses")} on Cardano hold the coin</span></div>`;
     $("[data-taken]").textContent = "Snapshot taken " + new Date(j.at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" }) + " ET";
+    $("[data-story]").hidden = false;
     $("[data-rules]").hidden = false;
     $("[data-result]").hidden = false;
     const u = new URL(location.href); u.searchParams.set("coin", c.tk || id); history.replaceState(null, "", u);
+    renderStory();
     await apply();
   } catch (err) {
     notice(`<strong>Couldn't load holders.</strong> ${esc(err.message || err)}. Check the ticker or paste the coin link from Solada.fun or Snek.fun.`);
   } finally { btn.disabled = false; btn.textContent = "Load holders"; }
+}
+
+// The supply bar, the group cards and the one-paragraph story above them.
+function renderStory() {
+  const { total, g } = st.groups, c = st.snap.coin, div = 10 ** st.dec, snek = c.src === "snek";
+  const share = (k) => (total ? (g[k].qty / total) * 100 : 0);
+  const keys = Object.keys(GROUPS).filter((k) => g[k].n || k === "wallet");
+
+  $("[data-bar]").innerHTML = keys.filter((k) => g[k].qty).map((k) => `<i style="--w:${share(k).toFixed(3)}%;--c:${GROUPS[k].color}" title="${esc(GROUPS[k].name)} ${pct(share(k))}"></i>`).join("");
+
+  $("[data-keys]").innerHTML = keys.map((k) => {
+    const G = GROUPS[k], x = g[k], on = st.on[k];
+    let what = G.what;
+    if (k === "script" && snek) what = "Script addresses. Snek.fun doesn't label its curve or pool, so they're in here too.";
+    if (k === "locked" && x.n) what = `Tokens in a lock until ${x.lockMin === x.lockMax ? dateET(x.lockMin) : dateET(x.lockMin) + " to " + dateET(x.lockMax)}${x.dev ? ", including the creator's" : ""}.`;
+    if (k === "curve" && c.cs === "graduated") what = "The coin graduated, so the curve is empty and trading moved to the pool.";
+    const empty = !x.n;
+    return `<button type="button" class="skey${on ? " is-on" : ""}${empty ? " is-empty" : ""}" data-key="${k}" aria-pressed="${on}" ${empty ? "disabled" : ""} style="--c:${G.color}">
+      <span class="skey-top"><i></i><b>${esc(G.name)}</b></span>
+      <span class="skey-big">${empty ? "0%" : pct(share(k))}<em>${on ? "in the list" : empty ? "none" : "left out"}</em></span>
+      <span class="skey-sub">${empty ? "No addresses" : plural(x.n, "address", "addresses") + " · " + amt(x.qty / div) + " tokens"}</span>
+      <span class="skey-what">${esc(what)}</span>
+    </button>`;
+  }).join("");
+  $("[data-keys]").querySelectorAll("[data-key]").forEach((b) => b.addEventListener("click", () => { st.on[b.dataset.key] = !st.on[b.dataset.key]; renderStory(); apply(); }));
+
+  // One paragraph that says where the supply is, in plain words.
+  const tk = c.tk || "this coin";
+  const parts = [];
+  const shows = (k) => share(k) >= 0.05;
+  if (shows("curve")) parts.push(`${pct(share("curve"))} is still on the bonding curve, waiting to be bought`);
+  if (shows("pool")) parts.push(`${pct(share("pool"))} sits in the liquidity pool`);
+  if (shows("locked")) parts.push(`${pct(share("locked"))} is locked across ${plural(g.locked.n, "address", "addresses")}${g.locked.dev ? ", the creator's included" : ""}`);
+  if (shows("dev")) parts.push(`${pct(share("dev"))} is with the creator`);
+  if (shows("script")) parts.push(`${pct(share("script"))} is in ${snek ? "contracts, including Snek.fun's own" : "other contracts"}`);
+  if (shows("nostake")) parts.push(`${pct(share("nostake"))} is in ${plural(g.nostake.n, "payment-only address", "payment-only addresses")} with no stake key`);
+  const w = g.wallet;
+  const walletShare = share("wallet");
+  const wallets = st.snap.holders.filter((h) => h.group === "wallet");
+  const byStake = new Map();
+  for (const h of wallets) { const k = h.stake || h.addr; byStake.set(k, (byStake.get(k) || 0) + Number(h.qty)); }
+  const sorted = [...byStake.values()].sort((a, b) => b - a);
+  const biggest = sorted[0] || 0, top10 = sorted.slice(0, 10).reduce((a, b) => a + b, 0);
+  let text = `Of ${tk}'s ${amt(total / div)} tokens on Cardano, ` + (parts.length ? parts.join(", ").replace(/, ([^,]*)$/, " and $1") + ". " : "nothing sits in the curve, pool, locks or contracts. ");
+  text += `The other ${pct(walletShare)} is spread across ${plural(byStake.size, "wallet")}${parts.length < keys.filter((k) => k !== "wallet" && g[k].qty).length ? " (tiny leftovers under 0.1% aren't listed)" : ""}`;
+  if (biggest && w.qty) text += `; the biggest holds ${pct((biggest / w.qty) * 100)} of that and the top ten hold ${pct((top10 / w.qty) * 100)}.`;
+  else text += ".";
+  const bigNoStake = st.snap.holders.filter((h) => h.group === "nostake").sort((a, b) => Number(b.qty) - Number(a.qty))[0];
+  if (bigNoStake && total && Number(bigNoStake.qty) / total > 0.2) text += ` One payment-only address holds ${pct((Number(bigNoStake.qty) / total) * 100)} on its own and ${snek ? "Snek.fun" : "Solada"} doesn't label it. Open it on Cardanoscan before you decide whether it belongs in an airdrop.`;
+  $("[data-story-text]").textContent = text;
 }
 
 // Pages back through the coin's launchpad trades until `stopAt` (or the start).
@@ -110,32 +208,30 @@ async function apply() {
   const s = st.snap;
   if (!s) return;
   const run = ++st.busy;
-  const c = s.coin, now = Date.now(), div = 10 ** st.dec;
-  const rules = { curve: R("curve").checked, locks: R("locks").checked, script: R("script").checked, dev: R("dev").checked, stake: R("stake").checked, min: Number(R("min").value) || 0, top: Math.max(0, Math.floor(Number(R("top").value) || 0)), skip: new Set(R("skip").value.split(/[\s,]+/).map((x) => x.trim()).filter(Boolean)), before: etMidnight(R("before").value), nosell: etMidnight(R("nosell").value) };
-  const left = { curve: 0, locks: 0, script: 0, dev: 0, skip: 0, min: 0, before: 0, nosell: 0, top: 0 };
-  const leftQty = { ...left };
-  const total = s.holders.reduce((a, h) => a + Number(h.qty), 0);
+  const c = s.coin, div = 10 ** st.dec;
+  const rules = { stake: R("stake").checked, min: Number(R("min").value) || 0, top: Math.max(0, Math.floor(Number(R("top").value) || 0)), skip: new Set(R("skip").value.split(/[\s,]+/).map((x) => x.trim()).filter(Boolean)), before: etMidnight(R("before").value), nosell: etMidnight(R("nosell").value) };
+  const left = { skip: 0, min: 0, before: 0, nosell: 0, top: 0 };
+  const { total, g } = st.groups;
 
   let rows = [];
   for (const h of s.holders) {
+    if (!st.on[h.group]) continue;
+    if (rules.skip.has(h.addr) || (h.stake && rules.skip.has(h.stake))) { left.skip++; continue; }
     const q = Number(h.qty);
-    let why = null;
-    if (rules.curve && (h.label === "curve" || h.label === "pool" || h.addr === c.curveAddress)) why = "curve";
-    else if (rules.locks && h.lockedUntilMs && h.lockedUntilMs > now) why = "locks";
-    else if (rules.dev && (h.label === "dev" || (c.launcher && (h.addr === c.launcher || h.stake === c.launcher)))) why = "dev";
-    else if (rules.script && isScript(h.addr)) why = "script";
-    else if (rules.skip.has(h.addr) || (h.stake && rules.skip.has(h.stake))) why = "skip";
-    if (why) { left[why]++; leftQty[why] += q; continue; }
-    rows.push({ key: rules.stake && h.stake ? h.stake : h.addr, addr: h.addr, stake: h.stake, qty: q, addrs: [h.addr] });
+    // Curve, pool and contract addresses stay as their own rows even when grouping by wallet.
+    const solo = h.group !== "wallet" && h.group !== "dev";
+    rows.push({ key: rules.stake && h.stake && !solo ? h.stake : h.addr, addr: h.addr, stake: h.stake, qty: q, addrs: [h.addr], group: h.group, groups: new Set([h.group]), lockedUntilMs: h.lockedUntilMs || 0 });
   }
   if (rules.stake) {
     const m = new Map();
     for (const r of rows) {
-      const g = m.get(r.key);
-      if (g) { g.qty += r.qty; g.addrs.push(r.addr); if (r.qty > g.top) { g.top = r.qty; g.addr = r.addr; } }
+      const x = m.get(r.key);
+      if (x) { x.qty += r.qty; x.addrs.push(r.addr); x.groups.add(r.group); if (r.qty > x.top) { x.top = r.qty; x.addr = r.addr; x.group = r.group; } }
       else m.set(r.key, { ...r, top: r.qty });
     }
     rows = [...m.values()];
+    // A wallet that also owns a creator-labelled address is the creator.
+    for (const r of rows) if (r.groups.has("dev")) r.group = "dev";
   }
 
   if (rules.before || rules.nosell) {
@@ -152,8 +248,8 @@ async function apply() {
       }
       rows = rows.filter((r) => {
         const has = (set) => r.addrs.some((a) => set.has(a)) || (r.stake && set.has(r.stake));
-        if (rules.before && !has(early)) { left.before++; leftQty.before += r.qty; return false; }
-        if (rules.nosell && has(sold)) { left.nosell++; leftQty.nosell += r.qty; return false; }
+        if (rules.before && !has(early)) { left.before++; return false; }
+        if (rules.nosell && has(sold)) { left.nosell++; return false; }
         return true;
       });
       if (st.trades.capped) notice("<strong>Long trade history.</strong> Only the most recent 5,000 trades were read, so the oldest buys may be missing.");
@@ -161,40 +257,57 @@ async function apply() {
   }
   if (run !== st.busy) return;
 
-  rows = rows.filter((r) => { if (r.qty / div < rules.min) { left.min++; leftQty.min += r.qty; return false; } return true; });
+  rows = rows.filter((r) => { if (r.qty / div < rules.min) { left.min++; return false; } return true; });
   rows.sort((a, b) => b.qty - a.qty);
-  if (rules.top && rows.length > rules.top) { for (const r of rows.slice(rules.top)) { left.top++; leftQty.top += r.qty; } rows = rows.slice(0, rules.top); }
+  if (rules.top && rows.length > rules.top) { left.top = rows.length - rules.top; rows = rows.slice(0, rules.top); }
 
   const kept = rows.reduce((a, r) => a + r.qty, 0);
   rows.forEach((r) => (r.share = kept ? (r.qty / kept) * 100 : 0));
   st.out = rows;
 
+  const onNames = Object.keys(GROUPS).filter((k) => st.on[k] && g[k].n).map((k) => GROUPS[k].name.toLowerCase());
   const top10 = rows.slice(0, 10).reduce((a, r) => a + r.share, 0);
+  const onlyWallets = onNames.length === 1 && onNames[0] === "wallets";
   $("[data-kpis]").innerHTML = [
-    [rules.stake ? "Wallets in the list" : "Addresses in the list", fmt(rows.length)],
-    ["Tokens they hold", compact(kept / div)],
-    ["Share of supply held", total ? ((kept / total) * 100).toFixed(1) + "%" : "–"],
-    ["Top 10 hold", rows.length ? top10.toFixed(1) + "% of the list" : "–"],
-  ].map(([l, v]) => `<div class="kpi"><span class="kpi-label">${esc(l)}</span><span class="kpi-value">${esc(v)}</span></div>`).join("");
+    [rules.stake ? "Wallets in the list" : "Addresses in the list", fmt(rows.length), onlyWallets ? "ordinary wallets only" : "includes " + onNames.join(", ")],
+    ["Tokens they hold", amt(kept / div), total ? pct((kept / total) * 100) + " of supply" : ""],
+    ["Biggest holder", rows.length ? pct(rows[0].share) : "–", "of the list"],
+    ["Top 10 hold", rows.length ? pct(top10) : "–", "of the list"]
+  ].map(([l, v, sub]) => `<div class="kpi"><span class="kpi-label">${esc(l)}</span><span class="kpi-value">${esc(v)}</span>${sub ? `<span class="kpi-sub">${esc(sub)}</span>` : ""}</div>`).join("");
 
-  const names = { curve: "curve and pools", locks: "locked", script: "other contracts", dev: "creator", skip: "your skip list", min: "under the minimum", before: "didn't buy before the date", nosell: "sold since the date", top: "outside the top " + rules.top };
-  const bits = Object.entries(left).filter(([, n]) => n).map(([k, n]) => `${names[k]}: ${fmt(n)} (${fmt(leftQty[k] / div)} tokens)`);
-  $("[data-left]").textContent = bits.length ? "Left out — " + bits.join(" · ") : "Nothing left out.";
+  const names = { skip: "on your skip list", min: "under the minimum", before: "didn't buy before the date", nosell: "sold since the date", top: "outside the top " + rules.top };
+  const bits = Object.entries(left).filter(([, n]) => n).map(([k, n]) => `${fmt(n)} ${names[k]}`);
+  $("[data-left]").textContent = bits.length ? "Rules left out " + bits.join(", ") + "." : "";
 
   renderRows();
   $("[data-csv]").disabled = $("[data-copy]").disabled = !rows.length;
 }
 
+function typeCell(r) {
+  if (r.group === "wallet") return r.addrs.length > 1 ? `<span class="cell-sub">${r.addrs.length} addresses</span>` : "";
+  const G = GROUPS[r.group];
+  let extra = "";
+  if (r.group === "locked" && r.lockedUntilMs) extra = `until ${dateET(r.lockedUntilMs)}`;
+  else if (r.group === "pool") extra = "Minswap";
+  else if (r.addrs.length > 1) extra = `${r.addrs.length} addresses`;
+  return `<span class="gtag" style="--c:${G.color}"><i></i>${esc(G.name)}</span>${extra ? `<span class="cell-sub">${esc(extra)}</span>` : ""}`;
+}
+
 function renderRows() {
   const div = 10 ** st.dec;
   const shown = st.more ? st.out : st.out.slice(0, 100);
-  $("[data-rows]").innerHTML = shown.length ? shown.map((r, i) => `<tr>
+  const grouped = R("stake").checked;
+  const max = st.out.length ? st.out[0].share : 0;
+  $("[data-rows]").innerHTML = shown.length ? shown.map((r, i) => {
+    const id = r.stake && grouped && r.group === "wallet" ? r.stake : r.addr;
+    const href = "https://cardanoscan.io/" + (id.startsWith("stake1") ? "stakekey/" : "address/") + esc(id);
+    return `<tr class="${r.group !== "wallet" ? "is-" + r.group : ""}">
     <td class="num">${i + 1}</td>
-    <td><a class="mono" href="https://cardanoscan.io/${r.stake ? "stakekey/" + esc(r.stake) : "address/" + esc(r.addr)}" target="_blank" rel="noopener" title="${esc(r.stake || r.addr)}">${esc(short(r.stake && R("stake").checked ? r.stake : r.addr))}</a></td>
+    <td><span class="wal"><span class="mono" title="${esc(id)}">${esc(short(id))}</span><a class="wal-link" href="${href}" target="_blank" rel="noopener" title="Open on Cardanoscan">Cardanoscan ↗</a></span></td>
+    <td>${typeCell(r)}</td>
     <td class="num">${fmt(r.qty / div, 2)}</td>
-    <td class="num">${r.share.toFixed(r.share < 0.1 ? 3 : 2)}%</td>
-    <td class="hide-sm"><span class="cell-sub">${r.addrs.length > 1 ? r.addrs.length + " addresses" : ""}</span></td>
-  </tr>`).join("") : `<tr><td colspan="5"><div class="empty"><p>No holders match these rules.</p></div></td></tr>`;
+    <td class="num"><span class="share-num">${r.share.toFixed(r.share < 0.1 ? 3 : 2)}%</span><span class="bar" style="--w:${max ? ((r.share / max) * 100).toFixed(1) : 0}%"></span></td>
+  </tr>`; }).join("") : `<tr><td colspan="5"><div class="empty"><p>No holders match these rules.</p></div></td></tr>`;
   $("[data-more]").hidden = st.more || st.out.length <= 100;
   $("[data-more]").textContent = `Show all ${fmt(st.out.length)}`;
 }
@@ -202,8 +315,8 @@ function renderRows() {
 function csv() {
   const div = 10 ** st.dec;
   const c = st.snap.coin;
-  const lines = ["rank,address,stake_address,balance,share_pct,addresses"];
-  st.out.forEach((r, i) => lines.push([i + 1, r.addr, r.stake || "", (r.qty / div).toFixed(st.dec), r.share.toFixed(6), r.addrs.length].join(",")));
+  const lines = ["rank,address,stake_address,balance,share_pct,addresses,type"];
+  st.out.forEach((r, i) => lines.push([i + 1, r.addr, r.stake || "", (r.qty / div).toFixed(st.dec), r.share.toFixed(6), r.addrs.length, r.group].join(",")));
   const blob = new Blob([lines.join("\n") + "\n"], { type: "text/csv" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);

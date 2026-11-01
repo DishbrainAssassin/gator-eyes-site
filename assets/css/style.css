@@ -779,3 +779,39 @@ button.link:hover { color: var(--color-amber-hover); }
 .tool-ask { border: 1px dashed var(--color-amber); }
 .ask-next .section-title { margin-bottom: var(--space-4); }
 .ask-next { border-top: 1px solid var(--color-border); }
+
+/* Holders: where the supply sits */
+.story { font-size: var(--text-sm); color: var(--color-text-muted); max-width: 70ch; margin-bottom: var(--space-5); }
+.supply-bar { display: flex; height: 14px; border-radius: var(--radius-full); overflow: hidden; background: var(--color-surface-2); margin-bottom: var(--space-4); }
+.supply-bar i { display: block; height: 100%; width: var(--w); min-width: 2px; background: var(--c); }
+.supply-bar i + i { border-left: 1px solid var(--color-surface); }
+.supply-keys { display: grid; grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr)); gap: var(--space-3); margin-bottom: var(--space-3); }
+.skey { display: grid; gap: 2px; text-align: left; padding: var(--space-3) var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-bg); color: var(--color-text-muted); font: inherit; cursor: pointer; transition: border-color var(--transition-interactive), background var(--transition-interactive); }
+.skey:hover:not(:disabled) { border-color: color-mix(in oklab, var(--c) 60%, var(--color-border)); }
+.skey.is-on { border-color: color-mix(in oklab, var(--c) 55%, var(--color-border)); background: color-mix(in oklab, var(--c) 6%, var(--color-bg)); color: var(--color-text); }
+.skey.is-empty { opacity: 0.45; cursor: default; }
+.skey-top { display: flex; align-items: center; gap: 6px; font-size: var(--text-xs); }
+.skey-top i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); flex: none; }
+.skey-top b { color: var(--color-text); }
+.skey-big { display: flex; align-items: baseline; gap: var(--space-2); font-family: var(--font-mono); font-size: var(--text-lg); font-weight: 500; color: var(--color-text); font-variant-numeric: tabular-nums; }
+.skey-big em { margin-left: auto; font-family: var(--font-body); font-style: normal; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-text-faint); white-space: nowrap; }
+.skey.is-on .skey-big em { color: var(--color-buy); }
+.skey-sub { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--color-text-faint); }
+.skey-what { font-size: var(--text-xs); color: var(--color-text-muted); margin-top: var(--space-1); line-height: 1.45; }
+.list-cta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-bottom: var(--space-5); }
+.list-cta .excl { flex: 1 1 14rem; }
+.holder-table .wal { display: inline-flex; flex-direction: column; gap: 1px; }
+.holder-table .wal .mono { font-size: 0.8125rem; white-space: nowrap; }
+.wal-link { font-size: 0.6875rem; color: var(--color-text-faint); text-decoration: none; }
+.wal-link:hover { color: var(--color-amber); }
+.gtag { display: inline-flex; align-items: center; gap: 6px; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--c); border: 1px solid color-mix(in oklab, var(--c) 40%, transparent); background: color-mix(in oklab, var(--c) 10%, transparent); border-radius: var(--radius-full); padding: 2px 8px; white-space: nowrap; }
+.gtag i { width: 6px; height: 6px; border-radius: 50%; background: var(--c); }
+.holder-table td.num .bar { width: var(--w); max-width: 100%; min-width: 2px; }
+.holder-table tr[class^="is-"] td { background: color-mix(in oklab, var(--color-text) 2%, transparent); }
+@media (max-width: 720px) {
+  .supply-keys { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .skey-what { display: none; }
+}
+.kpis-holders .kpi { background: var(--color-surface); }
+.form-grid .checks { align-content: start; }
+.form-grid .field { align-self: start; align-content: start; }
