@@ -3,7 +3,7 @@
 // about coins use the same /tokens data as the Tokens page.
 import { CONFIG } from "./config.js?v=20261101r";
 import { coinUrl, joinUrl } from "./data.js?v=20261101r";
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261101r";
+import { API, getApi, price, pct, signed, hours, span } from "./api.js?v=20261101r";
 import { esc, fmt, compact } from "./ui.js?v=20261101r";
 
 const DISCORD = CONFIG.discord;
@@ -320,6 +320,15 @@ async function answer(raw) {
 const SUGGEST = ["What do the alerts mean?", "What's close to graduating?", "Most traded today", "How do I make a holder list?", "What is net flow?"];
 const KEY = "gator-chat-v1";
 
+// Save the question and a plain-text copy of the answer for the daily review (no names or wallets).
+function logQuestion(q, html) {
+  try {
+    const a = String(html).replace(/<li>/g, " - ").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 600);
+    const fb = /not in my notes yet/.test(html);
+    fetch(API + "/qlog", { method: "POST", headers: { "content-type": "text/plain" }, body: JSON.stringify({ q, a, fb, pg: location.pathname }), keepalive: true }).catch(() => {});
+  } catch {}
+}
+
 export function mountGator() {
   if (document.querySelector(".gator-launch") || window.self !== window.top) return;
   const root = document.createElement("div");
@@ -340,6 +349,7 @@ export function mountGator() {
         <input type="text" name="q" maxlength="200" placeholder="Ask about a coin, alerts, tools…" autocomplete="off" aria-label="Your question">
         <button type="submit" class="btn btn-amber btn-sm">Ask</button>
       </form>
+      <p class="gator-note" style="margin:0;padding:0 16px 10px;font-size:12px;color:var(--color-text-muted)">Questions are saved without names to help Quagmire learn.</p>
     </section>`;
   document.body.appendChild(root);
   const btn = root.querySelector(".gator-launch"), panel = root.querySelector(".gator-panel");
@@ -373,6 +383,7 @@ export function mountGator() {
     try { html = await answer(q); } catch { html = "Something went wrong on my end. Try again in a minute."; }
     wait.remove();
     add("gator", html);
+    logQuestion(q, html);
   };
   const open = (on) => {
     panel.hidden = !on;
