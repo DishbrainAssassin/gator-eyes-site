@@ -14,7 +14,7 @@ const $ = (s) => document.querySelector(s);
 
 // Pages per batch and the hard stop (100 pages ≈ 5,000 Solada trades), matching the holder snapshot.
 const BATCH = 6, MAX_PAGES = 100;
-const st = { coins: [], coin: null, dec: 6, list: [], seen: new Set(), before: "", more: true, pages: 0, busy: false, run: 0, side: "", min: 0, wallet: "", shown: 200 };
+const st = { coins: [], coin: null, dec: 6, list: [], seen: new Set(), before: "", more: true, pages: 0, busy: false, run: 0, side: "", min: 0, wallet: "", shown: 200, sol: null, chain: "", adaUsd: null };
 
 const short = (a) => (a && a.length > 24 ? a.slice(0, 12) + "…" + a.slice(-8) : a || "");
 const when = (ms) => new Date(ms).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", second: "2-digit", timeZone: "America/New_York" });
@@ -26,6 +26,7 @@ const plural = (n, one, many) => `${fmt(n)} ${n === 1 ? one : many || one + "s"}
 const amt = (n) => (!isFinite(n) ? "–" : Math.abs(n) >= 1e9 ? (n / 1e9).toFixed(2).replace(/\.?0+$/, "") + "B" : Math.abs(n) >= 1e4 ? compact(n) : fmt(n, n < 10 ? 2 : 0));
 const ada = (n) => fmt(n, n < 10 ? 2 : n < 1000 ? 1 : 0);
 const VENUE = { curve: "Bonding curve", minswap: "Minswap pool", "snek-splash": "Snek.fun (Splash)", splash: "Splash pool" };
+const SOLSCAN = "https://solscan.io/";
 const venue = (v) => VENUE[v] || (v ? v.replace(/[-_]/g, " ").replace(/^\w/, (c) => c.toUpperCase()) : "–");
 
 function notice(html) { const n = $("[data-notice]"); n.hidden = !html; n.innerHTML = html || ""; }
@@ -51,6 +52,7 @@ async function loadList() {
   try {
     const j = await getApi("/tokens");
     st.coins = j.coins || [];
+    st.adaUsd = Number(j.adaUsd) || null;
     let sources; try { sources = (await fetchFeed()).sources || undefined; } catch {}
     liveStatus({ updatedAt: new Date(j.updatedAt), sources });
     fillList();
@@ -102,9 +104,16 @@ function buttons() {
   $("[data-csv]").disabled = st.busy && !st.list.length;
 }
 
+// Cardano rows come from Solada / Snek.fun; Solana rows (Pump coins only) from GeckoTerminal, last 24 hours.
+function allRows() {
+  const sol = st.sol && st.sol.trades || [];
+  if (st.chain === "ada" || !sol.length) return st.list;
+  if (st.chain === "sol") return sol;
+  return st.list.concat(sol).sort((a, b) => b.at - a.at);
+}
 function filtered() {
   const w = st.wallet.toLowerCase();
-  return st.list.filter((t) => (!st.side || t.side === st.side) && t.ada >= st.min && (!w || t.trader.toLowerCase().includes(w)));
+  return allRows().filter((t) => (!st.side || t.side === st.side) && t.ada >= st.min && (!w || t.trader.toLowerCase().includes(w)));
 }
 
 function render() {
@@ -114,42 +123,53 @@ function render() {
   const oldest = st.list.length ? st.list[st.list.length - 1].at : null;
   const newest = st.list.length ? st.list[0].at : null;
   const capped = st.pages >= MAX_PAGES && st.more;
-  $("[data-range]").textContent = !st.list.length ? "" : st.more
-    ? `Loaded back to ${when(oldest)} ET${capped ? " (5,000-trade limit)" : ""}`
-    : `Full history: ${dateET(oldest)} to ${dateET(newest)}`;
+  const solN = st.sol && st.sol.trades ? st.sol.trades.length : 0;
+  $("[data-range]").textContent = !st.list.length ? (solN ? "Solana side: last 24 hours" : "") : (st.more
+    ? `Cardano side loaded back to ${when(oldest)} ET${capped ? " (5,000-trade limit)" : ""}`
+    : `Cardano side complete: ${dateET(oldest)} to ${dateET(newest)}`) + (solN ? " · Solana side: last 24 hours" : "");
+  const chips = $("[data-chains]");
+  chips.hidden = !solN;
+  const hasSol = solN && st.chain !== "ada";
+  const approx = hasSol ? "~" : "";
   // KPIs over the filtered rows.
   let b = 0, s = 0, bAda = 0, sAda = 0, bTok = 0, sTok = 0;
   const wallets = new Set();
-  for (const t of rows) { if (t.side === "buy") { b++; bAda += t.ada; bTok += t.tokens; } else { s++; sAda += t.ada; sTok += t.tokens; } if (t.trader) wallets.add(t.trader); }
+  const cRows = rows.filter(counted);
+  for (const t of cRows) { if (t.side === "buy") { b++; bAda += t.ada; bTok += t.tokens; } else { s++; sAda += t.ada; sTok += t.tokens; } if (t.trader) wallets.add(t.trader); }
   const net = bAda - sAda;
   const kpi = (label, value, sub, cls = "") => `<div class="kpi"><span class="kpi-label">${label}</span><span class="kpi-value ${cls}">${value}</span><span class="kpi-sub">${sub}</span></div>`;
   $("[data-kpis]").innerHTML = [
-    kpi("Trades", fmt(rows.length), `${fmt(b)} buys · ${fmt(s)} sells`),
-    kpi("ADA in (buys)", ada(bAda), `${amt(bTok)} tokens bought`, "pos"),
-    kpi("ADA out (sells)", ada(sAda), `${amt(sTok)} tokens sold`, "neg"),
-    kpi("Net flow", (net > 0 ? "+" : net < 0 ? "−" : "") + ada(Math.abs(net)) + " ADA", net > 0 ? "More ADA bought than sold" : net < 0 ? "More ADA sold than bought" : "Even", net > 0 ? "pos" : net < 0 ? "neg" : ""),
-    kpi("Wallets", fmt(wallets.size), "distinct addresses in these trades"),
-    kpi("Biggest trade", rows.length ? ada(Math.max(...rows.map((t) => t.ada))) + " ADA" : "–", rows.length ? (rows.reduce((a, t) => (t.ada > a.ada ? t : a)).side === "buy" ? "a buy" : "a sell") : ""),
+    kpi("Trades", fmt(cRows.length), `${fmt(b)} buys · ${fmt(s)} sells${hasSol ? ` · ${fmt(cRows.filter((t) => t.chain === "sol").length)} on Solana` : ""}`),
+    kpi("ADA in (buys)", approx + ada(bAda), `${amt(bTok)} tokens bought`, "pos"),
+    kpi("ADA out (sells)", approx + ada(sAda), `${amt(sTok)} tokens sold`, "neg"),
+    kpi("Net flow", approx + (net > 0 ? "+" : net < 0 ? "−" : "") + ada(Math.abs(net)) + " ADA", net > 0 ? "More ADA bought than sold" : net < 0 ? "More ADA sold than bought" : "Even", net > 0 ? "pos" : net < 0 ? "neg" : ""),
+    kpi("Wallets", fmt(wallets.size), hasSol ? "Cardano and Solana addresses" : "distinct addresses in these trades"),
+    kpi("Biggest trade", cRows.length ? approx + ada(Math.max(...cRows.map((t) => t.ada))) + " ADA" : "–", cRows.length ? (cRows.reduce((a, t) => (t.ada > a.ada ? t : a)).side === "buy" ? "a buy" : "a sell") : ""),
   ].join("");
   const shown = rows.slice(0, st.shown);
   $("[data-rows]").innerHTML = shown.length ? shown.map((t) => {
     const p = t.tokens > 0 ? t.ada / t.tokens : null;
-    const wl = t.trader ? `<a href="https://cardanoscan.io/address/${esc(t.trader)}" target="_blank" rel="noopener" class="mono" title="${esc(t.trader)}"><span class="w-long">${esc(short(t.trader))}</span><span class="w-short">…${esc(t.trader.slice(-6))}</span></a>` : "–";
-    const tx = t.tx ? ` <a class="cell-sub" href="https://cardanoscan.io/transaction/${esc(t.tx)}" target="_blank" rel="noopener">tx</a>` : "";
-    return `<tr class="is-${t.side}">
+    const sol = t.chain === "sol";
+    const wl = t.trader ? `<a href="${sol ? SOLSCAN + "account/" : "https://cardanoscan.io/address/"}${esc(t.trader)}" target="_blank" rel="noopener" class="mono" title="${esc(t.trader)}"><span class="w-long">${esc(short(t.trader))}</span><span class="w-short">…${esc(t.trader.slice(-6))}</span></a>` : "–";
+    const tx = t.tx ? ` <a class="cell-sub" href="${sol ? SOLSCAN + "tx/" : "https://cardanoscan.io/transaction/"}${esc(t.tx)}" target="_blank" rel="noopener">tx</a>` : "";
+    const adaCell = sol ? `<span title="${esc(fmt(t.quoteAmt, 2))} ${esc(t.quote)} ≈ $${esc(fmt(t.usd, 2))}; shown in ADA at today's rate">~${ada(t.ada)}</span>` : ada(t.ada);
+    const mirror = sol && t.mirror && st.chain !== "sol";
+    return `<tr class="is-${t.side}${sol ? " is-sol" : ""}${mirror ? " is-mirror" : ""}"${mirror ? ` title="Solada settling the Cardano ${t.side} above on Solana: same trade, not counted again"` : ""}>
       <td class="th-when"><time datetime="${new Date(t.at).toISOString()}" title="${esc(when(t.at))} ET">${esc(clock(t.at))}</time><span class="cell-sub">${esc(day(t.at))}</span></td>
-      <td><span class="badge" style="--k:var(--color-${t.side})">${t.side === "buy" ? "Buy" : "Sell"}</span></td>
-      <td class="num ${t.side === "buy" ? "pos" : "neg"}">${ada(t.ada)}</td>
+      <td><span class="badge" style="--k:var(--color-${t.side})">${t.side === "buy" ? "Buy" : "Sell"}</span>${sol ? `<span class="cell-sub">Solana</span>` : ""}</td>
+      <td class="num ${t.side === "buy" ? "pos" : "neg"}">${adaCell}</td>
       <td class="num">${amt(t.tokens)}</td>
-      <td class="num hide-sm">${p != null ? fmtPrice(p) : "–"}</td>
+      <td class="num hide-sm">${p != null ? (sol ? "~" : "") + fmtPrice(p) : "–"}</td>
       <td>${wl}</td>
-      <td class="hide-sm"><span class="cell-sub" style="font-family:var(--font-body)">${esc(venue(t.venue))}</span>${tx}</td>
+      <td class="hide-sm"><span class="cell-sub" style="font-family:var(--font-body)">${esc(venue(t.venue))}${mirror ? ` · settles the Cardano ${t.side}` : ""}</span>${tx}</td>
     </tr>`;
   }).join("") : `<tr><td colspan="7"><div class="empty"><p>${st.list.length ? "No trades match these filters." : st.busy ? "Reading trades…" : "Nothing to show."}</p></div></td></tr>`;
   $("[data-more]").hidden = rows.length <= st.shown;
   $("[data-more]").textContent = `Show more (${fmt(rows.length - st.shown)} left)`;
-  const f = rows.length !== st.list.length ? ` · ${fmt(rows.length)} match your filters` : "";
-  $("[data-count]").textContent = st.list.length ? `${plural(st.list.length, "trade")} loaded${f}${st.more ? "" : " · that's the whole history"}` : "";
+  const f = rows.length !== allRows().length ? ` · ${fmt(rows.length)} match your filters` : "";
+  const total = st.list.length + solN;
+  const mirrors = solN ? st.sol.trades.filter((t) => t.mirror).length : 0;
+  $("[data-count]").textContent = total ? `${plural(total, "trade")} loaded${solN ? ` (${fmt(st.list.length)} Cardano, ${fmt(solN)} Solana${mirrors ? `, ${fmt(mirrors)} of those settle Cardano trades` : ""})` : ""}${f}${st.more || solN ? "" : " · that's the whole history"}` : "";
   const u = new URL(location.href); u.searchParams.set("coin", c.tk || c.id); history.replaceState(null, "", u);
 }
 
@@ -167,7 +187,8 @@ async function loadCoin(e) {
     st.coin = { id, slug: id, tk: id.length > 20 ? id.slice(0, 8) + "…" : id, name: "", src: /^[0-9a-f]{100,}$/i.test(id) ? "snek" : "solada" };
   } else st.coin = c;
   st.run++;
-  st.list = []; st.seen = new Set(); st.before = ""; st.more = true; st.pages = 0; st.busy = false; st.shown = 200; st.dec = st.coin.src === "snek" ? 0 : 6;
+  st.list = []; st.seen = new Set(); st.before = ""; st.more = true; st.pages = 0; st.busy = false; st.shown = 200; st.dec = st.coin.src === "snek" ? 0 : 6; st.sol = null; st.chain = "";
+  document.querySelectorAll("[data-chain]").forEach((x) => x.classList.toggle("is-on", !x.dataset.chain));
   const btn = $("[data-go]");
   btn.disabled = true; btn.textContent = "Loading…";
   const cc = st.coin, snek = cc.src === "snek";
@@ -210,29 +231,73 @@ async function pumpNote(c, run) {
       && (!x.pairCreatedAt || !c.born || Math.abs(Number(x.pairCreatedAt) - Number(c.born)) < 6e5))
       .sort((x, y) => ((y.volume && y.volume.h24) || 0) - ((x.volume && x.volume.h24) || 0));
     const pr = ps[0];
-    if (pr) sol = { b: (pr.txns && pr.txns.h24 && pr.txns.h24.buys) || 0, s: (pr.txns && pr.txns.h24 && pr.txns.h24.sells) || 0, vUsd: (pr.volume && pr.volume.h24) || 0, dex: DEX[pr.dexId] || pr.dexId, quote: (pr.quoteToken && pr.quoteToken.symbol) || "SOL", url: pr.url || null };
+    if (pr) sol = { pair: pr.pairAddress, mint: pr.baseToken.address, b: (pr.txns && pr.txns.h24 && pr.txns.h24.buys) || 0, s: (pr.txns && pr.txns.h24 && pr.txns.h24.sells) || 0, vUsd: (pr.volume && pr.volume.h24) || 0, dex: DEX[pr.dexId] || pr.dexId, quote: (pr.quoteToken && pr.quoteToken.symbol) || "SOL", url: pr.url || null, trades: [] };
   } catch {}
   if (run !== st.run) return;
+  // The Solana trades themselves: GeckoTerminal lists a pool's last 24 hours (up to 300), no key needed.
+  let gtErr = null;
+  if (sol && sol.pair) {
+    try {
+      const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 6000);
+      const r = await fetch(`https://api.geckoterminal.com/api/v2/networks/solana/pools/${encodeURIComponent(sol.pair)}/trades?trade_volume_in_usd_greater_than=0`, { signal: ctl.signal });
+      clearTimeout(tm);
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      const j = await r.json();
+      const rate = st.adaUsd || null;
+      for (const d of j.data || []) {
+        const a = d.attributes || {};
+        if (a.is_anomalous) continue;
+        const buy = a.kind === "buy";
+        // For a buy the base token is received (to); for a sell it is given (from).
+        const tokens = Number(buy ? a.to_token_amount : a.from_token_amount) || 0;
+        const quoteAmt = Number(buy ? a.from_token_amount : a.to_token_amount) || 0;
+        const usd = Number(a.volume_in_usd) || 0;
+        sol.trades.push({ at: Date.parse(a.block_timestamp), side: buy ? "buy" : "sell", ada: rate ? usd / rate : 0, usd, quoteAmt, quote: sol.quote, tokens, trader: a.tx_from_address || "", venue: `${sol.dex} · Solana`, tx: a.tx_hash || "", chain: "sol" });
+      }
+      sol.trades.sort((x, y) => y.at - x.at);
+      markMirrors(sol.trades);
+      if (!rate) gtErr = "no ADA rate";
+    } catch (e) { gtErr = String(e && e.message || e); }
+  }
+  if (run !== st.run) return;
+  st.sol = sol;
+  render();
   const t = esc(c.tk || c.id);
-  let html = `<strong>${t} is a Solada Pump coin, so this is only its ADA side.</strong> Solada reports just the trades made in ADA on Cardano (${plural(st.list.length, "trade")} so far). ${t} also trades on Solana, and those trades aren't in this list because Solada doesn't publish them one by one.`;
+  const withSol = sol && sol.trades.length;
+  let html = withSol
+    ? `<strong>${t} is a Solada Pump coin, so it trades on two chains.</strong> Solada reports its ADA trades on Cardano (${plural(st.list.length, "trade")} in total). Its Solana trades from the last 24 hours (${plural(sol.trades.length, "trade")} on ${esc(sol.dex)}, paired with ${esc(sol.quote)}) are in the list too, marked Solana and shown in ~ADA at today's rate.${sol.trades.filter((x) => x.mirror).length ? " Solada settles each ADA trade on the Solana pool a minute or so later with the same token amount; those Solana rows are dimmed and not counted twice." : ""} Older Solana trades aren't available from a free source yet.`
+    : `<strong>${t} is a Solada Pump coin, so this is only its ADA side.</strong> Solada reports just the trades made in ADA on Cardano (${plural(st.list.length, "trade")} so far). ${t} also trades on Solana, and those trades aren't in this list because Solada doesn't publish them one by one.`;
   // Solada's ADA-side record for Pump coins starts well after some of them launched; say so instead of calling it complete.
   const oldest = st.list.length ? st.list[st.list.length - 1].at : null;
   if (!st.more && oldest && c.born && oldest - c.born > 2 * 864e5) html += ` Solada's record of its ADA trades starts ${esc(dateET(oldest))}, though the coin launched ${esc(dateET(c.born))}, so earlier ADA trades aren't available either.`;
   if (sol) {
     const n = sol.b + sol.s;
     const usd = sol.vUsd >= 100 ? fmt(sol.vUsd) : sol.vUsd.toFixed(2);
-    html += n ? ` On Solana (${esc(sol.dex)}, paired with ${esc(sol.quote)}) DexScreener counts ${fmt(n)} trades in the last 24 hours, ${fmt(sol.b)} buys and ${fmt(sol.s)} sells, about $${usd} traded.` : ` DexScreener shows no Solana trades in the last 24 hours either.`;
-    if (sol.url) html += ` <a href="${esc(sol.url)}" target="_blank" rel="noopener">See the Solana trades on DexScreener</a>.`;
+    if (!withSol) html += n ? ` On Solana (${esc(sol.dex)}, paired with ${esc(sol.quote)}) DexScreener counts ${fmt(n)} trades in the last 24 hours, ${fmt(sol.b)} buys and ${fmt(sol.s)} sells, about $${usd} traded${gtErr ? ", but the trade list couldn't be read right now" : ""}.` : ` No Solana trades in the last 24 hours either.`;
+    if (sol.url) html += ` <a href="${esc(sol.url)}" target="_blank" rel="noopener">Full Solana history on DexScreener</a>.`;
   } else html += ` Solada's coin page shows the Solana side.`;
   notice(html);
 }
 
+// Solada settles each ADA-side trade on the Solana pool within about a minute, with the exact same token
+// amount. Those Solana rows are the same trade seen from the other chain, so they're marked and left out of
+// the combined totals rather than counted twice.
+function markMirrors(solTrades) {
+  for (const x of solTrades) {
+    x.mirror = st.list.some((t) => t.side === x.side && Math.abs(t.at - x.at) < 10 * 6e4 && t.tokens > 0 && Math.abs(t.tokens - x.tokens) / t.tokens < 1e-4);
+  }
+}
+const counted = (t) => !(t.mirror && st.chain !== "sol");
+
 function csv() {
   const c = st.coin, rows = filtered();
   if (!c || !rows.length) return;
-  const lines = ["time_et,time_iso,side,ada,tokens,price_ada_per_token,wallet,venue,tx"];
+  const lines = ["time_et,time_iso,chain,side,ada,ada_is_estimate,quote_amount,quote_symbol,usd,tokens,price_ada_per_token,wallet,venue,tx,settles_cardano_trade"];
   const cell = (x) => '"' + String(x ?? "").replace(/"/g, '""') + '"';
-  for (const t of rows) lines.push([when(t.at), new Date(t.at).toISOString(), t.side, t.ada, t.tokens, t.tokens > 0 ? (t.ada / t.tokens).toPrecision(8) : "", t.trader, t.venue, t.tx].map(cell).join(","));
+  for (const t of rows) {
+    const sol = t.chain === "sol";
+    lines.push([when(t.at), new Date(t.at).toISOString(), sol ? "solana" : "cardano", t.side, sol ? t.ada.toFixed(2) : t.ada, sol ? "yes" : "no", sol ? t.quoteAmt : t.ada, sol ? t.quote : "ADA", sol ? t.usd.toFixed(2) : "", t.tokens, t.tokens > 0 ? (t.ada / t.tokens).toPrecision(8) : "", t.trader, t.venue, t.tx, sol ? (t.mirror ? "yes" : "no") : ""].map(cell).join(","));
+  }
   const blob = new Blob([lines.join("\n") + "\n"], { type: "text/csv" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -245,6 +310,11 @@ $("[data-pick]").addEventListener("submit", loadCoin);
 document.querySelectorAll("[data-side]").forEach((b) => b.addEventListener("click", () => {
   st.side = b.dataset.side;
   document.querySelectorAll("[data-side]").forEach((x) => x.classList.toggle("is-on", x === b));
+  st.shown = 200; render();
+}));
+document.querySelectorAll("[data-chain]").forEach((b) => b.addEventListener("click", () => {
+  st.chain = b.dataset.chain;
+  document.querySelectorAll("[data-chain]").forEach((x) => x.classList.toggle("is-on", x === b));
   st.shown = 200; render();
 }));
 $("[data-min]").addEventListener("input", (e) => { st.min = Number(e.target.value) || 0; st.shown = 200; render(); });
