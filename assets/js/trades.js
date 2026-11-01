@@ -95,8 +95,9 @@ async function loadPages(pages) {
 
 function buttons() {
   const capped = st.pages >= MAX_PAGES && st.more;
-  $("[data-older]").disabled = st.busy || !st.more || capped;
-  $("[data-all]").disabled = st.busy || !st.more || capped;
+  // Once Solada or Snek.fun says there's nothing older, the buttons go away instead of sitting there disabled.
+  $("[data-older]").hidden = $("[data-all]").hidden = !st.more || capped;
+  $("[data-older]").disabled = $("[data-all]").disabled = st.busy;
   $("[data-older]").textContent = st.busy ? "Loading…" : "Load older trades";
   $("[data-csv]").disabled = st.busy && !st.list.length;
 }
@@ -184,10 +185,46 @@ async function loadCoin(e) {
     await loadPages(1);
     if (!st.list.length && !st.more && $("[data-notice]").hidden) notice(`<strong>No trades reported for ${esc(cc.tk || cc.id)} yet.</strong>`);
     await loadPages(BATCH - 1);
+    pumpNote(st.coin, st.run);
   } finally {
     btn.disabled = false; btn.textContent = "Show trades";
     render();
   }
+}
+
+// Solada "Pump" coins also trade on Solana (Pump.fun / PumpSwap). Solada only reports the ADA-side trades,
+// so this list can look thin for them. DexScreener's search gives the Solana pair; it's accepted only when the
+// ticker and name match and the pair was created within 10 minutes of the Solada launch, which is how Solada
+// creates the Pump.fun coin at launch time.
+const DEX = { pumpswap: "PumpSwap", pumpfun: "Pump.fun", raydium: "Raydium", meteora: "Meteora", orca: "Orca" };
+async function pumpNote(c, run) {
+  if (!c || c.kind !== "pump" || c.src !== "solada") return;
+  let sol = null;
+  try {
+    const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 4000);
+    const r = await fetch("https://api.dexscreener.com/latest/dex/search?q=" + encodeURIComponent(c.tk || ""), { signal: ctl.signal });
+    clearTimeout(tm);
+    const j = r.ok ? await r.json() : null;
+    const lc = (x) => String(x || "").trim().toLowerCase();
+    const ps = ((j && j.pairs) || []).filter((x) => x.chainId === "solana" && x.baseToken && lc(x.baseToken.symbol) === lc(c.tk) && lc(x.baseToken.name) === lc(c.name)
+      && (!x.pairCreatedAt || !c.born || Math.abs(Number(x.pairCreatedAt) - Number(c.born)) < 6e5))
+      .sort((x, y) => ((y.volume && y.volume.h24) || 0) - ((x.volume && x.volume.h24) || 0));
+    const pr = ps[0];
+    if (pr) sol = { b: (pr.txns && pr.txns.h24 && pr.txns.h24.buys) || 0, s: (pr.txns && pr.txns.h24 && pr.txns.h24.sells) || 0, vUsd: (pr.volume && pr.volume.h24) || 0, dex: DEX[pr.dexId] || pr.dexId, quote: (pr.quoteToken && pr.quoteToken.symbol) || "SOL", url: pr.url || null };
+  } catch {}
+  if (run !== st.run) return;
+  const t = esc(c.tk || c.id);
+  let html = `<strong>${t} is a Solada Pump coin, so this is only its ADA side.</strong> Solada reports just the trades made in ADA on Cardano (${plural(st.list.length, "trade")} so far). ${t} also trades on Solana, and those trades aren't in this list because Solada doesn't publish them one by one.`;
+  // Solada's ADA-side record for Pump coins starts well after some of them launched; say so instead of calling it complete.
+  const oldest = st.list.length ? st.list[st.list.length - 1].at : null;
+  if (!st.more && oldest && c.born && oldest - c.born > 2 * 864e5) html += ` Solada's record of its ADA trades starts ${esc(dateET(oldest))}, though the coin launched ${esc(dateET(c.born))}, so earlier ADA trades aren't available either.`;
+  if (sol) {
+    const n = sol.b + sol.s;
+    const usd = sol.vUsd >= 100 ? fmt(sol.vUsd) : sol.vUsd.toFixed(2);
+    html += n ? ` On Solana (${esc(sol.dex)}, paired with ${esc(sol.quote)}) DexScreener counts ${fmt(n)} trades in the last 24 hours, ${fmt(sol.b)} buys and ${fmt(sol.s)} sells, about $${usd} traded.` : ` DexScreener shows no Solana trades in the last 24 hours either.`;
+    if (sol.url) html += ` <a href="${esc(sol.url)}" target="_blank" rel="noopener">See the Solana trades on DexScreener</a>.`;
+  } else html += ` Solada's coin page shows the Solana side.`;
+  notice(html);
 }
 
 function csv() {
