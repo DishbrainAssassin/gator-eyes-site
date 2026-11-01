@@ -1,9 +1,9 @@
 // Live trade tape: a static strip of recent trades under the header on every page. Reads the
 // last 40 trades from /feed (both launchpads), newest first. It does not move on its own;
 // the newest trade is always on the left and people can swipe or scroll sideways for older ones.
-import { subscribe } from "./data.js?v=20261101-sol1";
-import * as platform from "./platform.js?v=20261101-sol1";
-import { fmt, esc } from "./ui.js?v=20261101-sol1";
+import { subscribe } from "./data.js?v=20261101-sol2";
+import * as platform from "./platform.js?v=20261101-sol2";
+import { fmt, esc } from "./ui.js?v=20261101-sol2";
 
 let host, track, lastKey = "", items = [];
 
