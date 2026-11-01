@@ -26,34 +26,27 @@
   <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
   <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/css/style.css?v=20261101r">
+  <link rel="stylesheet" href="./assets/css/style.css?v=20261101-clean3">
+  <link rel="stylesheet" href="./assets/css/clean-layout.css?v=20261101-compact1">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
-  <aside class="suri-bar" aria-label="Paid features from Suri">
-    <div class="wrap suri-bar-inner">
-      <p>Safety checks on new coins, wallet profiles, and copy trading take a paid tool, we point you to Suri instead of building a paywall.</p>
-      <a class="suri-bar-link" href="https://suriradar.fun/" target="_blank" rel="noopener">See Suri's tiers <span aria-hidden="true">&rarr;</span></a>
-    </div>
-  </aside>
-  <header class="site-header">
+<header class="site-header">
     <div class="wrap header-inner">
       <a class="brand" href="./index.html" aria-label="Gator Eyes home">
         <img src="./assets/img/avatar-256.webp" alt="" width="32" height="32">
         <span>Gator Eyes</span>
       </a>
       <nav class="nav" aria-label="Main">
-        <a href="./index.html#alerts">Alerts</a>
         <a href="./tokens.html">Tokens</a>
-        <a href="./race.html">Race</a>
-        <a href="./flows.html">Flows</a>
-        <a href="./followup.html">Follow-up</a>
         <a href="./watchlist.html">Watchlist</a>
-        <a href="./tools.html" aria-current="page">Tools</a>
-        <a href="./gaey.html">$GAEY</a>
-        <a href="./about.html">How it works</a>
+        <details class="tools-menu">
+          <summary>Tools <span aria-hidden="true">⌄</span></summary>
+          <div class="tools-dropdown"><a href="./race.html">Graduation race</a><a href="./flows.html">Flows</a><a href="./unlocks.html" aria-current="page">Unlock calendar</a><a href="./followup.html">Alert follow-up</a><a href="./holders.html">Holder snapshot</a><a href="./coincard.html">Coin share card</a><a href="./card.html">Daily flow card</a><a href="./tools.html">All tools</a><a href="./about.html">How it works</a><a href="./gaey.html">$GAEY</a></div>
+        </details>
+        <button type="button" class="nav-ask" data-ask aria-haspopup="dialog" aria-controls="gator-panel"><img src="./assets/img/gator-nerd-head-160.webp" alt="" width="28" height="28"><span>Ask Quagmire</span></button>
       </nav>
-      <a class="btn btn-sm btn-amber" data-link="discord" href="#">Join Discord</a>
+      <a class="btn btn-sm btn-ghost header-discord" data-link="discord" href="#">Join Discord</a>
     </div>
   </header>
   <div data-platform-bar></div>
@@ -120,6 +113,6 @@
       <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./tokens.html">Tokens</a><a href="./tools.html">Tools</a><a href="./app.html">Get the app</a></nav>
     </div>
   </footer>
-  <script type="module" src="./assets/js/unlocks.js?v=20261101r"></script>
+  <script type="module" src="./assets/js/unlocks.js?v=20261101-clean3"></script>
 </body>
 </html>

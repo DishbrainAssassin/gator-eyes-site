@@ -1,15 +1,15 @@
-import { subscribe } from "./data.js?v=20261101r";
-import { alertCard, emptyState, skeleton, tracks, mergeDays, lpSplit, dayLabel, fmt, usdcx, timeAgo, compact } from "./ui.js?v=20261101r";
-import { wireLinks, liveStatus } from "./common.js?v=20261101r";
-import * as platform from "./platform.js?v=20261101r";
+import { subscribe } from "./data.js?v=20261101-clean3";
+import { alertCard, emptyState, skeleton, tracks, mergeDays, lpSplit, dayLabel, fmt, usdcx, timeAgo, compact } from "./ui.js?v=20261101-clean3";
+import { wireLinks, liveStatus } from "./common.js?v=20261101-clean3";
+import * as platform from "./platform.js?v=20261101-clean3";
 
 const SHOW_ALL = ' <button type="button" class="link" data-platform="all">Show all launchpads</button>';
 
 wireLinks();
 platform.mount();
-import("./since.js?v=20261101r").then((m) => m.mountSince()).catch(() => {});
+import("./since.js?v=20261101-clean3").then((m) => m.mountSince()).catch(() => {});
 platform.on(() => {
-  shown = 10;
+  shown = 6;
   renderAlerts();
   renderTracks();
 });
@@ -25,7 +25,7 @@ const gaeyImg = $("[data-gaey-img]");
 
 let feed = null;
 let filter = "all";
-let shown = 10;
+let shown = 6;
 let day = "today";
 
 listEl.innerHTML = skeleton(4);
@@ -34,7 +34,7 @@ tracksEl.innerHTML = `<div class="kpis">${'<div class="kpi skel-block"></div>'.r
 document.querySelectorAll("[data-filter]").forEach((b) =>
   b.addEventListener("click", () => {
     filter = b.dataset.filter;
-    shown = 10;
+    shown = 6;
     document.querySelectorAll("[data-filter]").forEach((x) => {
       const on = x === b;
       x.classList.toggle("is-on", on);
@@ -69,6 +69,7 @@ function renderAlerts() {
 
 function renderTracks() {
   if (!feed) return;
+  const detailsOpen = tracksEl.querySelector(".home-report-details")?.open || false;
   const opts = dayOptions(feed, platform.get());
   if (!opts.length) {
     daysEl.innerHTML = "";
@@ -91,6 +92,16 @@ function renderTracks() {
   );
   const cur = opts.find((o) => o.id === day);
   tracksEl.innerHTML = tracks(cur.d, feed.rate) + lpSplit(cur.parts, feed.rate, platform.get());
+  const detailItems = [...tracksEl.children].filter(el => !el.matches(".kpis, .split"));
+  if (detailItems.length) {
+    const details = document.createElement("details");
+    details.className = "home-report-details";
+    details.open = detailsOpen;
+    const summary = document.createElement("summary");
+    summary.textContent = "See the full daily recap";
+    details.append(summary, ...detailItems);
+    tracksEl.append(details);
+  }
 }
 
 const dayName = (key) => dayLabel(key).replace(/,.*/, "") + " " + key.slice(5).replace("-", "/");

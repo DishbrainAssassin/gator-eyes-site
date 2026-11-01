@@ -2,11 +2,11 @@
 // Worked out in this browser. It remembers when you were last here and a small
 // price snapshot per coin (localStorage) so it can show price moves since then.
 // Nothing is sent anywhere and there is no sign-up.
-import { subscribe } from "./data.js?v=20261101r";
-import { getApi } from "./api.js?v=20261101r";
-import { fmt, compact, timeAgo, esc, dayLabel } from "./ui.js?v=20261101r";
-import * as watchlist from "./watchlist.js?v=20261101r";
-import * as platform from "./platform.js?v=20261101r";
+import { subscribe } from "./data.js?v=20261101-clean3";
+import { getApi } from "./api.js?v=20261101-clean3";
+import { fmt, compact, timeAgo, esc, dayLabel } from "./ui.js?v=20261101-clean3";
+import * as watchlist from "./watchlist.js?v=20261101-clean3";
+import * as platform from "./platform.js?v=20261101-clean3";
 
 const KEY = "ge-last-seen";
 const GAP = 30 * 60000;   // away at least this long counts as a new visit
