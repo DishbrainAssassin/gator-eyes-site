@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
   <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/css/style.css?v=20261101d">
+  <link rel="stylesheet" href="./assets/css/style.css?v=20261101e">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -119,7 +119,7 @@
         </div>
         <div class="list-foot"><button class="btn btn-ghost btn-sm" data-more hidden>Show all</button></div>
       </article>
-      <p class="dash-foot">Holder balances come from the Cardano blockchain through Koios, with Solada's own labels for the curve, pool, locks and creator wallet. Solada's own wallets (reserve, orders, pool) are named from its <a href="https://www.solada.fun/proof" target="_blank" rel="noopener">proof-of-reserves page</a>. Snek.fun coins get the creator wallet from the pool data and no other labels, so their curve and pool show up under "other contracts". Solana-side balances of dual-chain coins aren't included. Wallet links open Cardanoscan.</p>
+      <p class="dash-foot">Balances come from Cardano through Koios. Solada's own wallets are named from its <a href="https://www.solada.fun/proof" target="_blank" rel="noopener">proof-of-reserves page</a>. Pool contracts are matched against published <a href="https://github.com/splashprotocol/splash-offchain-multiplatform/blob/f23126425063d9d4dbf5ba07401f97737f99d3aa/bloom-cardano-agent/resources/mainnet.deployment.json" target="_blank" rel="noopener">Splash</a> and <a href="https://github.com/minswap/minswap-dex-v2/blob/c3293ad435792ba502f5a2b1691c6736e5f167e6/README.md" target="_blank" rel="noopener">Minswap</a> validators. The Snek.fun bonding curve is identified from its pool output. <a href="https://github.com/spectrum-finance/cardano-dex-sdk-js/blob/fcbec1bffe7f5400a3679d1b20de27e962c19dc0/src/amm/contractData.ts" target="_blank" rel="noopener">Spectrum/Splash lock dates</a> are decoded from unspent on-chain outputs only when amounts reconcile with the holder balance; expired locks are not called active. The <a href="https://songmarketcap.com/graveyard" target="_blank" rel="noopener">$burnsnek burn address</a> stays in the observed-supply denominator. Unknown contracts remain unidentified. Solana-side balances are not included. Wallet links open Cardanoscan.</p>
     </section>
   </main>
   <footer class="site-footer">
@@ -128,6 +128,6 @@
       <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./tokens.html">Tokens</a><a href="./tools.html">Tools</a></nav>
     </div>
   </footer>
-  <script type="module" src="./assets/js/holders.js?v=20261101d"></script>
+  <script type="module" src="./assets/js/holders.js?v=20261101e"></script>
 </body>
 </html>
