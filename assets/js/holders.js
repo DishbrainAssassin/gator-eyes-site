@@ -1,11 +1,11 @@
 // Holder snapshot: every Cardano holder of a Solada.fun or Snek.fun coin, filtered by rules,
 // ready to download as a CSV for airdrops.
-import { getApi } from "./api.js?v=20261101a";
-import { coinUrl, fetchFeed } from "./data.js?v=20261101a";
-import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261101a";
-import { wireLinks, liveStatus } from "./common.js?v=20261101a";
-import * as platform from "./platform.js?v=20261101a";
-import { pill } from "./platform.js?v=20261101a";
+import { getApi } from "./api.js?v=20261101b";
+import { coinUrl, fetchFeed } from "./data.js?v=20261101b";
+import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261101b";
+import { wireLinks, liveStatus } from "./common.js?v=20261101b";
+import * as platform from "./platform.js?v=20261101b";
+import { pill } from "./platform.js?v=20261101b";
 
 wireLinks();
 platform.mount();
