@@ -42,6 +42,7 @@ const GROUPS = {
   pool: { name: "Liquidity pool", color: "var(--color-spike)", on: false, what: "Tokens in the Minswap pool that opened at graduation." },
   locked: { name: "Locked", color: "var(--color-launch)", on: false, what: "Tokens sitting in a lock until a future date." },
   dev: { name: "Creator", color: "var(--color-sell)", on: false, what: "The wallet that launched the coin, plus anything Solada labels as the creator's." },
+  solada: { name: "Solada's wallets", color: "#5fd3b8", on: false, what: "Solada's own wallets, named on its proof-of-reserves page: the reserve that keeps Pump coins until someone buys them, the orders wallet and the pool wallet." },
   script: { name: "Other contracts", color: "var(--color-text-faint)", on: false, what: "Script addresses such as DEX orders, vaults and bots." },
   nostake: { name: "No stake key", color: "#c9a26b", on: true, what: "Payment-only addresses with no stake key. Exchanges and services often use these. They can't be grouped into a wallet." },
   wallet: { name: "Wallets", color: "var(--color-buy)", on: true, what: "Everyone else: ordinary Cardano wallets holding the coin." }
@@ -82,6 +83,7 @@ function groupOf(h, c, now) {
   if (h.label === "pool") return "pool";
   if (h.lockedUntilMs && h.lockedUntilMs > now) return "locked";
   if (h.label === "dev" || (c.launcher && (h.addr === c.launcher || h.stake === c.launcher))) return "dev";
+  if (h.label === "solada") return "solada";
   if (isScript(h.addr)) return "script";
   if (noStake(h.addr, h.stake)) return "nostake";
   return "wallet";
@@ -133,6 +135,20 @@ async function loadCoin(e) {
   } finally { btn.disabled = false; btn.textContent = "Load holders"; }
 }
 
+// Plain words for Solada's own wallets, using the names from its proof-of-reserves page.
+const SOLADA_WORDS = {
+  "Solada reserve": "Solada's reserve wallet (Cardano copies of a Pump coin waiting for someone to buy them)",
+  "Solada orders": "Solada's orders wallet (trades not yet filled or refunded)",
+  "Solada pool": "Solada's pool wallet (its own share of the Minswap pool)"
+};
+function soladaWords(rows) {
+  const names = [...new Set(rows.map((h) => h.name).filter(Boolean))];
+  // Only Pump coins have Cardano copies waiting in the reserve. For a Cardano-only coin (one with a curve) it's just Solada's operating wallet.
+  if (names.length === 1 && names[0] === "Solada reserve" && st.snap.coin.curveAddress) return "Solada's reserve wallet (the platform's own operating wallet)";
+  if (names.length === 1) return SOLADA_WORDS[names[0]] || `Solada's own "${names[0]}" wallet`;
+  return "Solada's own wallets (" + names.map((n) => n.replace(/^Solada /, "")).join(", ") + ")";
+}
+
 // The supply bar, the group cards and the one-paragraph story above them.
 function renderStory() {
   const { total, g } = st.groups, c = st.snap.coin, div = 10 ** st.dec, snek = c.src === "snek";
@@ -147,6 +163,7 @@ function renderStory() {
     if (k === "script" && snek) what = "Script addresses. Snek.fun doesn't label its curve or pool, so they're in here too.";
     if (k === "locked" && x.n) what = `Tokens in a lock until ${x.lockMin === x.lockMax ? dateET(x.lockMin) : dateET(x.lockMin) + " to " + dateET(x.lockMax)}${x.dev ? ", including the creator's" : ""}.`;
     if (k === "curve" && c.cs === "graduated") what = "The coin graduated, so the curve is empty and trading moved to the pool.";
+    if (k === "solada" && x.n) { const w = soladaWords(st.snap.holders.filter((h) => h.group === "solada")); what = w.charAt(0).toUpperCase() + w.slice(1) + ". Named on Solada's proof-of-reserves page; not a holder."; }
     const empty = !x.n;
     return `<button type="button" class="skey${on ? " is-on" : ""}${empty ? " is-empty" : ""}" data-key="${k}" aria-pressed="${on}" ${empty ? "disabled" : ""} style="--c:${G.color}">
       <span class="skey-top"><i></i><b>${esc(G.name)}</b></span>
@@ -165,6 +182,7 @@ function renderStory() {
   if (shows("pool")) parts.push(`${pct(share("pool"))} sits in the liquidity pool`);
   if (shows("locked")) parts.push(`${pct(share("locked"))} is locked across ${plural(g.locked.n, "address", "addresses")}${g.locked.dev ? ", the creator's included" : ""}`);
   if (shows("dev")) parts.push(`${pct(share("dev"))} is with the creator`);
+  if (shows("solada")) parts.push(`${pct(share("solada"))} is in ${soladaWords(st.snap.holders.filter((h) => h.group === "solada"))}`);
   if (shows("script")) parts.push(`${pct(share("script"))} is in ${snek ? "contracts, including Snek.fun's own" : "other contracts"}`);
   if (shows("nostake")) parts.push(`${pct(share("nostake"))} is in ${plural(g.nostake.n, "payment-only address", "payment-only addresses")} with no stake key`);
   const w = g.wallet;
@@ -220,7 +238,7 @@ async function apply() {
     const q = Number(h.qty);
     // Curve, pool and contract addresses stay as their own rows even when grouping by wallet.
     const solo = h.group !== "wallet" && h.group !== "dev";
-    rows.push({ key: rules.stake && h.stake && !solo ? h.stake : h.addr, addr: h.addr, stake: h.stake, qty: q, addrs: [h.addr], group: h.group, groups: new Set([h.group]), lockedUntilMs: h.lockedUntilMs || 0 });
+    rows.push({ key: rules.stake && h.stake && !solo ? h.stake : h.addr, addr: h.addr, stake: h.stake, qty: q, addrs: [h.addr], group: h.group, groups: new Set([h.group]), lockedUntilMs: h.lockedUntilMs || 0, name: h.name || null });
   }
   if (rules.stake) {
     const m = new Map();
@@ -265,7 +283,7 @@ async function apply() {
   rows.forEach((r) => (r.share = kept ? (r.qty / kept) * 100 : 0));
   st.out = rows;
 
-  const onNames = Object.keys(GROUPS).filter((k) => st.on[k] && g[k].n).map((k) => GROUPS[k].name.toLowerCase());
+  const onNames = Object.keys(GROUPS).filter((k) => st.on[k] && g[k].n).map((k) => (k === "solada" ? GROUPS[k].name : GROUPS[k].name.toLowerCase()));
   const top10 = rows.slice(0, 10).reduce((a, r) => a + r.share, 0);
   const onlyWallets = onNames.length === 1 && onNames[0] === "wallets";
   $("[data-kpis]").innerHTML = [
@@ -289,6 +307,7 @@ function typeCell(r) {
   let extra = "";
   if (r.group === "locked" && r.lockedUntilMs) extra = `until ${dateET(r.lockedUntilMs)}`;
   else if (r.group === "pool") extra = "Minswap";
+  else if (r.group === "solada") return `<span class="gtag" style="--c:${G.color}"><i></i>${esc(r.name || G.name)}</span><span class="cell-sub">Solada's own wallet · proof of reserves</span>`;
   else if (r.addrs.length > 1) extra = `${r.addrs.length} addresses`;
   return `<span class="gtag" style="--c:${G.color}"><i></i>${esc(G.name)}</span>${extra ? `<span class="cell-sub">${esc(extra)}</span>` : ""}`;
 }
