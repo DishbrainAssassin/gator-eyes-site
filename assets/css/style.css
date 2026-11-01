@@ -933,9 +933,16 @@ button.link:hover { color: var(--color-amber-hover); }
 .app-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: var(--space-3); }
 .app-status { grid-column: 1 / -1; font-size: var(--text-sm); color: var(--color-buy); min-height: 1.4em; }
 .app-status.is-bad { color: var(--color-sell); }
+.app-mute { grid-column: 1 / -1; display: grid; gap: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--color-border); }
+.app-mute[hidden] { display: none; }
+.app-mute > label { font-size: var(--text-sm); font-weight: 700; }
+.app-mute select { font: inherit; font-size: var(--text-sm); color: var(--color-text); background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: var(--radius-sm); min-height: 44px; padding: var(--space-2) var(--space-3); }
+.app-mute select:focus-visible { outline: 2px solid var(--color-amber); outline-offset: 2px; }
+.app-mute-note { margin: 0; font-size: var(--text-sm); color: var(--color-text-muted); }
 .app-blocked .notice { margin: 0 0 var(--space-5); }
 .app-step .notice { margin-top: 0; margin-bottom: var(--space-4); }
 .app-form input:disabled + span { opacity: 0.55; }
+.app-form button:disabled { opacity: 0.5; cursor: not-allowed; }
 .app-notes { display: grid; gap: var(--space-2); padding-left: 1.2em; margin: 0; color: var(--color-text-muted); font-size: var(--text-sm); }
 .app-notes li { max-width: 72ch; }
 .app-offline { min-height: 80vh; display: grid; place-content: center; justify-items: center; text-align: center; gap: var(--space-4); }
