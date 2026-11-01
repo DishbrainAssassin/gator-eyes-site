@@ -1,11 +1,11 @@
 // Trade history: every buy and sell for one Solada.fun or Snek.fun coin, newest first, with
 // side / size / wallet filters and a CSV download. Pages come from the worker's /coin-trades.
-import { getApi, price as fmtPrice } from "./api.js?v=20261101-sol1";
-import { coinUrl, fetchFeed } from "./data.js?v=20261101-sol1";
-import { esc, fmt, compact } from "./ui.js?v=20261101-sol1";
-import { wireLinks, liveStatus } from "./common.js?v=20261101-sol1";
-import * as platform from "./platform.js?v=20261101-sol1";
-import { pill } from "./platform.js?v=20261101-sol1";
+import { getApi, price as fmtPrice } from "./api.js?v=20261101-sol2";
+import { coinUrl, fetchFeed } from "./data.js?v=20261101-sol2";
+import { esc, fmt, compact } from "./ui.js?v=20261101-sol2";
+import { wireLinks, liveStatus } from "./common.js?v=20261101-sol2";
+import * as platform from "./platform.js?v=20261101-sol2";
+import { pill } from "./platform.js?v=20261101-sol2";
 
 wireLinks();
 platform.mount();
@@ -124,7 +124,7 @@ function render() {
   const newest = st.list.length ? st.list[0].at : null;
   const capped = st.pages >= MAX_PAGES && st.more;
   const solN = st.sol && st.sol.trades ? st.sol.trades.length : 0;
-  const solSpan = solN ? (st.sol.since ? `Solana side: kept since ${dateET(st.sol.since)}` : "Solana side: last 24 hours") : "";
+  const solSpan = solN ? (st.sol.from ? `Solana side: back to ${dateET(st.sol.from)}` : "Solana side: last 24 hours") : "";
   $("[data-range]").textContent = !st.list.length ? solSpan : (st.more
     ? `Cardano side loaded back to ${when(oldest)} ET${capped ? " (5,000-trade limit)" : ""}`
     : `Cardano side complete: ${dateET(oldest)} to ${dateET(newest)}`) + (solN ? " · " + solSpan : "");
@@ -153,7 +153,7 @@ function render() {
     const sol = t.chain === "sol";
     const wl = t.trader ? `<a href="${sol ? SOLSCAN + "account/" : "https://cardanoscan.io/address/"}${esc(t.trader)}" target="_blank" rel="noopener" class="mono" title="${esc(t.trader)}"><span class="w-long">${esc(short(t.trader))}</span><span class="w-short">…${esc(t.trader.slice(-6))}</span></a>` : "–";
     const tx = t.tx ? ` <a class="cell-sub" href="${sol ? SOLSCAN + "tx/" : "https://cardanoscan.io/transaction/"}${esc(t.tx)}" target="_blank" rel="noopener">tx</a>` : "";
-    const adaCell = sol ? `<span title="${esc(fmt(t.quoteAmt, 2))} ${esc(t.quote)} ≈ $${esc(fmt(t.usd, 2))}; shown in ADA at today's rate">~${ada(t.ada)}</span>` : ada(t.ada);
+    const adaCell = sol ? `<span title="${t.quoteAmt != null ? esc(fmt(t.quoteAmt, 2)) + " " + esc(t.quote) + " ≈ " : ""}$${esc(fmt(t.usd, 2))}; shown in ADA at today's rate">~${ada(t.ada)}</span>` : ada(t.ada);
     const mirror = sol && t.mirror && st.chain !== "sol";
     return `<tr class="is-${t.side}${sol ? " is-sol" : ""}${mirror ? " is-mirror" : ""}"${mirror ? ` title="Solada settling the Cardano ${t.side} above on Solana: same trade, not counted again"` : ""}>
       <td class="th-when"><time datetime="${new Date(t.at).toISOString()}" title="${esc(when(t.at))} ET">${esc(clock(t.at))}</time><span class="cell-sub">${esc(day(t.at))}</span></td>
@@ -195,6 +195,9 @@ async function loadCoin(e) {
   const cc = st.coin, snek = cc.src === "snek";
   const im = cc.img ? `<img src="${esc(cc.img)}" alt="" width="36" height="36">` : "";
   $("[data-head]").innerHTML = `${im}<div><h2 class="panel-title">Every <a href="${esc(coinUrl(snek ? cc.id : cc.slug || cc.id))}" target="_blank" rel="noopener">${esc(cc.tk || "?")}</a> trade ${pill(snek ? "snek" : "solada", { button: false })}</h2><span class="cell-sub">${esc(cc.name || "")}${cc.name ? " · " : ""}<a href="./holders.html?coin=${encodeURIComponent(cc.tk || cc.id)}">Holder snapshot</a> · <a href="./followup.html?coin=${encodeURIComponent(cc.tk || cc.id)}">Alert follow-up</a></span></div>`;
+  // The under-development note points at this coin's own launchpad page (the reference list).
+  const dl = $("[data-dev-link]");
+  if (dl) { dl.href = coinUrl(snek ? cc.id : cc.slug || cc.id); dl.textContent = `${cc.tk || "The coin"} on ${snek ? "Snek.fun" : "Solada"}`; }
   $("[data-result]").hidden = false;
   $("[data-table]").hidden = false;
   $("[data-rows]").innerHTML = Array.from({ length: 8 }, () => `<tr><td colspan="7"><div class="skel-block" style="min-height:32px"></div></td></tr>`).join("");
@@ -239,11 +242,12 @@ async function pumpNote(c, run) {
   if (!sol && c.pair) sol = { pair: c.pair, mint: c.mint || null, b: null, s: null, vUsd: null, dex: "Pump.fun", quote: null, url: "https://dexscreener.com/solana/" + encodeURIComponent(c.pair), trades: [] };
   if (run !== st.run) return;
   // The Solana trades themselves, two sources read together: GeckoTerminal's last 24 hours (up to 300, no
-  // key) and the worker's archive, which keeps every Solana trade it has seen since it started watching.
+  // key) and the worker's archive, which holds Solada's own record of the pool (what Solada's coin page
+  // shows) plus every Solana trade the worker has seen since, so nothing drops out as the sources roll on.
   let gtErr = null, arch = null;
   if (sol && sol.pair) {
     const rate = st.adaUsd || null;
-    const row = (t) => ({ at: t.at, side: t.side, ada: rate ? t.usd / rate : 0, usd: t.usd, quoteAmt: t.q, quote: sol.quote, tokens: t.tokens, trader: t.trader || "", venue: `${sol.dex} · Solana`, tx: t.tx || "", chain: "sol" });
+    const row = (t) => ({ at: t.at, side: t.side, ada: rate ? t.usd / rate : 0, usd: t.usd, quoteAmt: t.q == null ? null : t.q, quote: sol.quote, tokens: t.tokens, trader: t.trader || "", venue: `${sol.dex} · Solana`, tx: t.tx || "", chain: "sol" });
     const [fresh, stored] = await Promise.all([
       (async () => {
         const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 6000);
@@ -272,7 +276,8 @@ async function pumpNote(c, run) {
     for (const t of fresh.concat(arch && arch.trades || [])) { const k = solKey(t); if (!seen.has(k)) { seen.add(k); sol.trades.push(row(t)); } }
     sol.trades.sort((x, y) => y.at - x.at);
     markMirrors(sol.trades);
-    sol.since = arch && arch.since ? Number(arch.since) : null;
+    // How far back the Solana side reaches: the oldest archived trade (null when the archive has nothing yet).
+    sol.from = arch && arch.trades && arch.trades.length ? Math.min(...arch.trades.map((t) => t.at)) : null;
     if (!rate && sol.trades.length) gtErr = gtErr || "no ADA rate";
   }
   if (run !== st.run) return;
@@ -280,9 +285,9 @@ async function pumpNote(c, run) {
   render();
   const t = esc(c.tk || c.id);
   const withSol = sol && sol.trades.length;
-  const span = sol && sol.since ? `since ${esc(dateET(sol.since))}, when Gator Eyes started keeping them, plus the last 24 hours` : "from the last 24 hours";
+  const span = sol && sol.from ? `back to ${esc(dateET(sol.from))}` : "from the last 24 hours";
   let html = withSol
-    ? `<strong>${t} is a Solada Pump coin, so it trades on two chains.</strong> Solada reports its ADA trades on Cardano (${plural(st.list.length, "trade")} in total). Its Solana trades ${span} (${plural(sol.trades.length, "trade")} on ${esc(sol.dex)}, paired with ${esc(sol.quote)}) are in the list too, marked Solana and shown in ~ADA at today's rate.${sol.trades.filter((x) => x.mirror).length ? " Solada settles each ADA trade on the Solana pool a minute or so later with the same token amount; those Solana rows are dimmed and not counted twice." : ""}${sol.since ? "" : " Solana trades older than a day aren't available from a free source; Gator Eyes keeps every one it sees from here on."}`
+    ? `<strong>${t} is a Solada Pump coin, so it trades on two chains.</strong> Solada reports its ADA trades on Cardano (${plural(st.list.length, "trade")} in total). Its Solana trades ${span} (${plural(sol.trades.length, "trade")} on ${esc(sol.dex)}, paired with ${esc(sol.quote)}) are in the list too, marked Solana and shown in ~ADA at today's rate.${sol.trades.filter((x) => x.mirror).length ? " Solada settles each ADA trade on the Solana pool a minute or so later with the same token amount; those Solana rows are dimmed and not counted twice." : ""}${sol.from ? " They come from Solada's record of the pool and GeckoTerminal's last 24 hours; Gator Eyes keeps every one it has seen." : " Only the last 24 hours of Solana trades could be read right now; Gator Eyes keeps every one it sees from here on."}`
     : `<strong>${t} is a Solada Pump coin, so this is only its ADA side.</strong> Solada reports just the trades made in ADA on Cardano (${plural(st.list.length, "trade")} so far). ${t} also trades on Solana, and those trades aren't in this list because Solada doesn't publish them one by one.`;
   // Solada's ADA-side record for Pump coins starts well after some of them launched; say so instead of calling it complete.
   const oldest = st.list.length ? st.list[st.list.length - 1].at : null;
@@ -314,7 +319,7 @@ function csv() {
   const cell = (x) => '"' + String(x ?? "").replace(/"/g, '""') + '"';
   for (const t of rows) {
     const sol = t.chain === "sol";
-    lines.push([when(t.at), new Date(t.at).toISOString(), sol ? "solana" : "cardano", t.side, sol ? t.ada.toFixed(2) : t.ada, sol ? "yes" : "no", sol ? t.quoteAmt : t.ada, sol ? t.quote : "ADA", sol ? t.usd.toFixed(2) : "", t.tokens, t.tokens > 0 ? (t.ada / t.tokens).toPrecision(8) : "", t.trader, t.venue, t.tx, sol ? (t.mirror ? "yes" : "no") : ""].map(cell).join(","));
+    lines.push([when(t.at), new Date(t.at).toISOString(), sol ? "solana" : "cardano", t.side, sol ? t.ada.toFixed(2) : t.ada, sol ? "yes" : "no", sol ? (t.quoteAmt == null ? "" : t.quoteAmt) : t.ada, sol ? t.quote : "ADA", sol ? t.usd.toFixed(2) : "", t.tokens, t.tokens > 0 ? (t.ada / t.tokens).toPrecision(8) : "", t.trader, t.venue, t.tx, sol ? (t.mirror ? "yes" : "no") : ""].map(cell).join(","));
   }
   const blob = new Blob([lines.join("\n") + "\n"], { type: "text/csv" });
   const a = document.createElement("a");
