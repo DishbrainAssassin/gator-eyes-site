@@ -27,35 +27,28 @@
   <link rel="preload" as="image" href="./assets/img/keyart-1600.webp" imagesrcset="./assets/img/keyart-900.webp 900w, ./assets/img/keyart-1600.webp 1600w" imagesizes="100vw">
   <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/css/style.css?v=20261101r">
+  <link rel="stylesheet" href="./assets/css/style.css?v=20261101-clean1">
   <link rel="stylesheet" href="./assets/css/feature-map.css?v=20261030b">
+  <link rel="stylesheet" href="./assets/css/clean-layout.css?v=20261101-clean1">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
-  <aside class="suri-bar" aria-label="Paid features from Suri">
-    <div class="wrap suri-bar-inner">
-      <p>Safety checks on new coins, wallet profiles, and copy trading take a paid tool, we point you to Suri instead of building a paywall.</p>
-      <a class="suri-bar-link" href="https://suriradar.fun/" target="_blank" rel="noopener">See Suri's tiers <span aria-hidden="true">&rarr;</span></a>
-    </div>
-  </aside>
-  <header class="site-header">
+<header class="site-header">
     <div class="wrap header-inner">
       <a class="brand" href="./index.html" aria-label="Gator Eyes home">
         <img src="./assets/img/avatar-256.webp" alt="" width="32" height="32">
         <span>Gator Eyes</span>
       </a>
       <nav class="nav" aria-label="Main">
-        <a href="./index.html#alerts">Alerts</a>
         <a href="./tokens.html">Tokens</a>
-        <a href="./race.html">Race</a>
-        <a href="./flows.html">Flows</a>
-        <a href="./followup.html">Follow-up</a>
         <a href="./watchlist.html">Watchlist</a>
-        <a href="./tools.html">Tools</a>
-        <a href="./gaey.html">$GAEY</a>
-        <a href="./about.html">How it works</a>
+        <details class="tools-menu">
+          <summary>Tools <span aria-hidden="true">⌄</span></summary>
+          <div class="tools-dropdown"><a href="./race.html">Graduation race</a><a href="./flows.html">Flows</a><a href="./unlocks.html">Unlock calendar</a><a href="./followup.html">Alert follow-up</a><a href="./holders.html">Holder snapshot</a><a href="./coincard.html">Coin share card</a><a href="./card.html">Daily flow card</a><a href="./tools.html">All tools</a><a href="./about.html">How it works</a><a href="./gaey.html">$GAEY</a></div>
+        </details>
+        <button type="button" class="nav-ask" data-ask aria-haspopup="dialog" aria-controls="gator-panel"><img src="./assets/img/gator-nerd-head-160.webp" alt="" width="28" height="28"><span>Ask Quagmire</span></button>
       </nav>
-      <a class="btn btn-sm btn-amber" data-link="discord" href="#">Join Discord</a>
+      <a class="btn btn-sm btn-ghost header-discord" data-link="discord" href="#">Join Discord</a>
     </div>
   </header>
   <div data-platform-bar></div>
@@ -70,134 +63,27 @@
         <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching Solada and Snek.fun</span></p>
         <h1 id="hero-title">Lurking so you don't have to.</h1>
         <p class="lede">Whale buys, volume spikes and fast launches on Solada.fun and Snek.fun, as they happen. Not financial advice.</p>
-        <div class="cta-row">
-          <a class="btn btn-amber" data-link="discord" href="#">Join the Discord</a>
-          <a class="btn btn-ghost" data-link="x" href="#">Follow @GatorEyesADA</a>
-          <a class="btn btn-ghost" href="./app.html">Get phone alerts</a>
+        <div class="cta-row hero-primary">
+          <a class="btn btn-amber" href="./tokens.html">Explore tokens <span aria-hidden="true">&rarr;</span></a>
         </div>
-        <div class="ask-quag">
-          <img src="./assets/img/gator-nerd-head-160.webp" alt="" width="56" height="56">
-          <div class="ask-quag-body">
-            <p><strong>New here? Skip the reading and just ask Quagmire.</strong> He's the gator who reads every trade, and he'll answer anything about a coin, the alerts or the tools.</p>
-            <div class="ask-quag-chips">
-              <button type="button" class="btn btn-amber btn-sm" data-ask>Ask Quagmire</button>
-              <button type="button" class="gator-chip" data-ask="What do the alerts mean?">What do the alerts mean?</button>
-              <button type="button" class="gator-chip" data-ask="Most traded today">Most traded today</button>
-              <button type="button" class="gator-chip" data-ask="What's close to graduating?">What's close to graduating?</button>
-            </div>
-          </div>
+        <div class="hero-secondary" role="group" aria-label="Follow Gator Eyes">
+          <a data-link="discord" href="https://discord.gg/8vq4NkAj6v">Discord <span aria-hidden="true">↗</span></a>
+          <a data-link="x" href="https://x.com/GatorEyesADA">X <span aria-hidden="true">↗</span></a>
+          <a href="./app.html">Phone alerts <span aria-hidden="true">→</span></a>
         </div>
-        <p class="hero-note">New to Solada? <a data-link="join" href="#">Start trading here</a>.</p>
+
       </div>
     </section>
 
     <section class="since" data-since hidden aria-label="Since you last looked"></section>
 
-    <section class="section explore" aria-labelledby="explore-title">
-      <div class="wrap">
-        <h2 id="explore-title" class="section-title">Explore Gator Eyes</h2>
-        <div class="tool-grid tool-grid-3">
-          <a class="tool" href="./tokens.html"><span class="tag">Live</span><h3>Tokens</h3><p>Every coin in one table: volume, net flow, price change and alerts.</p></a>
-          <a class="tool" href="./race.html"><span class="tag">Live</span><h3>Graduation race</h3><p>Who's closest to graduating, how fast they're moving and a rough ETA.</p></a>
-          <a class="tool" href="./watchlist.html"><span class="tag">Yours</span><h3>Watchlist</h3><p>Star coins and keep their price, flows and alerts in one place. Saved in your browser, no sign-up.</p></a>
-          <a class="tool" href="./flows.html"><span class="tag">Live</span><h3>Flows</h3><p>Where the ADA went today, by coin, hour and venue.</p></a>
-          <a class="tool" href="./followup.html"><span class="tag">Track record</span><h3>Alert follow-up</h3><p>What each alert's coin did 1 hour and 24 hours later.</p></a>
-          <a class="tool" href="./unlocks.html"><span class="tag">Live</span><h3>Unlock calendar</h3><p>Every Solada token lock, checked on-chain, by the day it opens. Size as share of supply and ADA value.</p></a>
-          <a class="tool" href="./holders.html"><span class="tag">For projects</span><h3>Holder snapshot</h3><p>Where a coin's supply sits, plus a clean airdrop list as a CSV.</p></a>
-          <a class="tool" href="./coincard.html"><span class="tag">For projects</span><h3>Coin share card</h3><p>A ready-to-post image of any coin's last 24 hours.</p></a>
-        </div>
-      </div>
-    </section>
+    
 
-    <section class="section fmap" id="map" aria-labelledby="map-title">
-      <div class="wrap">
-        <p class="eyebrow">Feature map</p>
-        <h2 id="map-title" class="section-title">Everything Gator Eyes does, in one picture.</h2>
-        <p class="fmap-sub">One gator watches every trade. What it sees goes three places: Discord for right now, X for recaps, and this site to dig in.</p>
+    
 
-        <div class="fmap-hub">
-          <img src="./assets/img/avatar-256.webp" alt="" width="44" height="44">
-          <div><strong>The gator</strong><span>Reads every Solada.fun and Snek.fun trade, checked every minute</span></div>
-        </div>
+    
 
-        <div class="fmap-lanes">
-          <div class="fmap-bus" aria-hidden="true"></div>
-
-          <div class="fmap-lane" style="--lane: var(--color-amber)">
-            <div class="fmap-head"><h3>Discord</h3><small>right now</small></div>
-            <ul class="fmap-list" role="list">
-              <li><div class="fmap-item"><b><i class="fmap-dot" style="background:var(--color-amber)"></i>Whale trades</b><span>$1,000+ in ADA, or 7.5% of market cap</span></div></li>
-              <li><div class="fmap-item"><b><i class="fmap-dot" style="background:var(--color-spike)"></i>Volume spikes</b><span>4x normal pace in 15 minutes</span></div></li>
-              <li><div class="fmap-item"><b><i class="fmap-dot" style="background:var(--color-sell)"></i>Creator sells</b><span>Launch wallet sells 500+ ADA or 5%+ of market cap</span></div></li>
-              <li><div class="fmap-item"><b><i class="fmap-dot" style="background:var(--color-launch)"></i>Fast launches</b><span>1,000+ ADA from 8+ wallets, first hour</span></div></li>
-              <li><div class="fmap-item"><b>$GAEY trades</b><span>Every trade of the team's token</span></div></li>
-            </ul>
-            <a class="btn btn-amber btn-sm fmap-cta" data-link="discord" href="#">Join Discord</a>
-          </div>
-
-          <div class="fmap-lane" style="--lane: var(--color-buy)">
-            <div class="fmap-head"><h3>X</h3><small>recaps</small></div>
-            <ul class="fmap-list" role="list">
-              <li><div class="fmap-item"><b>Gator Tracks</b><span>Daily at 12:01 AM ET: the day's volume, top coins, money in and out, split by launchpad</span></div></li>
-              <li><div class="fmap-item"><b>Launchpad Pulse</b><span>Every 4 hours from 4 AM to 8 PM ET: volume, top coins, spikes and new launches</span></div></li>
-            </ul>
-            <a class="btn btn-ghost btn-sm fmap-cta" data-link="x" href="#">Follow @GatorEyesADA</a>
-          </div>
-
-          <div class="fmap-lane" style="--lane: var(--color-spike)">
-            <div class="fmap-head"><h3>gatoreyes.fun</h3><small>dig in</small></div>
-            <div class="fmap-groups">
-              <div class="fmap-group">
-                <h4>Watch the market</h4>
-                <ul class="fmap-list" role="list">
-                  <li><a class="fmap-item" href="#alerts"><b>Live alerts</b><span>The Discord feed, right on this page</span></a></li>
-                  <li><a class="fmap-item" href="./tokens.html"><b>Tokens</b><span>Every coin, sortable by volume and net flow</span></a></li>
-                  <li><a class="fmap-item" href="./race.html"><b>Graduation race</b><span>Closest to 50,000 ADA, with pace and ETA</span></a></li>
-                  <li><a class="fmap-item" href="./flows.html"><b>Flows</b><span>Where the ADA went, by coin, hour and venue</span></a></li>
-                </ul>
-              </div>
-              <div class="fmap-group">
-                <h4>Check the record</h4>
-                <ul class="fmap-list" role="list">
-                  <li><a class="fmap-item" href="./followup.html"><b>Alert follow-up</b><span>What each coin did 1 hour and 24 hours after its alert</span></a></li>
-                  <li><a class="fmap-item" href="./gaey.html"><b>$GAEY</b><span>The team's token, holder rewards paid in ADA</span></a></li>
-                </ul>
-                <h4 style="margin-top:var(--space-4)">For projects</h4>
-                <ul class="fmap-list" role="list">
-                  <li><a class="fmap-item" href="./holders.html"><b>Holder snapshot</b><span>Where the supply sits, plus an airdrop CSV</span></a></li>
-                  <li><a class="fmap-item" href="./coincard.html"><b>Coin share card</b><span>A ready-to-post image of any coin</span></a></li>
-                  <li><a class="fmap-item" href="./about.html#embed"><b>Embed widget</b><span>Put live Gator Eyes data on your own site</span></a></li>
-                </ul>
-              </div>
-              <div class="fmap-group" style="grid-column:1 / -1">
-                <h4>Get help</h4>
-                <ul class="fmap-list fmap-help" role="list">
-                  <li><div class="fmap-item"><b>Search</b><span>Press / or tap Search up top</span></div></li>
-                  <li><div class="fmap-item"><b>Beginner mode</b><span>Tap ? to explain the jargon</span></div></li>
-                  <li><button type="button" class="fmap-item" data-ask><b>Ask Quagmire</b><span>Our gator answers anything</span></button></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-        <p class="fmap-free"><strong>All of it is free, forever.</strong> No sign-up, no wallet.</p>
-      </div>
-    </section>
-
-    <section class="section watches" aria-labelledby="watch-title">
-      <div class="wrap">
-        <h2 id="watch-title" class="section-title">What the gator watches</h2>
-        <ol class="watch-list" role="list">
-          <li><span class="watch-k k-whale">Whale trades</span><p>Any trade worth $1,000 or more in ADA, or a trade worth at least 7.5% of a coin's market cap (minimum 250 ADA).</p></li>
-          <li><span class="watch-k k-spike">Volume spikes</span><p>A coin trading four times its normal pace over 15 minutes, with at least 1,500 ADA moving.</p></li>
-          <li><span class="watch-k k-dev">Creator sells</span><p>The wallet that created a coin selling 500 ADA or more, or at least 5% of its market cap. Posted as a record, not a warning.</p></li>
-          <li><span class="watch-k k-launch">Fast launches</span><p>New coins that pull in 1,000 ADA from eight or more wallets in their first hour.</p></li>
-          <li><span class="watch-k k-tracks">Gator Tracks</span><p>A daily recap at 12:01 AM Eastern, right after the day closes: volume, most traded coins, and where the money went, split by launchpad with a combined total.</p></li>
-        </ol>
-      </div>
-    </section>
-
-    <section class="section" id="alerts" aria-labelledby="alerts-title">
+    <section class="section home-market" id="alerts" aria-labelledby="alerts-title">
       <div class="wrap">
         <div class="section-head">
           <h2 id="alerts-title" class="section-title">Live alerts</h2>
@@ -211,6 +97,22 @@
           <button class="chip" data-filter="launch" aria-pressed="false">Launches</button>
           <button class="chip" data-filter="watch" aria-pressed="false">$GAEY</button>
         </div>
+<details class="alert-help">
+          <summary>What do these alerts mean?</summary>
+          <div class="alert-definitions">
+      <div class="wrap">
+        <h2 id="watch-title" class="section-title">What the gator watches</h2>
+        <ol class="watch-list" role="list">
+          <li><span class="watch-k k-whale">Whale trades</span><p>Any trade worth $1,000 or more in ADA, or a trade worth at least 7.5% of a coin's market cap (minimum 250 ADA).</p></li>
+          <li><span class="watch-k k-spike">Volume spikes</span><p>A coin trading four times its normal pace over 15 minutes, with at least 1,500 ADA moving.</p></li>
+          <li><span class="watch-k k-dev">Creator sells</span><p>The wallet that created a coin selling 500 ADA or more, or at least 5% of its market cap. Posted as a record, not a warning.</p></li>
+          <li><span class="watch-k k-launch">Fast launches</span><p>New coins that pull in 1,000 ADA from eight or more wallets in their first hour.</p></li>
+          <li><span class="watch-k k-tracks">Gator Tracks</span><p>A daily recap at 12:01 AM Eastern, right after the day closes: volume, most traded coins, and where the money went, split by launchpad with a combined total.</p></li>
+        </ol>
+      </div>
+    </div>
+          <a href="./about.html#rules-title">Full rules and data sources &rarr;</a>
+        </details>
         <div class="alert-list" data-alerts aria-live="polite"></div>
         <div class="list-foot"><button class="btn btn-ghost btn-sm" data-more hidden>Show more</button></div>
       </div>
@@ -227,19 +129,25 @@
       </div>
     </section>
 
-    <section class="section section-tight suri-teaser" aria-labelledby="suri-teaser-title">
+    <section class="section section-tight suri-teaser quiet-suri" aria-labelledby="suri-teaser-title">
       <div class="wrap two-col">
         <div>
           <p class="eyebrow">When you need more</p>
-          <h2 id="suri-teaser-title" class="section-title">Some things can't be free. For those, there's Suri.</h2>
+          <h2 id="suri-teaser-title" class="section-title">Need a deeper check?</h2>
           <p class="prose">Gator Eyes shows data for Solada, free forever. Safety checks on new coins, wallet profiles, and copy trading take a paid tool, we point you to Suri instead of building a paywall.</p>
         </div>
         <div class="cta-row">
-          <a class="btn btn-amber" href="https://suriradar.fun/" target="_blank" rel="noopener">Open Suri Radar</a>
+          <a class="btn btn-ghost" href="https://suriradar.fun/" target="_blank" rel="noopener">Open Suri Radar</a>
         </div>
       </div>
     </section>
 
+    <section class="section section-tight home-directory" aria-labelledby="directory-title">
+      <div class="wrap directory-inner">
+        <div><h2 id="directory-title" class="section-title">Find your next view.</h2><p class="muted">Watch a coin, follow the flows, or check an upcoming unlock.</p></div>
+        <div class="directory-links"><a href="./watchlist.html">Watchlist &rarr;</a><a href="./flows.html">Flows &rarr;</a><a href="./unlocks.html">Unlock calendar &rarr;</a><a href="./tools.html">All tools &rarr;</a></div>
+      </div>
+    </section>
     <section class="section gaey-teaser" aria-labelledby="gaey-title">
       <div class="wrap teaser-inner">
         <img class="teaser-img" data-gaey-img src="./assets/img/avatar-256.webp" alt="$GAEY token image" width="120" height="120">
@@ -248,36 +156,16 @@
           <p>The Gator Eyes team's own token. It trades on Solada.fun until it bonds, not on Snek.fun. Every $GAEY buy and sell posts live in its own Discord channel.</p>
           <dl class="mini-stats" data-gaey-mini></dl>
           <div class="cta-row">
-            <a class="btn btn-amber" href="./gaey.html">See the $GAEY page</a>
+            <a class="btn btn-ghost" href="./gaey.html">See the $GAEY page</a>
             <a class="btn btn-ghost" data-link="gaey-coin" href="#">Trade $GAEY on Solada</a>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section section-tight ask-next" aria-labelledby="ask-next-title">
-      <div class="wrap two-col">
-        <div>
-          <p class="eyebrow">Your call</p>
-          <h2 id="ask-next-title" class="section-title">What should we build next?</h2>
-          <p class="prose">Gator Eyes grows from what people ask for. Tell us the tool, alert or coin data you want, and what would make the site more useful to you.</p>
-        </div>
-        <div class="cta-row">
-          <a class="btn btn-amber" data-link="discord" href="#">Tell us in Discord</a>
-          <a class="btn btn-ghost" data-link="x" href="#">Reply on X</a>
-        </div>
-      </div>
-    </section>
+    
 
-    <section class="join" aria-labelledby="join-title">
-      <div class="wrap join-inner">
-        <h2 id="join-title">Get the alerts where you already are.</h2>
-        <div class="cta-row">
-          <a class="btn btn-amber" data-link="discord" href="#">Join the Discord</a>
-          <a class="btn btn-ghost" data-link="x" href="#">Follow on X</a>
-        </div>
-      </div>
-    </section>
+    
   </main>
 
   <footer class="site-footer">
@@ -286,6 +174,6 @@
       <nav aria-label="Footer"><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./flows.html">Flows</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./app.html">Get the app</a></nav>
     </div>
   </footer>
-  <script type="module" src="./assets/js/home.js?v=20261101r"></script>
+  <script type="module" src="./assets/js/home.js?v=20261101-clean1"></script>
 </body>
 </html>

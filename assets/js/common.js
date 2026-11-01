@@ -1,9 +1,10 @@
-import { CONFIG } from "./config.js?v=20261101r";
-import { joinUrl, coinUrl } from "./data.js?v=20261101r";
-import { timeAgo } from "./ui.js?v=20261101r";
+import { CONFIG } from "./config.js?v=20261101-clean1";
+import { joinUrl, coinUrl } from "./data.js?v=20261101-clean1";
+import { timeAgo } from "./ui.js?v=20261101-clean1";
 
 /** Fill every [data-link] with the right URL so links live in one place (config.js). */
 export function wireLinks(root = document) {
+  document.querySelectorAll(".nav-ask").forEach(button => button.setAttribute("aria-label", "Ask Quagmire"));
   const map = {
     discord: CONFIG.discord,
     x: CONFIG.x,
@@ -18,10 +19,29 @@ export function wireLinks(root = document) {
     a.rel = "noopener";
   });
   navTips();
-  import("./gator.js?v=20261101r").then((m) => m.mountGator()).catch(() => {});
-  import("./extras.js?v=20261101r").then((m) => m.mountExtras()).catch(() => {});
-  import("./tape.js?v=20261101r").then((m) => m.mountTape()).catch(() => {});
+  wireToolsMenu();
+  import("./gator.js?v=20261101-clean1").then((m) => m.mountGator()).catch(() => {});
+  import("./extras.js?v=20261101-clean1").then((m) => m.mountExtras()).catch(() => {});
+  import("./tape.js?v=20261101-clean1").then((m) => m.mountTape()).catch(() => {});
   import("./pwa.js?v=20261101s").then((m) => m.mountPwa()).catch(() => {});
+}
+
+function wireToolsMenu() {
+  const menu = document.querySelector(".tools-menu");
+  if (!menu || menu.dataset.wired) return;
+  menu.dataset.wired = "true";
+  const summary = menu.querySelector("summary");
+  summary.setAttribute("aria-expanded", String(menu.open));
+  menu.addEventListener("toggle", () => summary.setAttribute("aria-expanded", String(menu.open)));
+  document.addEventListener("click", (event) => {
+    if (!menu.contains(event.target)) menu.open = false;
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && menu.open) {
+      menu.open = false;
+      summary.focus();
+    }
+  });
 }
 
 export function liveStatus(feed, err) {

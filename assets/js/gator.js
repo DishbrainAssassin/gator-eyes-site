@@ -1,10 +1,10 @@
 // Ask Gator: a small helper that answers common questions about Gator Eyes and
 // the launchpads it tracks (Solada.fun and Snek.fun). Answers are built in (no AI, no running cost). Live questions
 // about coins use the same /tokens data as the Tokens page.
-import { CONFIG } from "./config.js?v=20261101r";
-import { coinUrl, joinUrl } from "./data.js?v=20261101r";
-import { API, getApi, price, pct, signed, hours, span } from "./api.js?v=20261101r";
-import { esc, fmt, compact } from "./ui.js?v=20261101r";
+import { CONFIG } from "./config.js?v=20261101-clean1";
+import { coinUrl, joinUrl } from "./data.js?v=20261101-clean1";
+import { API, getApi, price, pct, signed, hours, span } from "./api.js?v=20261101-clean1";
+import { esc, fmt, compact } from "./ui.js?v=20261101-clean1";
 
 const DISCORD = CONFIG.discord;
 const a = (href, label, ext) => `<a href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(label)}</a>`;
@@ -330,7 +330,7 @@ function logQuestion(q, html) {
 }
 
 export function mountGator() {
-  if (document.querySelector(".gator-launch") || window.self !== window.top) return;
+  if (!document.querySelector(".site-header") || document.querySelector(".gator-launch")) return;
   const root = document.createElement("div");
   root.className = "gator";
   root.innerHTML = `
@@ -385,12 +385,14 @@ export function mountGator() {
     add("gator", html);
     logQuestion(q, html);
   };
+  let opener = btn;
   const open = (on) => {
+    if (on && panel.hidden) opener = document.activeElement;
     panel.hidden = !on;
     btn.setAttribute("aria-expanded", on);
     root.classList.toggle("is-open", on);
     if (on) { log.scrollTop = log.scrollHeight; if (matchMedia("(pointer: fine)").matches) input.focus(); }
-    else btn.focus();
+    else (opener?.isConnected ? opener : document.querySelector("[data-ask]") || btn).focus();
   };
   if (hist.length) chips.hidden = true;
   btn.addEventListener("click", () => open(panel.hidden));

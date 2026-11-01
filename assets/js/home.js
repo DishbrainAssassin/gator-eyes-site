@@ -1,13 +1,13 @@
-import { subscribe } from "./data.js?v=20261101r";
-import { alertCard, emptyState, skeleton, tracks, mergeDays, lpSplit, dayLabel, fmt, usdcx, timeAgo, compact } from "./ui.js?v=20261101r";
-import { wireLinks, liveStatus } from "./common.js?v=20261101r";
-import * as platform from "./platform.js?v=20261101r";
+import { subscribe } from "./data.js?v=20261101-clean1";
+import { alertCard, emptyState, skeleton, tracks, mergeDays, lpSplit, dayLabel, fmt, usdcx, timeAgo, compact } from "./ui.js?v=20261101-clean1";
+import { wireLinks, liveStatus } from "./common.js?v=20261101-clean1";
+import * as platform from "./platform.js?v=20261101-clean1";
 
 const SHOW_ALL = ' <button type="button" class="link" data-platform="all">Show all launchpads</button>';
 
 wireLinks();
 platform.mount();
-import("./since.js?v=20261101r").then((m) => m.mountSince()).catch(() => {});
+import("./since.js?v=20261101-clean1").then((m) => m.mountSince()).catch(() => {});
 platform.on(() => {
   shown = 10;
   renderAlerts();
@@ -25,7 +25,7 @@ const gaeyImg = $("[data-gaey-img]");
 
 let feed = null;
 let filter = "all";
-let shown = 10;
+let shown = 6;
 let day = "today";
 
 listEl.innerHTML = skeleton(4);
