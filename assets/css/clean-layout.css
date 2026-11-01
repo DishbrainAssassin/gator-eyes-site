@@ -35,6 +35,10 @@
 .hero-secondary a { color: var(--color-text-muted); display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; font-size: var(--text-sm); text-decoration: none; }
 .hero-secondary a:hover { color: var(--color-text); }
 .hero-secondary a span { color: var(--color-text-faint); }
+.hero-secondary .phone-alerts-link { padding-inline: var(--space-3); border: 1px solid color-mix(in oklab, var(--color-amber) 55%, transparent); border-radius: var(--radius-full); color: var(--color-amber); background: color-mix(in oklab, var(--color-amber) 9%, transparent); font-weight: 700; }
+.hero-secondary .phone-alerts-link span { color: inherit; }
+.hero-secondary .phone-alerts-link:hover { color: var(--color-amber-hover); border-color: var(--color-amber); background: color-mix(in oklab, var(--color-amber) 16%, transparent); }
+.hero-secondary .phone-alerts-link:focus-visible { outline: 2px solid var(--color-amber); outline-offset: 4px; }
 .hero-art img { object-position: 65% 44%; }
 .hero::after { background: linear-gradient(90deg, color-mix(in oklab, var(--color-bg) 92%, transparent), color-mix(in oklab, var(--color-bg) 42%, transparent) 48%, transparent 75%), linear-gradient(0deg, var(--color-bg), transparent 45%); }
 .live-dot.is-live { animation: none; }
@@ -117,7 +121,8 @@
   .hero h1 { font-size: clamp(2.5rem, 9vw, 3.5rem); max-width: 13ch; }
   .hero .promise-line { max-width: 32ch; line-height: 1.6; }
   .hero .eyebrow { font-size: 12px; letter-spacing: .03em; }
-  .hero-secondary { gap: var(--space-5); }
+  .hero-secondary { gap: var(--space-3); }
+  .hero-secondary .phone-alerts-link { font-size: var(--text-xs); }
   .home-market { padding-top: var(--space-6); }
   .alert-definitions .watch-list { grid-template-columns: 1fr; }
   .directory-inner { flex-direction: column; align-items: stretch; gap: var(--space-4); }
@@ -125,6 +130,10 @@
   .gaey-teaser .teaser-inner { grid-template-columns: 1fr; gap: var(--space-4); }
 }
 @media (max-width: 370px) {
+  .hero-secondary { gap: var(--space-2); }
+  .hero-secondary a { font-size: var(--text-xs); }
+  .hero-secondary .phone-alerts-link { padding-inline: var(--space-2); }
+  .hero-secondary .phone-alerts-link span { display: none; }
   .header-platform .seg button { padding-inline: 6px; gap: 5px; font-size: 11px; }
   .header-platform .seg { gap: 0; }
 }
