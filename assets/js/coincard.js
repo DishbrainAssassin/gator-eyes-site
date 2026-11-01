@@ -1,9 +1,9 @@
 // Coin share card: one coin's last 24 hours on Solada.fun or Snek.fun as a 1200x675 PNG.
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261101-nav1";
-import { coinUrl, fetchFeed } from "./data.js?v=20261101-nav1";
-import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261101-nav1";
-import { wireLinks, liveStatus } from "./common.js?v=20261101-nav1";
-import * as platform from "./platform.js?v=20261101-nav1";
+import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261101-sol1";
+import { coinUrl, fetchFeed } from "./data.js?v=20261101-sol1";
+import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261101-sol1";
+import { wireLinks, liveStatus } from "./common.js?v=20261101-sol1";
+import * as platform from "./platform.js?v=20261101-sol1";
 
 wireLinks();
 platform.mount();
@@ -31,14 +31,17 @@ let data = null, coin = null, series = [], art = null, tainted = false, sol = nu
 // Solana side: Solada coins that also trade on Pump.fun/PumpSwap (kind "pump") can trade in SOL or USDC,
 // which the ADA tracker can't see. For those, the card uses DexScreener's 24h totals and GeckoTerminal's
 // hourly prices for the busiest Solana pool. Any error just leaves the card on the ADA numbers.
-const isSolSide = (c) => c && c.kind === "pump" && !((c.w.h24 || {}).n) && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(c.slug || "");
+// The Solana mint comes from the worker (Solada publishes it); older lists only had it when the slug happened to be the mint.
+const solMint = (c) => c && (c.mint || (/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(c.slug || "") ? c.slug : null)) || null;
+const isSolSide = (c) => c && c.kind === "pump" && !((c.w.h24 || {}).n) && !!solMint(c);
 const DEX = { pumpswap: "PumpSwap", pumpfun: "Pump.fun", raydium: "Raydium", meteora: "Meteora", orca: "Orca" };
 async function loadSol(c) {
   if (!isSolSide(c)) return null;
   try {
-    const r = await fetch("https://api.dexscreener.com/latest/dex/tokens/" + c.slug);
+    const mint = solMint(c);
+    const r = await fetch("https://api.dexscreener.com/latest/dex/tokens/" + mint);
     const j = r.ok ? await r.json() : null;
-    const ps = ((j && j.pairs) || []).filter((x) => x.chainId === "solana" && x.baseToken && x.baseToken.address === c.slug)
+    const ps = ((j && j.pairs) || []).filter((x) => x.chainId === "solana" && x.baseToken && x.baseToken.address === mint)
       .sort((x, y) => ((y.volume && y.volume.h24) || 0) - ((x.volume && x.volume.h24) || 0));
     const pr = ps[0];
     if (!pr) return null;
