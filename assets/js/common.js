@@ -21,7 +21,7 @@ export function wireLinks(root = document) {
   import("./gator.js?v=20261101r").then((m) => m.mountGator()).catch(() => {});
   import("./extras.js?v=20261101r").then((m) => m.mountExtras()).catch(() => {});
   import("./tape.js?v=20261101r").then((m) => m.mountTape()).catch(() => {});
-  import("./pwa.js?v=20261101r").then((m) => m.mountPwa()).catch(() => {});
+  import("./pwa.js?v=20261101s").then((m) => m.mountPwa()).catch(() => {});
 }
 
 export function liveStatus(feed, err) {

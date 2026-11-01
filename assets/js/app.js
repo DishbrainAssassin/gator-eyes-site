@@ -1,7 +1,7 @@
 // "Get the app" page: install steps for this device, then phone alert choices.
-import { wireLinks } from "./common.js?v=20261101r";
+import { wireLinks } from "./common.js?v=20261101s";
 import * as watchlist from "./watchlist.js?v=20261101r";
-import * as pwa from "./pwa.js?v=20261101r";
+import * as pwa from "./pwa.js?v=20261101s";
 
 wireLinks();
 
@@ -9,6 +9,26 @@ const $ = (s) => document.querySelector(s);
 const installEl = $("[data-install]"), installState = $("[data-install-state]");
 const form = $("[data-form]"), statusEl = $("[data-status]"), alertState = $("[data-alert-state]");
 const onBtn = $("[data-on]"), testBtn = $("[data-test]"), offBtn = $("[data-off]"), blocked = $("[data-alerts-blocked]");
+const muteControls = $("[data-mute-controls]"), muteBtn = $("[data-mute]"), unmuteBtn = $("[data-unmute]"), muteDuration = $("[data-mute-duration]");
+let alertsOn = false;
+let muteBusy = false;
+let wasMuted = false;
+
+function renderMute() {
+  const until = Number((pwa.savedPrefs() || {}).mutedUntil) || 0;
+  const muted = alertsOn && until > Date.now();
+  if (wasMuted && !muted && alertsOn) say("Alerts are on for this device.");
+  wasMuted = muted;
+  muteControls.hidden = !alertsOn;
+  unmuteBtn.hidden = !muted;
+  muteBtn.textContent = muted ? "Change mute" : "Mute alerts";
+  muteBtn.disabled = unmuteBtn.disabled = muteDuration.disabled = muteBusy;
+  testBtn.disabled = muted || muteBusy;
+  if (alertsOn) alertState.textContent = muted ? "Muted" : "On";
+  $("[data-mute-status]").textContent = muted
+    ? "Muted on this device. Alerts resume " + new Date(until).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" }) + ", even if the app is closed."
+    : "Alerts resume automatically after the time you choose, even if the app is closed.";
+}
 
 const SHARE = '<svg class="app-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 11H5v10h14V11h-1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
@@ -84,7 +104,9 @@ function readForm() {
 
 function watchCount() {
   const n = watchlist.count();
-  $("[data-watch-count]").textContent = n ? `${n} coin${n === 1 ? "" : "s"} on your watchlist right now. Changes to it carry over on their own.` : "Your watchlist is empty. Star coins on the Tokens page to fill it.";
+  $("[data-watch-count]").innerHTML = n
+    ? `${n} coin${n === 1 ? "" : "s"} on your <a href="./watchlist.html">watchlist</a> right now. Changes to it carry over on their own.`
+    : 'Your <a href="./watchlist.html">watchlist</a> is empty. Star coins on the Tokens page to fill it.';
 }
 
 const say = (msg, bad = false) => { statusEl.textContent = msg; statusEl.classList.toggle("is-bad", bad); };
@@ -97,18 +119,20 @@ async function renderAlerts() {
     blocked.innerHTML = iosBrowser
       ? '<p class="notice"><strong>Finish step 1 first.</strong> On iPhone, notifications only work after you open Gator Eyes from its home screen icon.</p>'
       : '<p class="notice">This browser can\'t do phone notifications. Try Chrome, Edge, Firefox or Safari.</p>';
-    form.querySelectorAll("input, button").forEach((el) => { el.disabled = true; });
+    form.querySelectorAll("input, button, select").forEach((el) => { el.disabled = true; });
     alertState.textContent = "Not available here";
     return;
   }
   blocked.hidden = true;
   const sub = await pwa.currentSub();
   const on = !!sub && Notification.permission === "granted";
+  alertsOn = on;
   onBtn.textContent = on ? "Save changes" : "Turn on alerts";
   testBtn.hidden = !on;
   offBtn.hidden = !on;
   alertState.textContent = on ? "On" : Notification.permission === "denied" ? "Blocked" : "Off";
-  if (Notification.permission === "denied") say("Notifications are blocked for Gator Eyes. Allow them in your phone's or browser's settings, then come back.", true);
+  renderMute();
+  if (Notification.permission === "denied") say("Notifications are blocked for Gator Eyes. Phone alerts can't be enabled while permission is blocked.", true);
 }
 
 form.addEventListener("submit", (e) => {
@@ -120,7 +144,7 @@ form.addEventListener("submit", (e) => {
   say("Working…");
   // enable() asks for permission first, straight from this tap (iPhone requires that).
   const job = Notification.permission === "granted" ? pwa.currentSub().then((s) => (s ? pwa.save(p, s) : pwa.enable(p))) : pwa.enable(p);
-  job.then(() => { say("Alerts are on. You'll get a notification when the gator spots something you picked."); return renderAlerts(); })
+  job.then((saved) => { say(saved.mutedUntil > Date.now() ? "Choices saved. Your timed mute is still active." : "Alerts are on. You'll get a notification when the gator spots something you picked."); return renderAlerts(); })
     .catch((err) => say(err.message || String(err), true))
     .finally(() => { onBtn.disabled = false; });
 });
@@ -142,6 +166,24 @@ offBtn.addEventListener("click", async () => {
   offBtn.disabled = false;
   renderAlerts();
 });
+
+async function changeMute(minutes) {
+  muteBusy = true;
+  onBtn.disabled = offBtn.disabled = true;
+  renderMute();
+  say(minutes ? "Muting alerts…" : "Unmuting alerts…");
+  try {
+    await pwa.mute(minutes);
+    say(minutes ? "Alerts muted for this device. Your alert choices are unchanged." : "Alerts are unmuted for this device.");
+  } catch (err) { say(err.message || String(err), true); }
+  finally { muteBusy = false; onBtn.disabled = offBtn.disabled = false; renderMute(); }
+}
+muteBtn.addEventListener("click", () => changeMute(Number(muteDuration.value)));
+unmuteBtn.addEventListener("click", () => changeMute(0));
+// Refresh the displayed state after expiry or when returning to the app.
+setInterval(renderMute, 30000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) renderMute(); });
+addEventListener("storage", (e) => { if (e.key === "ge-push") renderMute(); });
 
 renderInstall();
 renderKinds(pwa.savedPrefs() || pwa.DEFAULT_PREFS);

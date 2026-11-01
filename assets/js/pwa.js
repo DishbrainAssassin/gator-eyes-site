@@ -65,7 +65,7 @@ const sig = (p) => JSON.stringify([p.kinds, p.src, p.watchOnly, p.watchOnly ? wa
 export async function enable(prefs) {
   const perm = await Notification.requestPermission();
   if (perm !== "granted") throw new Error(perm === "denied"
-    ? "Notifications are blocked for Gator Eyes. Turn them on in your phone's Settings, then try again."
+    ? "Notifications are blocked for Gator Eyes. Phone alerts can't be enabled while permission is blocked."
     : "Notifications weren't allowed. Tap the button again and choose Allow.");
   const reg = await registration();
   if (!reg) throw new Error("This browser can't run the Gator Eyes app.");
@@ -80,9 +80,19 @@ export async function save(prefs, sub) {
   sub = sub || (await currentSub());
   if (!sub) throw new Error("Alerts aren't on for this device yet.");
   const p = { kinds: prefs.kinds, src: prefs.src, watchOnly: !!prefs.watchOnly };
-  await post("/subscribe", { sub: sub.toJSON(), prefs: { ...p, watch: watchIds() } });
-  storePrefs({ ...p, synced: sig(p) });
-  return p;
+  const r = await post("/subscribe", { sub: sub.toJSON(), prefs: { ...p, watch: watchIds() } });
+  const saved = { ...p, mutedUntil: Number(r.mutedUntil) || 0, synced: sig(p) };
+  storePrefs(saved);
+  return saved;
+}
+
+/** Mute this device server-side, or unmute early with minutes = 0. */
+export async function mute(minutes) {
+  const sub = await currentSub();
+  if (!sub) throw new Error("Alerts aren't on for this device yet.");
+  const r = await post("/mute", { sub: sub.toJSON(), minutes });
+  storePrefs({ ...(savedPrefs() || DEFAULT_PREFS), mutedUntil: Number(r.mutedUntil) || 0 });
+  return r;
 }
 
 export async function disable() {
