@@ -1,11 +1,11 @@
 // Holder snapshot: where a Solada.fun or Snek.fun coin's supply sits on Cardano, then a filtered
 // holder list ready to filter and download as a CSV.
-import { getApi } from "./api.js?v=20261101-sol2";
-import { coinUrl, fetchFeed } from "./data.js?v=20261101-sol2";
-import { esc, fmt, compact } from "./ui.js?v=20261101-sol2";
-import { wireLinks, liveStatus } from "./common.js?v=20261101-sol2";
-import * as platform from "./platform.js?v=20261101-sol2";
-import { pill } from "./platform.js?v=20261101-sol2";
+import { getApi } from "./api.js?v=20261101-tape2";
+import { coinUrl, fetchFeed } from "./data.js?v=20261101-tape2";
+import { esc, fmt, compact } from "./ui.js?v=20261101-tape2";
+import { wireLinks, liveStatus } from "./common.js?v=20261101-tape2";
+import * as platform from "./platform.js?v=20261101-tape2";
+import { pill } from "./platform.js?v=20261101-tape2";
 
 wireLinks();
 platform.mount();

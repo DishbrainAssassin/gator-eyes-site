@@ -1,7 +1,7 @@
 // Reusable display pieces. Each takes plain data and returns HTML, so the same
 // pieces can be rearranged into a dashboard later.
-import { withRef, coinUrl } from "./data.js?v=20261101-sol2";
-import { pill, srcOf, LP } from "./platform.js?v=20261101-sol2";
+import { withRef, coinUrl } from "./data.js?v=20261101-tape2";
+import { pill, srcOf, LP } from "./platform.js?v=20261101-tape2";
 
 export const KINDS = {
   big: { label: "Whale", cls: "k-whale" },

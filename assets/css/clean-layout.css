@@ -79,6 +79,9 @@
 .gaey-teaser .teaser-img { width: 72px; height: 72px; }
 .gaey-teaser .section-title { font-size: var(--text-lg); }
 .gaey-teaser p { font-size: var(--text-sm); }
+.tape-toggle { flex: none; min-width: 76px; padding-inline: var(--space-3); border: 0; border-left: 1px solid var(--color-divider); color: var(--color-text-muted); background: var(--color-surface); font: 500 var(--text-xs) var(--font-body); cursor: pointer; }
+.tape-toggle:hover { color: var(--color-amber); }
+.tape.is-paused .tape-track { animation-play-state: paused; }
 .gator-panel { bottom: 0; }
 @media (max-width: 1000px) {
   .header-inner { gap: var(--space-3); }
@@ -137,6 +140,10 @@
   .hero-secondary .phone-alerts-link span { display: none; }
   .header-platform .seg button { padding-inline: 6px; gap: 5px; font-size: 11px; }
   .header-platform .seg { gap: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tape-track { animation: none; }
 }
 
 /* Installed phone app: bottom navigation bar (Back, Home, Tokens, Watchlist, Tools, Ask). */
