@@ -1,6 +1,6 @@
 import { subscribe } from "./data.js?v=20261102-hatch";
 import { alertCard, emptyState, skeleton, tracks, mergeDays, lpSplit, dayLabel, fmt, usdcx, timeAgo, compact } from "./ui.js?v=20261102-hatch";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-hatch";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-tools-first";
 import * as platform from "./platform.js?v=20261102-hatch";
 
 const SHOW_ALL = ' <button type="button" class="link" data-platform="all">Show all launchpads</button>';

@@ -4,7 +4,7 @@
 import { getApi, price, pct, signed, span } from "./api.js?v=20261102-hatch";
 import { coinUrl } from "./data.js?v=20261102-hatch";
 import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261102-hatch";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-hatch";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-tools-first";
 import * as platform from "./platform.js?v=20261102-hatch";
 import * as watchlist from "./watchlist.js?v=20261102-hatch";
 import { pill, LP } from "./platform.js?v=20261102-hatch";

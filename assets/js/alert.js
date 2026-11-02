@@ -5,7 +5,7 @@
 import { getApi } from "./api.js?v=20261102-hatch";
 import { fetchFeed, coinUrl } from "./data.js?v=20261102-hatch";
 import { esc, alertCard, emptyState } from "./ui.js?v=20261102-hatch";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-hatch";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-tools-first";
 import * as watchlist from "./watchlist.js?v=20261102-hatch";
 
 wireLinks();

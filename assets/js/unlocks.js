@@ -2,7 +2,7 @@
 import { getApi } from "./api.js?v=20261102-hatch";
 import { coinUrl } from "./data.js?v=20261102-hatch";
 import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261102-hatch";
-import { wireLinks } from "./common.js?v=20261102-hatch";
+import { wireLinks } from "./common.js?v=20261102-tools-first";
 
 wireLinks();
 const $ = (s) => document.querySelector(s);

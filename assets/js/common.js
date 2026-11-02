@@ -36,7 +36,9 @@ function wireToolsMenu() {
   const mobileLinks = document.createElement("div");
   mobileLinks.className = "mobile-nav-extra";
   mobileLinks.innerHTML = `<a href="./tokens.html">Tokens</a><a href="./watchlist.html">Watchlist</a><button type="button" class="menu-action" data-menu-ask>Ask Quagmire</button><button type="button" class="menu-action" data-menu-search>Search coins</button>`;
-  dropdown.prepend(mobileLinks);
+  const allTools = dropdown.querySelector(".all-tools-link");
+  if (allTools) allTools.after(mobileLinks);
+  else dropdown.prepend(mobileLinks);
   mobileLinks.addEventListener("click", (event) => {
     const action = event.target.closest("[data-menu-ask], [data-menu-search]");
     if (!action) return;
