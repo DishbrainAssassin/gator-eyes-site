@@ -1,10 +1,10 @@
 // One table row for a coin from /tokens. Shared by the Tokens page and the Watchlist
 // so both show the same numbers the same way.
-import { price, pct, signed, hours, age } from "./api.js?v=20261102-hatch";
-import { coinUrl } from "./data.js?v=20261102-hatch";
-import { esc, fmt, compact, usdcx } from "./ui.js?v=20261102-hatch";
-import { pill } from "./platform.js?v=20261102-hatch";
-import { starBtn } from "./watchlist.js?v=20261102-hatch";
+import { price, pct, signed, hours, age, usdcxPrice } from "./api.js?v=20261102-usdcx2";
+import { coinUrl } from "./data.js?v=20261102-usdcx2";
+import { esc, fmt, compact, usdcx, usdcxShort } from "./ui.js?v=20261102-usdcx2";
+import { pill } from "./platform.js?v=20261102-usdcx2";
+import { starBtn } from "./watchlist.js?v=20261102-usdcx2";
 
 export const AL = { big: ["Whale", "var(--color-amber)"], spike: ["Spike", "var(--color-spike)"], launch: ["Fast Lunge", "var(--color-launch)"], hatch: ["Hatchling", "var(--color-hatch)"], dev: ["Creator sell", "var(--color-sell)"] };
 
@@ -61,12 +61,12 @@ export function coinRow(c, { win = "h24", rate = null, showPill = true, star = t
   return `<tr data-id="${esc(c.id)}">
     ${star ? `<td class="star-col">${starBtn(c)}</td>` : ""}
     <td><div class="coin-cell">${img}<div><a href="${esc(coinUrl(c.id))}" target="_blank" rel="noopener">${esc(c.tk || "?")}</a>${showPill && c.src === "snek" ? pill("snek") : ""}<span class="cell-sub">${esc((c.name || "").slice(0, 22))}${c.born ? " · " + esc(age(c.born)) : ""}</span></div></div></td>
-    <td class="num">${price(c.price)}</td>
+    <td class="num">${price(c.price)}<span class="cell-sub">${esc(usdcxPrice(c.price, rate))}</span></td>
     <td class="num ${w.ch > 0 ? "pos" : w.ch < 0 ? "neg" : ""}">${pct(w.ch)}</td>
     <td class="num">${fmt(w.v)}<span class="cell-sub">${esc(usdcx(w.v, rate))}</span></td>
     <td class="num hide-sm">${fmt(w.n)}<span class="cell-sub">${fmt(w.wal)} wallets</span></td>
-    <td class="num split-col"><span class="${w.net > 0 ? "pos" : w.net < 0 ? "neg" : ""}">${signed(w.net)}</span><span class="rowsplit" title="${fmt(w.b)} ADA bought, ${fmt(w.s)} ADA sold"><span class="split-buy" style="width:${bp}%"></span></span></td>
-    <td class="num hide-sm">${compact(c.mc)}</td>
+    <td class="num split-col"><span class="${w.net > 0 ? "pos" : w.net < 0 ? "neg" : ""}">${signed(w.net)}</span><span class="cell-sub">${w.net ? esc(usdcxShort(w.net, rate)) : ""}</span><span class="rowsplit" title="${fmt(w.b)} ADA bought, ${fmt(w.s)} ADA sold${rate ? ` (${usdcx(w.b, rate)} in, ${usdcx(w.s, rate)} out)` : ""}"><span class="split-buy" style="width:${bp}%"></span></span></td>
+    <td class="num hide-sm">${compact(c.mc)}<span class="cell-sub">${esc(usdcxShort(c.mc, rate))}</span></td>
     <td class="hide-sm curve-cell">${curveCell(c)}</td>
     <td class="num">${alertsCell(c)}</td>
     <td class="hide-sm">${actionsCell(c, { more })}</td>

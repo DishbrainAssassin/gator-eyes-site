@@ -1,12 +1,12 @@
 // Watchlist page: the coins saved in this browser, with their live numbers from
 // /tokens and every recent alert on them from /feed.
-import { getApi } from "./api.js?v=20261102-hatch";
-import { fetchFeed } from "./data.js?v=20261102-hatch";
-import { esc, fmt, usdcx, usdcxSigned, timeAgo, alertCard, emptyState, skeleton } from "./ui.js?v=20261102-hatch";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-tools-first";
-import * as platform from "./platform.js?v=20261102-hatch";
-import * as watchlist from "./watchlist.js?v=20261102-hatch";
-import { coinRow, missingRow } from "./coinrow.js?v=20261102-hatch";
+import { getApi } from "./api.js?v=20261102-usdcx2";
+import { fetchFeed } from "./data.js?v=20261102-usdcx2";
+import { esc, fmt, usdcx, usdcxSigned, usdcxShort, timeAgo, alertCard, emptyState, skeleton } from "./ui.js?v=20261102-usdcx2";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx2";
+import * as platform from "./platform.js?v=20261102-usdcx2";
+import * as watchlist from "./watchlist.js?v=20261102-usdcx2";
+import { coinRow, missingRow } from "./coinrow.js?v=20261102-usdcx2";
 
 wireLinks();
 platform.mount();
@@ -109,8 +109,8 @@ const VENUE = { curve: "Solada curve", minswap: "Minswap", "snek-curve": "Snek.f
 function tradeAlert(t) {
   const tk = t.tk ? "$" + t.tk : "A starred coin";
   return { kind: "wtrade", at: t.at, tokenId: t.id, ticker: t.tk, src: t.src, side: t.side, ada: t.ada, img: t.img,
-    title: `Starred: ${tk} ${t.side === "buy" ? "buy" : "sell"} ${fmt(t.ada)} ADA`,
-    desc: [VENUE[t.v] ? "Venue: " + VENUE[t.v] : "", t.p ? "Price " + Number(t.p).toPrecision(3) + " ADA" : ""].filter(Boolean).join(" · ") };
+    title: `Starred: ${tk} ${t.side === "buy" ? "buy" : "sell"} ${fmt(t.ada)} ADA${st.data && st.data.adaUsd ? ` (${usdcxShort(t.ada, st.data.adaUsd)})` : ""}`,
+    desc: [VENUE[t.v] ? "Venue: " + VENUE[t.v] : "", t.p ? "Price " + Number(t.p).toPrecision(3) + " ADA" + (st.data && st.data.adaUsd ? ` (~${Number(t.p * st.data.adaUsd).toPrecision(3)} USDCx)` : "") : ""].filter(Boolean).join(" · ") };
 }
 async function loadTrades() {
   const min = watchlist.minAda();

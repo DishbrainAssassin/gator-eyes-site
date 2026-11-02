@@ -1,10 +1,10 @@
 // Ask Gator: a small helper that answers common questions about Gator Eyes and
 // the launchpads it tracks (Solada.fun and Snek.fun). Answers are built in (no AI, no running cost). Live questions
 // about coins use the same /tokens data as the Tokens page.
-import { CONFIG } from "./config.js?v=20261102-hatch";
-import { coinUrl, joinUrl } from "./data.js?v=20261102-hatch";
-import { API, getApi, price, pct, signed, hours, span } from "./api.js?v=20261102-hatch";
-import { esc, fmt, compact } from "./ui.js?v=20261102-hatch";
+import { CONFIG } from "./config.js?v=20261102-usdcx2";
+import { coinUrl, joinUrl } from "./data.js?v=20261102-usdcx2";
+import { API, getApi, price, pct, signed, hours, span } from "./api.js?v=20261102-usdcx2";
+import { esc, fmt, compact } from "./ui.js?v=20261102-usdcx2";
 
 const DISCORD = CONFIG.discord;
 const a = (href, label, ext) => `<a href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(label)}</a>`;
@@ -13,6 +13,13 @@ const discord = (label = "the Discord") => a(DISCORD, label, true);
 
 // ---------- live data ----------
 let tok = null, tokAt = 0;
+function qRate() { return tok && tok.adaUsd || null; }
+function qUx(ada) {
+  const r = qRate();
+  if (!r || !ada || !isFinite(ada)) return "";
+  const v = Math.abs(ada * r);
+  return ` (~${v >= 1e4 ? compact(v) : fmt(v, v < 10 ? 2 : 0)} USDCx)`;
+}
 async function tokens() {
   if (tok && Date.now() - tokAt < 60000) return tok;
   tok = await getApi("/tokens");
@@ -59,22 +66,22 @@ function solLine(sw) {
   var n = sw.b + sw.s;
   if (!n) return "No trades on the Solana side in the last 24 hours either";
   var usd = sw.vUsd >= 100 ? Math.round(sw.vUsd).toLocaleString("en-US") : sw.vUsd.toFixed(2);
-  return `On Solana (${esc(sw.dex)}, paired with ${esc(sw.quote)}): ${fmt(n)} trades, ${fmt(sw.b)} buys and ${fmt(sw.s)} sells, about $${usd} traded${sw.vAda ? " (~" + fmt(sw.vAda) + " ADA)" : ""}`;
+  return `On Solana (${esc(sw.dex)}, paired with ${esc(sw.quote)}): ${fmt(n)} trades, ${fmt(sw.b)} buys and ${fmt(sw.s)} sells, about ${usd} USDCx traded${sw.vAda ? " (~" + fmt(sw.vAda) + " ADA)" : ""}`;
 }
 function coinAnswer(c) {
   const w = h24(c);
   const bits = [`<strong>${esc(tk(c))}</strong>${c.name ? " (" + esc(c.name) + ")" : ""}, last 24 hours:`];
   const list = [];
   var chg = w.ch != null ? w.ch : c.sol && c.sol.ch != null ? c.sol.ch : null;
-  list.push(`Price ${esc(price(c.price))} ADA${chg != null ? ", " + esc(pct(chg)) : ""}`);
-  if (w.n) list.push(`${fmt(w.v)} ADA traded in ${fmt(w.n)} trades by ${fmt(w.wal)} wallets`);
+  list.push(`Price ${esc(price(c.price))} ADA${qRate() ? " (~" + esc(price(c.price * qRate())) + " USDCx)" : ""}${chg != null ? ", " + esc(pct(chg)) : ""}`);
+  if (w.n) list.push(`${fmt(w.v)} ADA${qUx(w.v)} traded in ${fmt(w.n)} trades by ${fmt(w.wal)} wallets`);
   else if (c.sol) list.push(solLine(c.sol) + (c.sol.url ? " · " + a(c.sol.url, "DexScreener", true) : ""));
   else if (noAda(c)) list.push(esc(noAda(c)));
-  list.push(w.n ? `Net flow ${esc(signed(w.net))} ADA (${w.net > 0 ? "more bought than sold" : w.net < 0 ? "more sold than bought" : "buys and sells even"})` : c.sol ? "No ADA trades on the Cardano side; the Solana trades above are counted by DexScreener, not Gator Eyes" : noAda(c) ? null : "No ADA trades seen in the last 24 hours (Gator Eyes only counts trades in ADA)");
-  if (c.mc) list.push(`Market cap about ${compact(c.mc)} ADA${c.hold ? ", " + fmt(c.hold) + " holders" : ""}`);
+  list.push(w.n ? `Net flow ${esc(signed(w.net))} ADA${qUx(w.net)} (${w.net > 0 ? "more bought than sold" : w.net < 0 ? "more sold than bought" : "buys and sells even"})` : c.sol ? "No ADA trades on the Cardano side; the Solana trades above are counted by DexScreener, not Gator Eyes" : noAda(c) ? null : "No ADA trades seen in the last 24 hours (Gator Eyes only counts trades in ADA)");
+  if (c.mc) list.push(`Market cap about ${compact(c.mc)} ADA${qUx(c.mc)}${c.hold ? ", " + fmt(c.hold) + " holders" : ""}`);
   if (c.cs === "open" && c.prog != null) {
     const p = c.pace || {};
-    list.push(`${(c.prog / 100).toFixed(1)}% of the way to graduating, ${fmt(p.need)} ADA to go${p.etaH != null ? ", " + esc(hours(p.etaH)) + " at the last 6 hours' pace" : ", not moving closer right now"}`);
+    list.push(`${(c.prog / 100).toFixed(1)}% of the way to graduating, ${fmt(p.need)} ADA${qUx(p.need)} to go${p.etaH != null ? ", " + esc(hours(p.etaH)) + " at the last 6 hours' pace" : ", not moving closer right now"}`);
   } else if (c.cs === "graduated") list.push(`Graduated to Minswap${c.gAt && c.born ? " after " + esc(span(c.gAt - c.born)) : ""}`);
   const al = Object.entries(c.al || {}).map(([k, n]) => `${n} ${{ big: "whale", spike: "volume spike", launch: "Fast Lunge", hatch: "Hatchling", dev: "creator sell" }[k] || k}`);
   list.push(al.length ? `Alerts today: ${al.join(", ")}` : "No Gator Eyes alerts in the last 24 hours");
@@ -89,8 +96,8 @@ function walletAnswer(c) {
   const list = [];
   if (w.n) {
     list.push(`${fmt(w.wal)} different wallets made ${fmt(w.n)} trades`);
-    list.push(`Bought ${fmt(w.b)} ADA, sold ${fmt(w.s)} ADA: net ${esc(signed(w.net))} ADA (${w.net > 0 ? "more bought than sold" : w.net < 0 ? "more sold than bought" : "buys and sells even"})`);
-    if (h1.n) list.push(`Last hour: ${fmt(h1.wal)} wallets, ${fmt(h1.n)} trades, net ${esc(signed(h1.net))} ADA`);
+    list.push(`Bought ${fmt(w.b)} ADA${qUx(w.b)}, sold ${fmt(w.s)} ADA${qUx(w.s)}: net ${esc(signed(w.net))} ADA${qUx(w.net)} (${w.net > 0 ? "more bought than sold" : w.net < 0 ? "more sold than bought" : "buys and sells even"})`);
+    if (h1.n) list.push(`Last hour: ${fmt(h1.wal)} wallets, ${fmt(h1.n)} trades, net ${esc(signed(h1.net))} ADA${qUx(h1.net)}`);
   } else if (c.sol) list.push(solLine(c.sol) + ". DexScreener doesn't say how many wallets");
   else list.push(noAda(c) ? esc(noAda(c)) : "No ADA trades in the last 24 hours");
   if (c.hold) list.push(`${fmt(c.hold)} wallets hold it right now`);
@@ -143,7 +150,7 @@ const LIVE = [
     run: async () => {
       const d = await tokens();
       const l = [...d.coins].sort((x, y) => h24(y).v - h24(x).v);
-      return `Most traded in the last 24 hours:${top(l, 5, (c) => `${coinLink(c)} ${fmt(h24(c).v)} ADA, net ${esc(signed(h24(c).net))}`)}Sort it any way you like on the ${page("tokens.html", "Tokens page")}.`;
+      return `Most traded in the last 24 hours:${top(l, 5, (c) => `${coinLink(c)} ${fmt(h24(c).v)} ADA${qUx(h24(c).v)}, net ${esc(signed(h24(c).net))}`)}Sort it any way you like on the ${page("tokens.html", "Tokens page")}.`;
     },
   },
   {
@@ -152,7 +159,7 @@ const LIVE = [
       const d = await tokens();
       const l = d.coins.filter((c) => h24(c).net > 0).sort((x, y) => h24(y).net - h24(x).net);
       if (!l.length) return "No coin has more buying than selling in the last 24 hours.";
-      return `Biggest net buying in the last 24 hours:${top(l, 5, (c) => `${coinLink(c)} ${esc(signed(h24(c).net))} ADA`)}Hour-by-hour detail is on the ${page("flows.html", "Flows page")}.`;
+      return `Biggest net buying in the last 24 hours:${top(l, 5, (c) => `${coinLink(c)} ${esc(signed(h24(c).net))} ADA${qUx(h24(c).net)}`)}Hour-by-hour detail is on the ${page("flows.html", "Flows page")}.`;
     },
   },
   {
@@ -161,7 +168,7 @@ const LIVE = [
       const d = await tokens();
       const l = d.coins.filter((c) => h24(c).net < 0).sort((x, y) => h24(x).net - h24(y).net);
       if (!l.length) return "No coin has more selling than buying in the last 24 hours.";
-      return `Biggest net selling in the last 24 hours:${top(l, 5, (c) => `${coinLink(c)} ${esc(signed(h24(c).net))} ADA`)}`;
+      return `Biggest net selling in the last 24 hours:${top(l, 5, (c) => `${coinLink(c)} ${esc(signed(h24(c).net))} ADA${qUx(h24(c).net)}`)}`;
     },
   },
   {
@@ -170,7 +177,7 @@ const LIVE = [
       const d = await tokens();
       const l = d.coins.filter((c) => c.mc && c.kind !== "solada").sort((x, y) => y.mc - x.mc);
       if (!l.length) return "I don't have market caps right now. Give it a minute and ask again.";
-      return `Biggest by market cap right now:${top(l, 10, (c) => `${coinLink(c)} ${compact(c.mc)} ADA${c.hold ? ", " + fmt(c.hold) + " holders" : ""}`)}I only know today's numbers, not how long anyone has been up there. Sort by market cap on the ${page("tokens.html", "Tokens page")}.`;
+      return `Biggest by market cap right now:${top(l, 10, (c) => `${coinLink(c)} ${compact(c.mc)} ADA${qUx(c.mc)}${c.hold ? ", " + fmt(c.hold) + " holders" : ""}`)}I only know today's numbers, not how long anyone has been up there. Sort by market cap on the ${page("tokens.html", "Tokens page")}.`;
     },
   },
   {
@@ -183,7 +190,7 @@ const LIVE = [
       const recent = all.filter((c) => Date.now() - c.born < 2 * 864e5);
       const l = recent.length >= n ? recent : all;
       const head = l === recent ? `The ${l.length === 1 ? "newest coin" : Math.min(n, l.length) + " newest coins"} that have traded:` : `Not many new coins in the last two days, so here are the ${Math.min(n, l.length)} newest that have traded:`;
-      return `${head}${top(l, n, (c) => `${coinLink(c)}${c.name && c.name !== c.tk ? " (" + esc(c.name) + ")" : ""} launched ${esc(span(Date.now() - c.born))} ago, ${fmt(h24(c).v)} ADA traded in 24h`)}Sort by age on the ${page("tokens.html", "Tokens page")}. Every new coin is posted as a Hatchling in #hatchlings, and fast starters as a Fast Lunge in #fast-lunge, on ${discord()}.`;
+      return `${head}${top(l, n, (c) => `${coinLink(c)}${c.name && c.name !== c.tk ? " (" + esc(c.name) + ")" : ""} launched ${esc(span(Date.now() - c.born))} ago, ${fmt(h24(c).v)} ADA${qUx(h24(c).v)} traded in 24h`)}Sort by age on the ${page("tokens.html", "Tokens page")}. Every new coin is posted as a Hatchling in #hatchlings, and fast starters as a Fast Lunge in #fast-lunge, on ${discord()}.`;
     },
   },
   {
@@ -203,8 +210,8 @@ const LIVE = [
       const by = { "Solada.fun": { v: 0, n: 0, net: 0 }, "Snek.fun": { v: 0, n: 0, net: 0 } };
       for (const c of d.coins) { const w = h24(c), b = by[lpName(c)]; b.v += w.v; b.n += w.n; b.net += w.net; }
       const v = by["Solada.fun"].v + by["Snek.fun"].v, n = by["Solada.fun"].n + by["Snek.fun"].n, net = by["Solada.fun"].net + by["Snek.fun"].net;
-      const rows = Object.keys(by).filter((k) => by[k].n).map((k) => `<li>${k}: ${fmt(by[k].v)} ADA, ${fmt(by[k].n)} trades, net flow ${esc(signed(by[k].net))} ADA</li>`).join("");
-      return `In the last 24 hours across Solada.fun and Snek.fun: <strong>${fmt(v)} ADA</strong> traded${d.adaUsd ? ` (~${fmt(v * d.adaUsd)} USDCx)` : ""} across ${fmt(n)} trades. Net flow ${esc(signed(net))} ADA.${rows ? `<ul>${rows}</ul>` : ""} Today's full picture is on the ${page("flows.html", "Flows page")}.`;
+      const rows = Object.keys(by).filter((k) => by[k].n).map((k) => `<li>${k}: ${fmt(by[k].v)} ADA${qUx(by[k].v)}, ${fmt(by[k].n)} trades, net flow ${esc(signed(by[k].net))} ADA${qUx(by[k].net)}</li>`).join("");
+      return `In the last 24 hours across Solada.fun and Snek.fun: <strong>${fmt(v)} ADA</strong> traded${d.adaUsd ? ` (~${fmt(v * d.adaUsd)} USDCx)` : ""} across ${fmt(n)} trades. Net flow ${esc(signed(net))} ADA${qUx(net)}.${rows ? `<ul>${rows}</ul>` : ""} Today's full picture is on the ${page("flows.html", "Flows page")}.`;
     },
   },
 ];

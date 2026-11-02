@@ -1,4 +1,4 @@
-import { wireLinks } from "./common.js?v=20261102-tools-first";
+import { wireLinks } from "./common.js?v=20261102-usdcx2";
 wireLinks();
 
 const search = document.querySelector("#tool-search");

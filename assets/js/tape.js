@@ -1,9 +1,11 @@
 // Live trade tape: a stock-ticker strip pinned inside the sticky header on every page. Reads the last
 // 40 trades from /feed (both launchpads), newest first, and scrolls them sideways.
 // Pauses on hover and focus. With reduced motion it becomes a plain side-scrolling row.
-import { subscribe } from "./data.js?v=20261102-hatch";
-import * as platform from "./platform.js?v=20261102-hatch";
-import { fmt, esc } from "./ui.js?v=20261102-hatch";
+import { subscribe } from "./data.js?v=20261102-usdcx2";
+import * as platform from "./platform.js?v=20261102-usdcx2";
+import { fmt, esc, usdcxShort } from "./ui.js?v=20261102-usdcx2";
+
+let rate = null;
 
 const PX_PER_SEC = 55; // scroll speed
 let host, track, lastKey = "", items = [];
@@ -22,7 +24,7 @@ function item(t) {
   const img = t.img ? `<img src="${esc(t.img)}" alt="" width="16" height="16" loading="lazy" onerror="this.remove()">` : "";
   const lp = t.src === "snek" ? `<i class="tape-lp lp-snek" title="Snek.fun"></i>` : "";
   const ada = t.ada >= 1000 ? fmt(t.ada) : fmt(t.ada, t.ada < 10 ? 2 : 0);
-  return `<a class="tape-item ${buy ? "is-buy" : "is-sell"}" href="./tokens.html?q=${encodeURIComponent(tk)}" title="${buy ? "Bought" : "Sold"} ${fmt(t.ada, 2)} ADA of $${esc(tk)} ${esc(ago(t.at))} ago${t.src === "snek" ? " on Snek.fun" : ""}">${lp}${img}<b>$${esc(tk)}</b><span class="tape-side">${buy ? "▲" : "▼"} ${ada} ADA</span><small>${esc(ago(t.at))}</small></a>`;
+  return `<a class="tape-item ${buy ? "is-buy" : "is-sell"}" href="./tokens.html?q=${encodeURIComponent(tk)}" title="${buy ? "Bought" : "Sold"} ${fmt(t.ada, 2)} ADA${rate ? " (" + usdcxShort(t.ada, rate) + ")" : ""} of $${esc(tk)} ${esc(ago(t.at))} ago${t.src === "snek" ? " on Snek.fun" : ""}">${lp}${img}<b>$${esc(tk)}</b><span class="tape-side">${buy ? "▲" : "▼"} ${ada} ADA${rate ? `<em class="tape-usd">${usdcxShort(t.ada, rate)}</em>` : ""}</span><small>${esc(ago(t.at))}</small></a>`;
 }
 
 function render() {
@@ -74,6 +76,7 @@ export function mountTape() {
   subscribe((feed) => {
     if (!feed) return;
     items = Array.isArray(feed.tape) ? feed.tape : [];
+    rate = feed.rate || null;
     render();
   });
   platform.on(() => render());

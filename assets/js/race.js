@@ -1,12 +1,13 @@
 // Graduation race: open bonding curves ranked by progress, with pace and ETA.
-import { getApi, hours, span, signed } from "./api.js?v=20261102-hatch";
-import { coinUrl } from "./data.js?v=20261102-hatch";
-import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261102-hatch";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-tools-first";
+import { getApi, hours, span, signed } from "./api.js?v=20261102-usdcx2";
+import { coinUrl } from "./data.js?v=20261102-usdcx2";
+import { esc, fmt, compact, timeAgo, usdcxShort } from "./ui.js?v=20261102-usdcx2";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx2";
 
 wireLinks();
 const $ = (s) => document.querySelector(s);
 const st = { sort: "close", all: false, more: false, data: null };
+const ux = (ada) => { const s = ada ? usdcxShort(Math.abs(ada), st.data && st.data.adaUsd) : ""; return s ? ` (${s})` : ""; };
 
 function img(c, size = 28) {
   return c.img ? `<img src="${esc(c.img)}" alt="" loading="lazy" width="${size}" height="${size}">` : `<span class="coin-dot"></span>`;
@@ -14,8 +15,8 @@ function img(c, size = 28) {
 
 function etaBlock(c) {
   const p = c.pace || {};
-  if (p.etaH != null) return `<div class="race-eta"><strong>${esc(hours(p.etaH))} to go</strong><span>${signed(p.n6)} ADA in 6h · ${signed(p.n1)} in 1h</span></div>`;
-  return `<div class="race-eta is-still"><strong>Not moving closer</strong><span>${signed(p.n6 || 0)} ADA net in 6h</span></div>`;
+  if (p.etaH != null) return `<div class="race-eta"><strong>${esc(hours(p.etaH))} to go</strong><span>${signed(p.n6)} ADA${ux(p.n6)} in 6h · ${signed(p.n1)}${ux(p.n1)} in 1h</span></div>`;
+  return `<div class="race-eta is-still"><strong>Not moving closer</strong><span>${signed(p.n6 || 0)} ADA${ux(p.n6 || 0)} net in 6h</span></div>`;
 }
 
 function render() {
@@ -36,7 +37,7 @@ function render() {
     return `<li class="race-row">
       <span class="race-rank">${i + 1}</span>
       <div class="coin-cell">${img(c)}<div><a href="${esc(coinUrl(c.id))}" target="_blank" rel="noopener">${esc(c.tk || "?")}</a><span class="cell-sub">${esc((c.name || "").slice(0, 24))}${c.born ? " · " + esc(span(Date.now() - c.born)) + " old" : ""}</span></div></div>
-      <div class="race-bar"><span class="prog"><i style="--p:${p}%"></i></span><div class="race-nums"><span>${p.toFixed(1)}%</span><span>${fmt(need)} ADA to go</span></div></div>
+      <div class="race-bar"><span class="prog"><i style="--p:${p}%"></i></span><div class="race-nums"><span>${p.toFixed(1)}%</span><span>${fmt(need)} ADA${ux(need)} to go</span></div></div>
       ${etaBlock(c)}
       <div class="race-act"><a class="icon-btn" href="./coincard.html?coin=${encodeURIComponent(c.id)}">Card</a></div>
     </li>`;
@@ -47,7 +48,7 @@ function render() {
   const grads = d.coins.filter((c) => c.cs === "graduated" && c.gAt && Date.now() - c.gAt < 7 * 864e5).sort((a, b) => b.gAt - a.gAt);
   $("[data-grads]").innerHTML = grads.length ? grads.map((c) => `<li>
       <div class="coin-cell">${img(c, 24)}<div><a href="${esc(coinUrl(c.id))}" target="_blank" rel="noopener">${esc(c.tk || "?")}</a><span class="cell-sub">graduated ${esc(timeAgo(c.gAt))}</span></div></div>
-      <span class="muted">${c.born && c.gAt > c.born ? "Took " + esc(span(c.gAt - c.born)) + " from launch" : ""}${c.w.h24 ? " · " + fmt(c.w.h24.v) + " ADA traded in 24h" : ""}</span>
+      <span class="muted">${c.born && c.gAt > c.born ? "Took " + esc(span(c.gAt - c.born)) + " from launch" : ""}${c.w.h24 ? " · " + fmt(c.w.h24.v) + " ADA" + ux(c.w.h24.v) + " traded in 24h" : ""}</span>
     </li>`).join("") : `<li class="empty"><p>No coins graduated in the last 7 days.</p></li>`;
 
   const moving = open.filter((c) => c.pace && c.pace.etaH != null);
@@ -59,7 +60,7 @@ function render() {
     ["Moving closer", fmt(moving.length), "net buying in the last 6h"],
     ["Graduated this week", fmt(grads.length), grads[0] ? "latest: " + (grads[0].tk || "") : ""],
     ["Fastest pace", fastest ? fastest.tk : "–", fastest ? hours(fastest.pace.etaH) + " to go" : "no net buying"],
-    ["Typical target", open[0] ? fmt(open[0].nAda) + " ADA" : "–", "in the curve to graduate"],
+    ["Typical target", open[0] ? fmt(open[0].nAda) + " ADA" : "–", open[0] && ux(open[0].nAda) ? ux(open[0].nAda).slice(2, -1) + " in the curve to graduate" : "in the curve to graduate"],
   ].map(([l, v, s]) => `<div class="kpi"><span class="kpi-label">${esc(l)}</span><span class="kpi-value">${esc(v)}</span><span class="kpi-sub">${esc(s)}</span></div>`).join("");
   $("[data-updated]").textContent = d.updatedAt ? "Updated " + timeAgo(Date.parse(d.updatedAt)) + "." : "";
 }

@@ -1,8 +1,8 @@
 // Unlock calendar: every Solada token lock the worker has verified on-chain, by the day it opens.
-import { getApi } from "./api.js?v=20261102-hatch";
-import { coinUrl } from "./data.js?v=20261102-hatch";
-import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261102-hatch";
-import { wireLinks } from "./common.js?v=20261102-tools-first";
+import { getApi } from "./api.js?v=20261102-usdcx2";
+import { coinUrl } from "./data.js?v=20261102-usdcx2";
+import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261102-usdcx2";
+import { wireLinks } from "./common.js?v=20261102-usdcx2";
 
 wireLinks();
 const $ = (s) => document.querySelector(s);
@@ -36,7 +36,7 @@ const pctTxt = (p) => (p == null ? "–" : p >= 10 ? p.toFixed(1) + "%" : p >= 1
 const adaTxt = (v) => (v == null ? "–" : v >= 1000 ? compact(Math.round(v)) + " ADA" : fmt(v, v < 10 ? 1 : 0) + " ADA");
 const usd = (v) => {
   const r = st.data && st.data.adaUsd;
-  return v != null && r ? `<small>~$${fmt(v * r, v * r < 10 ? 2 : 0)}</small>` : "";
+  return v != null && r ? `<small>~${fmt(v * r, v * r < 10 ? 2 : 0)} USDCx</small>` : "";
 };
 const short = (a) => a.slice(0, 10) + "…" + a.slice(-6);
 
@@ -100,7 +100,7 @@ function render() {
     <div class="kpi"><span class="kpi-label">Locks tracked</span><span class="kpi-value">${fmt(every.length)}</span><span class="kpi-sub">on ${fmt(d.coins.length)} coins · ${fmt(every.filter((x) => x.l.ver === "script").length)} verified on-chain</span></div>
     <div class="kpi"><span class="kpi-label">Opening in 7 days</span><span class="kpi-value">${fmt(up7.length)}</span><span class="kpi-sub">≈ ${adaTxt(ada7)} ${usd(ada7)} at today's prices</span></div>
     <div class="kpi"><span class="kpi-label">Next unlock</span><span class="kpi-value">${nextUp ? esc(dayLabel(dayKey(nextUp.l.untilMs))) : "–"}</span><span class="kpi-sub">${nextUp ? `$${esc(nextUp.c.tk)} · ${pctTxt(nextUp.l.pct)} of supply · ${esc(inDays(nextUp.l.untilMs, now))}` : "nothing scheduled"}</span></div>
-    <div class="kpi"><span class="kpi-label">Open, not withdrawn</span><span class="kpi-value">${fmt(openAll.length)}</span><span class="kpi-sub">${openAll.length ? "≈ " + adaTxt(openAda) + " that can move any time" : "every opened lock has been withdrawn"}</span></div>`;
+    <div class="kpi"><span class="kpi-label">Open, not withdrawn</span><span class="kpi-value">${fmt(openAll.length)}</span><span class="kpi-sub">${openAll.length ? "≈ " + adaTxt(openAda) + " " + usd(openAda) + " that can move any time" : "every opened lock has been withdrawn"}</span></div>`;
 
   // Calendar.
   $("[data-cal-title]").textContent = st.days ? `Opening in the next ${st.days} days` : "All upcoming unlocks";
@@ -150,7 +150,7 @@ function render() {
         return `<tr>
           <td>${coinCell(r.c)}</td>
           <td class="num"><strong>${pctTxt(r.pct)}</strong></td>
-          <td class="num hide-sm">${adaTxt(r.ada)}</td>
+          <td class="num hide-sm">${adaTxt(r.ada)}${usd(r.ada)}</td>
           <td class="num">${r.live.length}${(() => { const n = []; if (r.locks.length > r.live.length) n.push("+" + (r.locks.length - r.live.length) + " open"); if (r.live.some((l) => l.dev)) n.push("incl. creator"); return n.length ? ` <small class="cell-sub">${n.join(" · ")}</small>` : ""; })()}</td>
           <td>${r.next ? `${esc(dayLabel(dayKey(r.next.untilMs)))} <small class="cell-sub">${pctTxt(r.next.pct)} · ${esc(inDays(r.next.untilMs, now))}</small>` : "<small class=\"cell-sub\">none upcoming</small>"}</td>
           <td class="num hide-sm">${sol == null ? "–" : `<span class="${stale ? "unl-stale" : ""}" title="${stale ? "Solada's coin page still shows the launch-time figure." : "Matches the chain."}">${pctTxt(sol)}${stale ? " <small>stale</small>" : ""}</span>`}</td>

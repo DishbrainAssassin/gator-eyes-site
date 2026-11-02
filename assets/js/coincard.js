@@ -1,9 +1,9 @@
 // Stat card: one coin's last 24 hours on Solada.fun or Snek.fun as a 1200x675 PNG.
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261102-hatch";
-import { coinUrl, fetchFeed } from "./data.js?v=20261102-hatch";
-import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261102-hatch";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-tools-first";
-import * as platform from "./platform.js?v=20261102-hatch";
+import { getApi, price, pct, signed, hours, span, usdcxPrice } from "./api.js?v=20261102-usdcx2";
+import { coinUrl, fetchFeed } from "./data.js?v=20261102-usdcx2";
+import { esc, fmt, compact, timeAgo, usdcxShort, usdcxOf } from "./ui.js?v=20261102-usdcx2";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx2";
+import * as platform from "./platform.js?v=20261102-usdcx2";
 
 wireLinks();
 platform.mount();
@@ -64,7 +64,7 @@ async function loadSolSeries(sw) {
     return out;
   } catch { return []; }
 }
-const usd = (n) => "$" + (n >= 100 ? Math.round(n).toLocaleString("en-US") : n.toFixed(2));
+const usd = (n) => "~" + (n >= 100 ? Math.round(n).toLocaleString("en-US") : n.toFixed(2)) + " USDCx";
 
 function text(s, x, y, { font, color = C.text, align = "left", spacing = 0 } = {}) {
   ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = "alphabetic";
@@ -123,9 +123,12 @@ function draw() {
   text(fit(c.tk || "?", 520, `800 64px ${F.d}`), tx, iy + 58, { font: `800 64px ${F.d}` });
   text(fit(c.name || "", 520, `500 20px ${F.b}`), tx, iy + 90, { font: `500 20px ${F.b}`, color: C.muted });
   text(price(c.price) + " ADA", W - P, iy + 50, { font: `500 40px ${F.m}`, align: "right" });
+  const R = data && data.adaUsd;
+  const pu = usdcxPrice(c.price, R);
+  if (pu) text(pu, W - P, iy + 78, { font: `500 18px ${F.m}`, color: C.muted, align: "right" });
   const chg = w.ch != null ? w.ch : sol && sol.ch != null ? sol.ch : null;
   const chCol = chg > 0 ? C.buy : chg < 0 ? C.sell : C.muted;
-  text((chg != null ? pct(chg) : "–") + " in 24h", W - P, iy + 86, { font: `700 20px ${F.b}`, color: chCol, align: "right" });
+  text((chg != null ? pct(chg) : "–") + " in 24h", W - P, pu ? iy + 108 : iy + 86, { font: `700 20px ${F.b}`, color: chCol, align: "right" });
 
   // KPI row
   const ky = 246, kh = 78, kw = (W - 2 * P - 3 * 12) / 4;
@@ -133,12 +136,12 @@ function draw() {
     ["Traded", usd(sol.vUsd), C.text, sol.vAda ? `~${fmt(sol.vAda)} ADA` : ""],
     ["Buys / sells", `${fmt(sol.b)} / ${fmt(sol.s)}`, sol.b > sol.s ? C.buy : sol.b < sol.s ? C.sell : C.text, "by number of trades"],
     ["Trades", fmt(sol.b + sol.s), C.text, `${sol.dex} · ${sol.quote} pair`],
-    ["Market cap", c.mc ? compact(c.mc) + " ADA" : "–", C.text, c.hold ? `${fmt(c.hold)} holders` : ""],
+    ["Market cap", c.mc ? compact(c.mc) + " ADA" : "–", C.text, [c.mc && R ? usdcxShort(c.mc, R) : "", c.hold ? `${fmt(c.hold)} holders` : ""].filter(Boolean).join(" · ")],
   ] : [
     ["Traded", compact(w.v) + " ADA", C.text, data.adaUsd ? `~${fmt(w.v * data.adaUsd)} USDCx` : ""],
-    ["Net flow", signed(w.net) + " ADA", w.net > 0 ? C.buy : w.net < 0 ? C.sell : C.text, `${compact(w.b)} in · ${compact(w.s)} out`],
+    ["Net flow", signed(w.net) + " ADA", w.net > 0 ? C.buy : w.net < 0 ? C.sell : C.text, `${w.net && R ? usdcxShort(w.net, R) + " · " : ""}${compact(w.b)} in · ${compact(w.s)} out`],
     ["Trades", fmt(w.n), C.text, `${fmt(w.wal)} wallets`],
-    ["Market cap", c.mc ? compact(c.mc) + " ADA" : "–", C.text, c.hold ? `${fmt(c.hold)} holders` : ""],
+    ["Market cap", c.mc ? compact(c.mc) + " ADA" : "–", C.text, [c.mc && R ? usdcxShort(c.mc, R) : "", c.hold ? `${fmt(c.hold)} holders` : ""].filter(Boolean).join(" · ")],
   ];
   kpis.forEach(([l, v, col, sub], i) => {
     const x = P + i * (kw + 12);
@@ -186,7 +189,7 @@ function draw() {
     rrect(rx + 18, y + 14, rw - 36, 12, 6, C.line);
     rrect(rx + 18, y + 14, Math.max(8, ((rw - 36) * p) / 100), 12, 6, C.amber);
     const pc = c.pace || {};
-    text(fit(`${fmt(pc.need)} ADA to go · ${pc.etaH != null ? hours(pc.etaH) + " at this pace" : "not moving closer"}`, rw - 36, `500 14px ${F.b}`), rx + 18, y + 50, { font: `500 14px ${F.b}`, color: C.muted });
+    text(fit(`${fmt(pc.need)} ADA${data && data.adaUsd ? " (" + usdcxShort(pc.need, data.adaUsd) + ")" : ""} to go · ${pc.etaH != null ? hours(pc.etaH) + " at this pace" : "not moving closer"}`, rw - 36, `500 14px ${F.b}`), rx + 18, y + 50, { font: `500 14px ${F.b}`, color: C.muted });
     y += 86;
   } else if (c.cs === "graduated") {
     text(c.src === "snek" ? "Graduated to Splash" : "Graduated to Minswap", rx + 18, y, { font: `700 15px ${F.b}` });
@@ -216,7 +219,7 @@ function caption() {
     const chg = sol.ch != null ? pct(sol.ch) : "flat";
     return [`$${c.tk} on Solana (${sol.dex}), last 24 hours`, `${fmt(sol.b + sol.s)} trades: ${fmt(sol.b)} buys, ${fmt(sol.s)} sells. About ${usd(sol.vUsd)} traded${sol.vAda ? ` (~${fmt(sol.vAda)} ADA)` : ""}. Price ${chg}.`, link].join("\n");
   }
-  const bits = [`$${c.tk} on ${siteOf(c)}, last 24 hours`, `${fmt(w.v || 0)} ADA traded by ${fmt(w.wal || 0)} wallets. Net flow ${signed(w.net || 0)} ADA. Price ${w.ch != null ? pct(w.ch) : "flat"}.`];
+  const bits = [`$${c.tk} on ${siteOf(c)}, last 24 hours`, `${fmt(w.v || 0)} ADA${data && data.adaUsd ? ` (${usdcxShort(w.v || 0, data.adaUsd)})` : ""} traded by ${fmt(w.wal || 0)} wallets. Net flow ${signed(w.net || 0)} ADA${data && data.adaUsd && w.net ? ` (${usdcxShort(Math.abs(w.net), data.adaUsd)})` : ""}. Price ${w.ch != null ? pct(w.ch) : "flat"}.`];
   if (c.cs === "open" && c.prog != null) bits.push(`${(c.prog / 100).toFixed(0)}% of the way to graduating.`);
   bits.push(link);
   return bits.join("\n");

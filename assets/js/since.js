@@ -2,11 +2,11 @@
 // Worked out in this browser. It remembers when you were last here and a small
 // price snapshot per coin (localStorage) so it can show price moves since then.
 // Nothing is sent anywhere and there is no sign-up.
-import { subscribe } from "./data.js?v=20261102-hatch";
-import { getApi } from "./api.js?v=20261102-hatch";
-import { fmt, compact, timeAgo, esc, dayLabel } from "./ui.js?v=20261102-hatch";
-import * as watchlist from "./watchlist.js?v=20261102-hatch";
-import * as platform from "./platform.js?v=20261102-hatch";
+import { subscribe } from "./data.js?v=20261102-usdcx2";
+import { getApi } from "./api.js?v=20261102-usdcx2";
+import { fmt, compact, timeAgo, esc, dayLabel, usdcxShort } from "./ui.js?v=20261102-usdcx2";
+import * as watchlist from "./watchlist.js?v=20261102-usdcx2";
+import * as platform from "./platform.js?v=20261102-usdcx2";
 
 const KEY = "ge-last-seen";
 const GAP = 30 * 60000;   // away at least this long counts as a new visit
@@ -64,7 +64,7 @@ export function mountSince() {
     cards.push({ k: "Alerts", v: alerts.length ? fmt(alerts.length) + (more ? "+" : "") : "0", s: parts.length ? parts.join(" · ") + ` · <a href="#alerts">see them</a>` : "Quiet while you were gone." });
 
     const big = alerts.filter((a) => a.kind === "big" && a.ada).sort((a, b) => b.ada - a.ada)[0];
-    if (big) cards.push({ k: "Biggest trade", v: fmt(big.ada) + " ADA", s: `${big.side === "sell" ? "Sold" : "Bought"} · ${link(big.ticker)}` });
+    if (big) cards.push({ k: "Biggest trade", v: fmt(big.ada) + " ADA", s: `${big.side === "sell" ? "Sold" : "Bought"} · ${link(big.ticker)}${feed.rate ? " · " + usdcxShort(big.ada, feed.rate) : ""}` });
 
     if (tokens && Array.isArray(tokens.coins)) {
       const coins = tokens.coins.filter((c) => platform.inScope(c));
@@ -101,7 +101,7 @@ export function mountSince() {
     const fresh = (feed.recaps || []).filter((d) => d.key >= baseKey).sort((a, b) => (a.key < b.key ? 1 : -1))[0];
     if (fresh) {
       const top = fresh.top && fresh.top[0];
-      cards.push({ k: "Gator Tracks", v: compact(fresh.volAda) + " ADA", s: `${esc(dayLabel(fresh.key))}: ${fmt(fresh.trades)} trades${top ? ` · top ${link(top.tk)}` : ""} · <a href="./flows.html">open</a>` });
+      cards.push({ k: "Gator Tracks", v: compact(fresh.volAda) + " ADA", s: `${esc(dayLabel(fresh.key))}: ${feed.rate ? usdcxShort(fresh.volAda, feed.rate) + " · " : ""}${fmt(fresh.trades)} trades${top ? ` · top ${link(top.tk)}` : ""} · <a href="./flows.html">open</a>` });
     }
 
     host.innerHTML = `<div class="wrap"><div class="panel">

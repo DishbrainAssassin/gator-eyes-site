@@ -1,7 +1,7 @@
 // Reusable display pieces. Each takes plain data and returns HTML, so the same
 // pieces can be rearranged into a dashboard later.
-import { withRef, coinUrl } from "./data.js?v=20261102-hatch";
-import { pill, srcOf, LP } from "./platform.js?v=20261102-hatch";
+import { withRef, coinUrl } from "./data.js?v=20261102-usdcx2";
+import { pill, srcOf, LP } from "./platform.js?v=20261102-usdcx2";
 
 export const KINDS = {
   big: { label: "Whale", cls: "k-whale" },
@@ -28,7 +28,20 @@ export function usdcxSigned(ada, rate) {
   if (!rate || ada == null) return "";
   const v = ada * rate;
   const a = Math.abs(v);
-  return `~${v > 0 ? "+" : v < 0 ? "−" : ""}${fmt(a, a < 10 ? 2 : 0)} USDCx`;
+  return `~${fmt(a, a < 10 ? 2 : 0)} USDCx`; // unsigned: the signed ADA figure beside it carries the direction
+}
+
+/** Short form for tight spots: "~1.2k USDCx". Always unsigned: it sits beside a signed ADA figure. */
+export function usdcxShort(ada, rate) {
+  if (!rate || ada == null || !isFinite(ada)) return "";
+  const v = Math.abs(ada * rate);
+  return `~${v >= 1e4 ? compact(v) : fmt(v, v < 10 ? 2 : 0)} USDCx`;
+}
+
+/** A dollar amount that is already known (Solana-side trades): "~1,234 USDCx". */
+export function usdcxOf(usd) {
+  if (usd == null || !isFinite(usd)) return "";
+  return `~${fmt(usd, Math.abs(usd) < 10 ? 2 : 0)} USDCx`;
 }
 
 /** One-line note on the ADA to USDCx rate behind every ~USDCx figure. */
@@ -153,7 +166,7 @@ export function lpSplit(parts, rate, scope = "all") {
     return `<div class="lp-row ${lp.cls} ${scope !== "all" && scope !== key ? "is-dim" : ""}">
       <button type="button" class="lp-name" data-platform-pick="${key}" title="Show ${esc(lp.label)} only"><i></i>${esc(lp.label)}</button>
       <div class="lp-bar" style="--share:${share}%" role="img" aria-label="${esc(lp.label)}: ${fmt(d.volAda)} ADA, ${Math.round(share)}% of the day"><span class="b" style="width:${d.volAda ? (d.buyAda / d.volAda) * 100 : 0}%"></span><span class="s" style="width:${d.volAda ? (d.sellAda / d.volAda) * 100 : 0}%"></span></div>
-      <span class="lp-num">${compact(d.volAda)} ADA · ${Math.round(share)}%<small>${fmt(d.trades)} trades · ${fmt(d.wallets)} wallets · net ${net >= 0 ? "+" : "−"}${fmt(Math.abs(net))}${rate ? " · " + usdcx(d.volAda, rate) : ""}</small></span>
+      <span class="lp-num">${compact(d.volAda)} ADA · ${Math.round(share)}%<small>${fmt(d.trades)} trades · ${fmt(d.wallets)} wallets · net ${net >= 0 ? "+" : "−"}${fmt(Math.abs(net))}${rate && net ? ` (${usdcxShort(Math.abs(net), rate)})` : ""}${rate ? " · " + usdcx(d.volAda, rate) + " traded" : ""}</small></span>
     </div>`;
   };
   return `<div class="lp-split-wrap"><div class="sub-row"><h3 class="sub">By launchpad</h3>${scope !== "all" ? `<button type="button" class="link" data-platform="all">Compare all</button>` : `<span class="sub-hint">Pick one to focus on it</span>`}</div><div class="lp-split">${rows.map(row).join("")}</div></div>`;
@@ -170,9 +183,9 @@ export function tracks(d, rate) {
       (k, i) => `<tr>
       <td class="num rank">${i + 1}</td>
       <td>${coinTag(k)}</td>
-      <td class="num">${fmt(k.v)}<span class="bar" style="--w:${Math.max(4, (k.v / maxV) * 100)}%"></span></td>
+      <td class="num">${fmt(k.v)}${rate ? `<span class="cell-sub">${usdcxShort(k.v, rate)}</span>` : ""}<span class="bar" style="--w:${Math.max(4, (k.v / maxV) * 100)}%"></span></td>
       <td class="num hide-sm">${fmt(k.n)}</td>
-      <td class="num ${k.net >= 0 ? "pos" : "neg"}">${k.net >= 0 ? "+" : "−"}${fmt(Math.abs(k.net))}</td>
+      <td class="num ${k.net >= 0 ? "pos" : "neg"}">${k.net >= 0 ? "+" : "−"}${fmt(Math.abs(k.net))}${rate ? `<span class="cell-sub">${usdcxShort(k.net, rate)}</span>` : ""}</td>
     </tr>`
     )
     .join("");

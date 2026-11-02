@@ -1,8 +1,8 @@
 // Daily flow card: draws one day of Solada flows onto a 1200x675 canvas
 // (X and Discord friendly) and lets you download it as a PNG.
-import { subscribe } from "./data.js?v=20261102-hatch";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-tools-first";
-import { dayLabel, fmt, compact, esc } from "./ui.js?v=20261102-hatch";
+import { subscribe } from "./data.js?v=20261102-usdcx2";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx2";
+import { dayLabel, fmt, compact, esc, usdcxShort } from "./ui.js?v=20261102-usdcx2";
 
 wireLinks();
 
@@ -108,15 +108,17 @@ function draw(opt) {
   const kw = (660 - 3 * 12) / 4;
   const kpis = [
     ["Net flow", signed(net) + " ADA", net >= 0 ? C.buy : C.sell],
-    ["Bought", fmt(d.buyAda) + " ADA", C.text],
-    ["Sold", fmt(d.sellAda) + " ADA", C.text],
+    ["Bought", compact(d.buyAda) + " ADA", C.text],
+    ["Sold", compact(d.sellAda) + " ADA", C.text],
     [d.big ? fit(`Biggest · ${d.big.side} $${d.big.tk}`, kw - 32, `500 14px ${F.b}`) : "Biggest trade", d.big ? fmt(d.big.ada) + " ADA" : "–", C.text],
   ];
+  const kusd = [net, d.buyAda, d.sellAda, d.big ? d.big.ada : null].map((v) => (rate && v != null ? usdcxShort(v, rate) : ""));
   kpis.forEach(([l, v, col], i) => {
     const x = P + i * (kw + 12);
     rrect(x, 232, kw, 78, 10, C.panel, C.line);
-    text(l, x + 16, 260, { font: `500 14px ${F.b}`, color: C.muted });
-    text(fit(v, kw - 32, `500 19px ${F.m}`), x + 16, 292, { font: `500 19px ${F.m}`, color: col });
+    text(l, x + 16, kusd[i] ? 254 : 260, { font: `500 14px ${F.b}`, color: C.muted });
+    text(fit(v, kw - 32, `500 19px ${F.m}`), x + 16, kusd[i] ? 280 : 292, { font: `500 19px ${F.m}`, color: col });
+    if (kusd[i]) text(fit(kusd[i], kw - 32, `500 13px ${F.m}`), x + 16, 300, { font: `500 13px ${F.m}`, color: C.muted });
   });
 
   // hourly chart
@@ -124,7 +126,7 @@ function draw(opt) {
   rrect(cx, cy, cw, ch, 12, C.panel, C.line);
   text("Bought and sold by hour", cx + 18, cy + 30, { font: `700 15px ${F.b}`, color: C.text });
   const bz = busiest(d);
-  if (bz) text(`Busiest: ${hourName(bz.h)} · ${compact(bz.v)} ADA`, cx + cw - 18, cy + 30, { font: `500 13px ${F.m}`, color: C.muted, align: "right" });
+  if (bz) text(`Busiest: ${hourName(bz.h)} · ${compact(bz.v)} ADA${rate ? " (" + usdcxShort(bz.v, rate) + ")" : ""}`, cx + cw - 18, cy + 30, { font: `500 13px ${F.m}`, color: C.muted, align: "right" });
   if (d.hours) {
     const max = Math.max(1, ...d.hours.map((h) => Math.max(h[0], h[1])));
     const top = cy + 50, mid = cy + 50 + 74, half = 70;

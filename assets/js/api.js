@@ -1,6 +1,6 @@
 // Worker API for the tools pages (tokens, race, follow-up, holders, stat cards).
 // ?api=<url> points a page at another copy of the worker for testing.
-import { CONFIG } from "./config.js?v=20261102-hatch";
+import { CONFIG } from "./config.js?v=20261102-usdcx2";
 
 export const API = new URL(new URLSearchParams(location.search).get("api") || CONFIG.feedUrl.replace(/\/feed$/, ""), location.href).href.replace(/\/$/, "");
 
@@ -30,6 +30,12 @@ export function price(p) {
   const digits = m.replace(".", "").replace(/0+$/, "") || "0";
   const sub = String(zeros).split("").map((d) => "₀₁₂₃₄₅₆₇₈₉"[d]).join("");
   return "0.0" + sub + digits;
+}
+
+/** The same price in USDCx, e.g. "~0.0₅79 USDCx". Empty when the rate is unknown. */
+export function usdcxPrice(p, rate) {
+  if (!rate || p == null || !isFinite(p)) return "";
+  return "~" + price(p * rate) + " USDCx";
 }
 
 export function pct(n, d = 1) {
