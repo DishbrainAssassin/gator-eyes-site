@@ -1,0 +1,9 @@
+/* Graduated coins: Cardano / Solana chain switch, styled like the launchpad switch. */
+:root { --ch-ada: #5b8def; --ch-sol: #14f195; }
+.chain-seg { margin: var(--space-3) 0 var(--space-1); }
+.chain-seg .ch-ada { --lp: var(--ch-ada); }
+.chain-seg .ch-sol { --lp: var(--ch-sol); }
+.chain-seg button { min-height: 32px; padding-inline: 14px; font-size: var(--text-sm); }
+.chain-seg button i { width: 8px; height: 8px; }
+.chain-pill { display: inline-flex; align-items: center; gap: 5px; margin-left: 6px; padding: 1px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 700; color: var(--ch-sol); border: 1px solid color-mix(in oklab, var(--ch-sol) 45%, transparent); background: color-mix(in oklab, var(--ch-sol) 10%, transparent); vertical-align: 1px; }
+.chain-pill i { width: 6px; height: 6px; border-radius: 50%; background: var(--ch-sol); }
