@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Gator Eyes | Free tools for Solada.fun and Snek.fun</title>
-  <meta name="description" content="Free Gator Eyes tools for Solada.fun and Snek.fun projects and traders: holder snapshots for airdrops, stat cards and daily flow cards.">
+  <title>All tools | Gator Eyes</title>
+  <meta name="description" content="Find your next Gator Eyes tool: explore coins, research a coin, track activity, create and share, or get help. Free tools for Solada.fun and Snek.fun.">
   <meta property="og:title" content="Gator Eyes | Lurking so you don't have to">
   <meta property="og:description" content="Free, live tracker for Solada.fun and Snek.fun: whale buys, volume spikes, new launches, money flows and holder checks. No sign-up, no wallet. Just ask Quagmire the gator.">
   <meta property="og:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
@@ -26,8 +26,9 @@
   <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
   <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/css/style.css?v=20261102-usdcx">
-  <link rel="stylesheet" href="./assets/css/clean-layout.css?v=20261101-tape2">
+  <link rel="stylesheet" href="./assets/css/style.css?v=20261102-usdcx2">
+  <link rel="stylesheet" href="./assets/css/clean-layout.css?v=20261102-usdcx2">
+  <link rel="stylesheet" href="./assets/css/tools-directory.css?v=20261102-directory">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -42,7 +43,7 @@
         <a href="./watchlist.html">Watchlist</a>
         <details class="tools-menu">
           <summary>Tools <span aria-hidden="true">⌄</span></summary>
-          <div class="tools-dropdown"><a href="./race.html">Graduation race</a><a href="./graduated.html">Graduated coins</a><a href="./flows.html">Flows</a><a href="./unlocks.html">Unlock calendar</a><a href="./followup.html">Alert follow-up</a><a href="./holders.html">Holder snapshot</a><a href="./trades.html">Trade history</a><a href="./coincard.html">Stat card</a><a href="./card.html">Daily flow card</a><a href="./tools.html" aria-current="page">All tools</a><a href="./about.html">How it works</a><a href="./gaey.html">$GAEY</a></div>
+          <div class="tools-dropdown"><a class="all-tools-link" href="./tools.html" aria-current="page">All tools</a><a href="./race.html">Graduation race</a><a href="./graduated.html">Graduated coins</a><a href="./flows.html">Flows</a><a href="./unlocks.html">Unlock calendar</a><a href="./followup.html">Alert follow-up</a><a href="./holders.html">Holder snapshot</a><a href="./trades.html">Trade history</a><a href="./coincard.html">Stat card</a><a href="./card.html">Daily flow card</a><a href="./about.html">How it works</a><a href="./gaey.html">$GAEY</a></div>
         </details>
         <button type="button" class="nav-ask" data-ask aria-haspopup="dialog" aria-controls="gator-panel"><img src="./assets/img/gator-nerd-head-160.webp" alt="" width="28" height="28"><span>Ask Quagmire</span></button>
       </nav>
@@ -50,14 +51,14 @@
     </div>
   </header>
 
-    <main id="main" class="dash">
+    <main id="main" class="dash tools-directory">
     <section class="dash-top" aria-labelledby="dash-title">
       <div class="wrap">
         <div class="dash-head">
           <div>
-            <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching Solada and Snek.fun</span></p>
-            <h1 id="dash-title">Tools</h1>
-            <p class="dash-lede">Free tools for Solada.fun and Snek.fun projects and the people who trade them. No sign-up and no wallet connection.</p>
+            <p class="eyebrow">All tools <span aria-hidden="true">/</span> Free forever</p>
+            <h1 id="dash-title">What would you like to do?</h1>
+            <p class="dash-lede">Your guide to Gator Eyes. Pick a category, find your tool, and jump straight in.</p>
           </div>
           
         </div>
@@ -65,18 +66,74 @@
       </div>
     </section>
 
-    <section class="wrap dash-body" aria-label="Tools">
-      <div class="tool-grid">
-        <a class="tool" href="./app.html"><span class="tag">For everyone</span><h2>Phone alerts</h2><p>Put Gator Eyes on your home screen and get whale trades, volume spikes, creator sells and fast launches as phone notifications. Pick which ones, or only coins on your watchlist. Works on iPhone and Android.</p></a>
-        <a class="tool" href="./holders.html"><span class="tag">For projects</span><h2>Holder snapshot</h2><p>See where a coin's supply sits: the curve, the pool, locks, the creator, contracts and the wallets that actually hold it. Then turn those wallets into an airdrop list with a minimum balance or "held since" rule, and download the CSV.</p></a>
-        <a class="tool" href="./trades.html"><span class="tag">For research</span><h2>Trade history</h2><p>Every buy and sell for one coin, newest first: time, side, ADA, tokens, price paid and the wallet. Filter by side, size or a single wallet, load the full history and download the CSV.</p></a>
-        <a class="tool" href="./graduated.html"><span class="tag">For research</span><h2>Graduated coins</h2><p>Every coin that graduated from Solada.fun to Minswap or from Snek.fun to Splash: when it graduated, how long it took, and its market cap, holders, volume and net flow since.</p></a>
-        <a class="tool" href="./unlocks.html"><span class="tag">For everyone</span><h2>Unlock calendar</h2><p>Every Solada.fun token lock, verified on Cardano itself and laid out by the day it opens. Each one shows its share of supply and ADA value, with creator locks marked, so a big unlock day is never a surprise.</p></a>
-        <a class="tool" href="./coincard.html"><span class="tag">For projects</span><h2>Stat card</h2><p>A ready-to-post image of any coin's last 24 hours: volume, net flow, price change, graduation progress and alerts.</p></a>
-        <a class="tool" href="./watchlist.html"><span class="tag">For everyone</span><h2>Watchlist</h2><p>Star any Solada.fun or Snek.fun coin and see price, flows, graduation progress and every alert on it in one view. Saved in your browser, with a link to carry it to another device.</p></a>
-        <a class="tool" href="./card.html"><span class="tag">For everyone</span><h2>Daily flow card</h2><p>One image of a whole day on Solada.fun, sized for X and Discord.</p></a>
-        <a class="tool" href="./about.html#embed"><span class="tag">For websites</span><h2>Alerts widget</h2><p>Put live Gator Eyes alerts for your coin on your own site.</p></a>
-        <a class="tool tool-ask" data-link="discord" href="#"><span class="tag">Your call</span><h2>What should we build next?</h2><p>Tell us the tool, alert or coin data you want. Drop it in our Discord, or reply to us on X.</p></a>
+    <section class="wrap directory-body" aria-label="Tools directory">
+      <nav class="directory-jumps" aria-label="Tool categories">
+        <a href="#explore"><span class="category-dot explore-color" aria-hidden="true"></span>Explore coins</a>
+        <a href="#research"><span class="category-dot research-color" aria-hidden="true"></span>Research a coin</a>
+        <a href="#track"><span class="category-dot track-color" aria-hidden="true"></span>Track activity</a>
+        <a href="#create"><span class="category-dot create-color" aria-hidden="true"></span>Create &amp; share</a>
+        <a href="#help"><span class="category-dot help-color" aria-hidden="true"></span>Get help</a>
+      </nav>
+      <div class="directory-search" hidden data-directory-search>
+        <label for="tool-search">Find a tool</label>
+        <input id="tool-search" type="search" placeholder="Try holders, alerts, Discord..." autocomplete="off" aria-controls="directory-groups">
+        <p data-tool-count role="status" aria-live="polite">20 tools &amp; destinations</p>
+      </div>
+      <div class="directory-groups" id="directory-groups">
+        <section class="directory-category explore-color" id="explore" aria-labelledby="explore-title">
+          <header><span class="category-number" aria-hidden="true">01</span><div><h2 id="explore-title">Explore coins</h2><p>See what's out there.</p></div></header>
+          <div class="directory-items">
+            <a class="directory-tool" href="./tokens.html"><span><h3>Tokens</h3><p>Browse coins by volume, price change, net flow and launchpad.</p></span><span class="tool-arrow" aria-hidden="true">→</span></a>
+            <a class="directory-tool" href="./race.html"><span><h3>Graduation race</h3><p>See which coins are closest to completing their bonding curve.</p></span><span class="tool-arrow" aria-hidden="true">→</span></a>
+            <a class="directory-tool" href="./graduated.html"><span><h3>Graduated coins</h3><p>Explore graduated coins with Cardano, Solana and launchpad filters.</p></span><span class="tool-arrow" aria-hidden="true">→</span></a>
+          </div>
+          <a class="directory-start" href="./tokens.html">New here? Start with Tokens <span aria-hidden="true">→</span></a>
+        </section>
+        <section class="directory-category research-color" id="research" aria-labelledby="research-title">
+          <header><span class="category-number" aria-hidden="true">02</span><div><h2 id="research-title">Research a coin</h2><p>Look beyond the price.</p></div></header>
+          <div class="directory-items">
+            <a class="directory-tool" href="./holders.html"><span><h3>Holder snapshot</h3><p>See where the supply sits and export a filtered holder list.</p></span><span class="tool-arrow" aria-hidden="true">→</span></a>
+            <a class="directory-tool" href="./trades.html"><span><h3>Trade history</h3><p>Inspect available buys, sells and wallets, or download a CSV.</p></span><span class="tool-arrow" aria-hidden="true">→</span></a>
+            <a class="directory-tool" href="./unlocks.html"><span><h3>Unlock calendar</h3><p>Check upcoming Solada token unlocks verified on Cardano.</p></span><span class="tool-arrow" aria-hidden="true">→</span></a>
+            <a class="directory-tool" href="./followup.html"><span><h3>Alert follow-up</h3><p>See what a coin did one hour and 24 hours after an alert.</p></span><span class="tool-arrow" aria-hidden="true">→</span></a>
+          </div>
+        </section>
+        <section class="directory-category track-color" id="track" aria-labelledby="track-title">
+          <header><span class="category-number" aria-hidden="true">03</span><div><h2 id="track-title">Track activity</h2><p>Keep up without watching every trade.</p></div></header>
+          <div class="directory-items">
+            <a class="directory-tool" href="./index.html#alerts"><span><h3>Live alerts</h3><p>Follow whale trades, spikes, creator sells and new launches.</p></span><span class="tool-arrow" aria-hidden="true">→</span></a>
+            <a class="directory-tool" href="./watchlist.html"><span><h3>Watchlist</h3><p>Keep starred coins together, with a link to copy your list to another device.</p></span><span class="tool-arrow" aria-hidden="true">→</span></a>
+            <a class="directory-tool" href="./app.html"><span><h3>Phone alerts</h3><p>Install Gator Eyes and choose which notifications reach your phone.</p></span><span class="tool-arrow" aria-hidden="true">→</span></a>
+            <a class="directory-tool" href="./flows.html"><span><h3>Flows</h3><p>See where ADA is moving by coin, hour and trading venue.</p></span><span class="tool-arrow" aria-hidden="true">→</span></a>
+            <a class="directory-tool" href="./index.html#tracks"><span><h3>Gator Tracks</h3><p>Catch up on daily volume, most-traded coins and money in or out.</p></span><span class="tool-arrow" aria-hidden="true">→</span></a>
+          </div>
+        </section>
+        <section class="directory-category create-color" id="create" aria-labelledby="create-title">
+          <header><span class="category-number" aria-hidden="true">04</span><div><h2 id="create-title">Create &amp; share</h2><p>Bring the data to your community.</p></div></header>
+          <div class="directory-items">
+            <a class="directory-tool" href="./coincard.html"><span><h3>Stat card</h3><p>Make a ready-to-post image of a coin's latest activity.</p></span><span class="tool-arrow" aria-hidden="true">→</span></a>
+            <a class="directory-tool" href="./card.html"><span><h3>Daily flow card</h3><p>Turn a day's Solada trading activity into a shareable image.</p></span><span class="tool-arrow" aria-hidden="true">→</span></a>
+            <a class="directory-tool" href="./about.html#embed"><span><h3>Alerts widget</h3><p>Add an embeddable panel of live flows and alerts to your website.</p></span><span class="tool-arrow" aria-hidden="true">→</span></a>
+            <a class="directory-tool directory-discord" href="https://discord.com/oauth2/authorize?client_id=1565927118242578442&amp;scope=bot+applications.commands&amp;permissions=0" target="_blank" rel="noopener"><span><h3>Add Quagmire to your Discord</h3><p>Bring Gator Eyes' live-data helper into your own server.</p><span class="tool-note">Create <code>#ask-quagmire</code>, then use <code>/ask</code>. Opens Discord setup.</span></span><span class="tool-arrow" aria-hidden="true">↗</span></a>
+          </div>
+        </section>
+        <section class="directory-category help-color directory-help" id="help" aria-labelledby="help-title">
+          <header><span class="category-number" aria-hidden="true">05</span><div><h2 id="help-title">Get help</h2><p>Find an answer or join the conversation.</p></div></header>
+          <div class="directory-items">
+            <button type="button" class="directory-tool" data-ask aria-haspopup="dialog" aria-controls="gator-panel"><span><span class="tool-title">Ask Quagmire</span><span class="tool-description">Ask about a coin, an alert or a tool right here on the website.</span></span><span class="tool-arrow" aria-hidden="true">→</span></button>
+            <a class="directory-tool" href="./about.html"><span><h3>How it works</h3><p>Understand alert rules, data sources and coverage limits.</p></span><span class="tool-arrow" aria-hidden="true">→</span></a>
+            <a class="directory-tool" data-link="discord" href="https://discord.gg/8vq4NkAj6v"><span><h3>Join our Discord</h3><p>Get community help, follow alerts and suggest what to build next.</p></span><span class="tool-arrow" aria-hidden="true">↗</span></a>
+            <a class="directory-tool" data-link="x" href="https://x.com/GatorEyesADA"><span><h3>Follow on X</h3><p>Read Gator Tracks, Launchpad Pulse and project updates.</p></span><span class="tool-arrow" aria-hidden="true">↗</span></a>
+          </div>
+        </section>
+      </div>
+      <div class="directory-empty" data-directory-empty hidden>
+        <h2>No matching tools</h2><p>Try a different word, or browse the full directory.</p>
+        <button type="button" class="btn btn-ghost btn-sm" data-directory-reset>Show all tools</button>
+      </div>
+      <div class="directory-footnote">
+        <p>Free forever. No coin required. Just information, not financial advice.</p>
+        <a href="./gaey.html">About the Gator Eyes token, $GAEY <span aria-hidden="true">→</span></a>
       </div>
     </section>
   </main>
@@ -87,6 +144,6 @@
     </div>
   </footer>
   
-  <script type="module" src="./assets/js/tools.js?v=20261102-usdcx"></script>
+  <script type="module" src="./assets/js/tools.js?v=20261102-directory"></script>
 </body>
 </html>

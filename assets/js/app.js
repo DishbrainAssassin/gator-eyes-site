@@ -1,6 +1,6 @@
 // "Get the app" page: install steps for this device, then phone alert choices.
-import { wireLinks } from "./common.js?v=20261102-usdcx";
-import * as watchlist from "./watchlist.js?v=20261102-usdcx";
+import { wireLinks } from "./common.js?v=20261102-usdcx2";
+import * as watchlist from "./watchlist.js?v=20261102-usdcx2";
 import * as pwa from "./pwa.js?v=20261102-stats";
 
 wireLinks();

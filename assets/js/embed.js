@@ -1,7 +1,7 @@
 // Embeddable live-flows box. Use ?coin=<Solada coin id> for one coin, or leave it
 // off for all of Solada. Add &theme=light for light backgrounds.
-import { subscribe, setFeedParams } from "./data.js?v=20261102-usdcx";
-import { esc, fmt, compact, timeAgo, KINDS, usdcx, usdcxSigned, usdcxShort } from "./ui.js?v=20261102-usdcx";
+import { subscribe, setFeedParams } from "./data.js?v=20261102-usdcx2";
+import { esc, fmt, compact, timeAgo, KINDS, usdcx, usdcxSigned, usdcxShort } from "./ui.js?v=20261102-usdcx2";
 
 const p = new URLSearchParams(location.search);
 const coinId = (p.get("coin") || "").trim();

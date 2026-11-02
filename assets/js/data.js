@@ -1,6 +1,6 @@
 // Data layer. Everything the site shows comes through here, so a future
 // dashboard can add views without touching how data is fetched.
-import { CONFIG } from "./config.js?v=20261102-usdcx";
+import { CONFIG } from "./config.js?v=20261102-usdcx2";
 
 const listeners = new Set();
 let last = null;

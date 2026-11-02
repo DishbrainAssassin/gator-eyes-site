@@ -1,14 +1,14 @@
 // Graduated coins: every coin that left its bonding curve for a regular pool, on Cardano
 // (Solada.fun to Minswap, Snek.fun to Splash) or Solana (Solada Pump coins to PumpSwap),
 // with when it graduated, how long it took and how it trades now.
-import { getApi, price, pct, signed, span, usdcxPrice } from "./api.js?v=20261102-usdcx";
-import { coinUrl } from "./data.js?v=20261102-usdcx";
-import { esc, fmt, compact, timeAgo, usdcxShort, usdcxOf } from "./ui.js?v=20261102-usdcx";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx";
-import * as platform from "./platform.js?v=20261102-usdcx";
-import * as watchlist from "./watchlist.js?v=20261102-usdcx";
-import { pill, LP } from "./platform.js?v=20261102-usdcx";
-import { starBtn } from "./watchlist.js?v=20261102-usdcx";
+import { getApi, price, pct, signed, span, usdcxPrice } from "./api.js?v=20261102-usdcx2";
+import { coinUrl } from "./data.js?v=20261102-usdcx2";
+import { esc, fmt, compact, timeAgo, usdcxShort, usdcxOf } from "./ui.js?v=20261102-usdcx2";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx2";
+import * as platform from "./platform.js?v=20261102-usdcx2";
+import * as watchlist from "./watchlist.js?v=20261102-usdcx2";
+import { pill, LP } from "./platform.js?v=20261102-usdcx2";
+import { starBtn } from "./watchlist.js?v=20261102-usdcx2";
 
 wireLinks();
 platform.mount();
