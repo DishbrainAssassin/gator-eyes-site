@@ -321,6 +321,19 @@ async function answer(raw) {
   return notSure(null);
 }
 
+// A short follow-up ("I want to see all of them", "what about its holders") that I can't answer on its own:
+// read it together with the previous question so the coin and topic carry over. Only used when the
+// question by itself would get the "not in my notes" reply, and never for questions about Quagmire itself.
+const FOLLOW_RE = /\b(them|those|it|its|that one|that coin|this one|all of them|more|same)\b/;
+async function answerFollowUp(q, prev) {
+  const html = await answer(q);
+  if (!prev || !/not in my notes yet/.test(html)) return html;
+  const n = norm(q);
+  if (!FOLLOW_RE.test(n) || /\b(you|your|yourself)\b/.test(n) || n.trim().split(" ").length > 10) return html;
+  const both = await answer(prev + " " + q).catch(() => null);
+  return both && !/not in my notes yet/.test(both) ? both : html;
+}
+
 // ---------- widget ----------
 const SUGGEST = ["What do the alerts mean?", "What's close to graduating?", "Most traded today", "How do I make a holder list?", "What is net flow?"];
 const KEY = "gator-chat-v1";
@@ -381,11 +394,12 @@ export function mountGator() {
   const ask = async (q) => {
     q = q.trim();
     if (!q) return;
+    const prev = [...hist].reverse().find(([w]) => w === "me")?.[1] || "";
     add("me", q);
     chips.hidden = true;
     const wait = add("gator", '<span class="gator-dots"><i></i><i></i><i></i></span>', false);
     let html;
-    try { html = await answer(q); } catch { html = "Something went wrong on my end. Try again in a minute."; }
+    try { html = await answerFollowUp(q, prev); } catch { html = "Something went wrong on my end. Try again in a minute."; }
     wait.remove();
     add("gator", html);
     logQuestion(q, html);
@@ -417,4 +431,4 @@ export function mountGator() {
 }
 
 // Exposed for testing.
-export { answer };
+export { answer, answerFollowUp };
