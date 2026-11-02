@@ -25,7 +25,7 @@ assert.equal(invite.searchParams.get("client_id"), "1565927118242578442");
 assert.equal(invite.searchParams.get("permissions"), "0");
 assert.equal(invite.searchParams.get("scope"), "bot applications.commands");
 assert(html.split('id="help"')[1].includes("data-ask"), "Website chat remains under Get help");
-assert(home.includes('class="browse-tools-link" href="./tools.html"'), "Homepage needs a visible directory entry");
+assert(home.includes('class="browse-tools-link btn" href="./tools.html"'), "Homepage needs a visible directory entry");
 for (const file of fs.readdirSync(root).filter(f => f.endsWith(".html"))) {
   const content = fs.readFileSync(path.join(root, file), "utf8");
   if (!content.includes('class="tools-dropdown"')) continue;
