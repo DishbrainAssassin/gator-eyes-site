@@ -1,7 +1,7 @@
 // "Get the app" page: install steps for this device, then phone alert choices.
-import { wireLinks } from "./common.js?v=20261102-watchmin";
-import * as watchlist from "./watchlist.js?v=20261102-watchmin";
-import * as pwa from "./pwa.js?v=20261102-watchmin";
+import { wireLinks } from "./common.js?v=20261102-watchcopy";
+import * as watchlist from "./watchlist.js?v=20261102-watchcopy";
+import * as pwa from "./pwa.js?v=20261102-watchcopy";
 
 wireLinks();
 
@@ -105,8 +105,8 @@ function readForm() {
 function watchCount() {
   const n = watchlist.count();
   $("[data-watch-count]").innerHTML = n
-    ? `${n} coin${n === 1 ? "" : "s"} on your <a href="./watchlist.html">watchlist</a> right now. Changes to it carry over on their own.`
-    : 'Your <a href="./watchlist.html">watchlist</a> is empty. Star coins on the Tokens page to fill it.';
+    ? `${n} coin${n === 1 ? "" : "s"} on this device's <a href="./watchlist.html">watchlist</a> right now. Changes to it carry over on their own.`
+    : 'Nothing is starred on this device yet. Star coins on the Tokens page, or open a list link from your other device here (on the <a href="./watchlist.html">Watchlist</a>, tap Copy link to this list).' + (pwa.isIOS() ? " On iPhone, the home-screen app keeps its own list, separate from Safari, so open the link inside the app." : "");
 }
 
 const say = (msg, bad = false) => { statusEl.textContent = msg; statusEl.classList.toggle("is-bad", bad); };

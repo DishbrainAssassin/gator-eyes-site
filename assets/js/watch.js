@@ -1,12 +1,12 @@
 // Watchlist page: the coins saved in this browser, with their live numbers from
 // /tokens and every recent alert on them from /feed.
-import { getApi } from "./api.js?v=20261102-watchmin";
-import { fetchFeed } from "./data.js?v=20261102-watchmin";
-import { esc, fmt, usdcx, usdcxSigned, timeAgo, alertCard, emptyState, skeleton } from "./ui.js?v=20261102-watchmin";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-watchmin";
-import * as platform from "./platform.js?v=20261102-watchmin";
-import * as watchlist from "./watchlist.js?v=20261102-watchmin";
-import { coinRow, missingRow } from "./coinrow.js?v=20261102-watchmin";
+import { getApi } from "./api.js?v=20261102-watchcopy";
+import { fetchFeed } from "./data.js?v=20261102-watchcopy";
+import { esc, fmt, usdcx, usdcxSigned, timeAgo, alertCard, emptyState, skeleton } from "./ui.js?v=20261102-watchcopy";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-watchcopy";
+import * as platform from "./platform.js?v=20261102-watchcopy";
+import * as watchlist from "./watchlist.js?v=20261102-watchcopy";
+import { coinRow, missingRow } from "./coinrow.js?v=20261102-watchcopy";
 
 wireLinks();
 platform.mount();
@@ -83,9 +83,9 @@ function renderRows() {
   const html = list.map((c) => coinRow(c, { win: st.win, rate: st.data.adaUsd, showPill: lp === "all", more: true })).join("") + miss.map((x) => missingRow(x)).join("");
   const emptyEl = $("[data-empty]"), tableWrap = rowsEl.closest(".table-wrap");
   if (!html) {
-    const msg = !saved.length ? "Nothing starred yet." : `None of your starred coins are on ${platform.label(lp)}.`;
+    const msg = !saved.length ? "Nothing is starred in this browser yet." : `None of your starred coins are on ${platform.label(lp)}.`;
     const hint = !saved.length
-      ? ` Tap the star next to any coin on the <a href="./tokens.html">Tokens</a> page, or type a ticker in the box above. The list is saved in this browser, no sign-up.`
+      ? ` Tap the star next to any coin on the <a href="./tokens.html">Tokens</a> page, or type a ticker in the box above. Starred on your phone or another computer? Open the Watchlist there, tap <strong>Copy link to this list</strong> and open that link here.`
       : ` <button type="button" class="link" data-platform="all">Show all launchpads</button>.`;
     emptyEl.innerHTML = emptyState(msg, hint);
   }
@@ -96,7 +96,7 @@ function renderRows() {
   renderKpis(live);
   $("[data-sub]").innerHTML = saved.length
     ? `${saved.length} coin${saved.length === 1 ? "" : "s"} saved in this browser.${missing.length ? ` ${missing.length} not in the live list right now.` : ""} Un-star a coin to remove it.`
-    : `Star coins on the <a href="./tokens.html">Tokens</a> page or add one here.`;
+    : `Nothing starred in this browser yet.`;
   $("[data-updated]").textContent = st.data.updatedAt ? "Updated " + timeAgo(Date.parse(st.data.updatedAt)) + "." : "";
   const fu = $("[data-fu-link]");
   const tks = list.map((c) => c.tk).filter(Boolean);
@@ -136,7 +136,7 @@ function renderAlerts() {
   if (!st.feed) return;
   showMin();
   const ids = new Set(watchlist.ids());
-  if (!ids.size) { alertsEl.innerHTML = emptyState("Alerts on your starred coins will show up here."); return; }
+  if (!ids.size) { alertsEl.innerHTML = emptyState("Nothing is starred in this browser yet.", " Coins starred on another device don't carry over on their own: open that device's list link here."); return; }
   const flagged = st.feed.alerts.filter((a) => ids.has(a.tokenId) && platform.inScope(a));
   const covered = new Set(flagged.filter((a) => a.ada != null).map((a) => a.tokenId + "|" + Math.round(a.ada)));
   const min = watchlist.minAda();

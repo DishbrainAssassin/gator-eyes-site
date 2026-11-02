@@ -2,15 +2,15 @@
 // Each return visit shows the next one; arrows and dots browse all of them.
 // Items are typed so a future "coin" slot (featured coins) can join the rotation
 // without changing the rotation or layout code.
-import { esc } from "./ui.js?v=20261102-watchmin";
-import * as watchlist from "./watchlist.js?v=20261102-watchmin";
+import { esc } from "./ui.js?v=20261102-watchcopy";
+import * as watchlist from "./watchlist.js?v=20261102-watchcopy";
 
 export const ITEMS = [
   { type: "feature", key: "phone", tag: "Phone alerts", title: "Alerts on your phone", href: "./app.html", cta: "Set up phone alerts",
     text: "Whale buys, volume spikes, creator sells and new launches as phone notifications. Pick which ones you want and mute them for a while whenever you like.",
     skip: () => typeof Notification !== "undefined" && Notification.permission === "granted" },
   { type: "feature", key: "watch", tag: "Watchlist", title: "Star the coins you care about", href: "./watchlist.html", cta: "Open your watchlist",
-    text: "Tap the star on any coin to keep its flows, curve progress and alerts on one page. Saved in your browser. No account needed.",
+    text: "Tap the star on any coin to keep its flows, curve progress and alerts on one page. Saved in this browser, no account needed, and one link copies the list to your phone.",
     skip: () => watchlist.count() > 0 },
   { type: "feature", key: "unlocks", tag: "Unlock calendar", title: "See unlocks before they happen", href: "./unlocks.html", cta: "Check the unlock calendar",
     text: "Solada token locks checked on-chain, listed by day and by coin, so you know when locked supply can come back to the market." },

@@ -1,12 +1,12 @@
 // Tokens table: every coin on Solada.fun with windowed volume, net flow,
 // price change, graduation progress and each coin's Gator Eyes alerts.
-import { getApi } from "./api.js?v=20261102-watchmin";
-import { fetchFeed } from "./data.js?v=20261102-watchmin";
-import { timeAgo } from "./ui.js?v=20261102-watchmin";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-watchmin";
-import * as platform from "./platform.js?v=20261102-watchmin";
-import * as watchlist from "./watchlist.js?v=20261102-watchmin";
-import { coinRow } from "./coinrow.js?v=20261102-watchmin";
+import { getApi } from "./api.js?v=20261102-watchcopy";
+import { fetchFeed } from "./data.js?v=20261102-watchcopy";
+import { timeAgo } from "./ui.js?v=20261102-watchcopy";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-watchcopy";
+import * as platform from "./platform.js?v=20261102-watchcopy";
+import * as watchlist from "./watchlist.js?v=20261102-watchcopy";
+import { coinRow } from "./coinrow.js?v=20261102-watchcopy";
 
 wireLinks();
 platform.mount();
@@ -57,7 +57,7 @@ function render() {
   if (st.f === "watch") {
     const n = watchlist.count();
     emptyMsg = n ? (lp === "all" ? "None of your starred coins are in the live list right now." : `None of your starred coins are on ${platform.label(lp)}.`) : "You haven't starred any coins yet.";
-    emptyHint = n ? `See them all on your <a href="./watchlist.html">Watchlist</a>.` : "Tap the star next to a coin to save it in this browser. No sign-up, no wallet.";
+    emptyHint = n ? `See them all on your <a href="./watchlist.html">Watchlist</a>.` : "Tap the star next to a coin to save it in this browser. No sign-up, no wallet. Starred somewhere else? Open that list's link here.";
   }
   rowsEl.innerHTML = shown.length ? shown.map((c) => coinRow(c, { win: st.win, rate: st.data.adaUsd, showPill: platform.get() === "all" })).join("") : `<tr><td colspan="11"><div class="empty"><p>${emptyMsg} ${emptyHint}</p></div></td></tr>`;
   watchlist.wire();

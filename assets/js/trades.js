@@ -1,11 +1,11 @@
 // Trade history: every buy and sell for one Solada.fun or Snek.fun coin, newest first, with
 // side / size / wallet filters and a CSV download. Pages come from the worker's /coin-trades.
-import { getApi, price as fmtPrice } from "./api.js?v=20261102-watchmin";
-import { coinUrl, fetchFeed } from "./data.js?v=20261102-watchmin";
-import { esc, fmt, compact } from "./ui.js?v=20261102-watchmin";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-watchmin";
-import * as platform from "./platform.js?v=20261102-watchmin";
-import { pill } from "./platform.js?v=20261102-watchmin";
+import { getApi, price as fmtPrice } from "./api.js?v=20261102-watchcopy";
+import { coinUrl, fetchFeed } from "./data.js?v=20261102-watchcopy";
+import { esc, fmt, compact } from "./ui.js?v=20261102-watchcopy";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-watchcopy";
+import * as platform from "./platform.js?v=20261102-watchcopy";
+import { pill } from "./platform.js?v=20261102-watchcopy";
 
 wireLinks();
 platform.mount();
