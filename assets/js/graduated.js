@@ -6,7 +6,7 @@ import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261102-statcard";
 import { wireLinks, liveStatus } from "./common.js?v=20261102-statcard";
 import * as platform from "./platform.js?v=20261102-statcard";
 import * as watchlist from "./watchlist.js?v=20261102-statcard";
-import { pill } from "./platform.js?v=20261102-statcard";
+import { pill, LP } from "./platform.js?v=20261102-statcard";
 import { starBtn } from "./watchlist.js?v=20261102-statcard";
 
 wireLinks();
@@ -94,11 +94,34 @@ function kpis(all) {
   ].map(([l, v, s]) => `<div class="kpi"><span class="kpi-label">${esc(l)}</span><span class="kpi-value">${esc(v)}</span><span class="kpi-sub">${esc(s)}</span></div>`).join("");
 }
 
+/** "By launchpad" rows like Home and Flows: graduates per launchpad, click one to focus on it. */
+function split(all) {
+  const scope = platform.get();
+  const keys = ["solada", "snek"];
+  const by = Object.fromEntries(keys.map((k) => [k, all.filter((c) => (c.src === "snek" ? "snek" : "solada") === k)]));
+  const total = all.length || 1;
+  const rowFor = (key) => {
+    const lp = LP[key], list = by[key];
+    const sum = (f) => list.reduce((a, c) => a + (h24(c)[f] || 0), 0);
+    const v = sum("v"), b = sum("b"), s = sum("s"), net = b - s;
+    const share = (list.length / total) * 100;
+    const week = list.filter((c) => c.gAt && Date.now() - c.gAt < 7 * 864e5).length;
+    return `<div class="lp-row ${lp.cls} ${scope !== "all" && scope !== key ? "is-dim" : ""}">
+      <button type="button" class="lp-name" data-platform-pick="${key}" title="Show ${esc(lp.label)} graduates only"><i></i>${esc(lp.label)}</button>
+      <div class="lp-bar" style="--share:${share}%" role="img" aria-label="${esc(lp.label)}: ${list.length} graduated coins, ${Math.round(share)}% of the total"><span class="b" style="width:${v ? (b / v) * 100 : 0}%"></span><span class="s" style="width:${v ? (s / v) * 100 : 0}%"></span></div>
+      <span class="lp-num">${fmt(list.length)} graduated · ${Math.round(share)}%<small>${key === "snek" ? "no graduation times" : fmt(week) + " this week"} · ${compact(v)} ADA 24h · net ${net >= 0 ? "+" : "−"}${fmt(Math.abs(net))}</small></span>
+    </div>`;
+  };
+  return `<div class="lp-split-wrap"><div class="sub-row"><h3 class="sub">By launchpad</h3>${scope !== "all" ? `<button type="button" class="link" data-platform="all">Compare all</button>` : `<span class="sub-hint">Pick one to focus on it</span>`}</div><div class="lp-split">${keys.map(rowFor).join("")}</div></div>`;
+}
+
 function render() {
   const d = st.data;
   if (!d) return;
   const now = Date.now();
-  const grads = (d.coins || []).filter((c) => c.cs === "graduated" && platform.inScope(c));
+  const allGrads = (d.coins || []).filter((c) => c.cs === "graduated");
+  $("[data-lp-split]").innerHTML = split(allGrads);
+  const grads = allGrads.filter((c) => platform.inScope(c));
   $("[data-kpis]").innerHTML = kpis(grads.slice());
   const q = st.q.toLowerCase().replace(/^\$/, "");
   let list = grads.filter((c) => {
