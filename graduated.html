@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gator Eyes | Graduated coins on Solada and Snek.fun</title>
+  <meta name="description" content="Every coin that has graduated from the Solada.fun and Snek.fun bonding curves: when it graduated, how long it took, where it trades now, and how it is doing since.">
+  <meta property="og:title" content="Gator Eyes | Lurking so you don't have to">
+  <meta property="og:description" content="Free, live tracker for Solada.fun and Snek.fun: whale buys, volume spikes, new launches, money flows and holder checks. No sign-up, no wallet. Just ask Quagmire the gator.">
+  <meta property="og:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta property="og:url" content="https://www.gatoreyes.fun/graduated.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Gator Eyes">
+  <link rel="canonical" href="https://www.gatoreyes.fun/graduated.html">
+  <meta name="twitter:site" content="@GatorEyesADA">
+  <meta name="theme-color" content="#06090a">
+  <link rel="icon" href="./assets/img/favicon-64.png">
+  <link rel="apple-touch-icon" href="./assets/img/apple-touch-icon.png">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Gator Eyes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/style.css?v=20261101-tape2">
+  <link rel="stylesheet" href="./assets/css/clean-layout.css?v=20261101-tape2">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./index.html" aria-label="Gator Eyes home">
+        <img src="./assets/img/avatar-256.webp" alt="" width="32" height="32">
+        <span>Gator Eyes</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="./tokens.html">Tokens</a>
+        <a href="./watchlist.html">Watchlist</a>
+        <details class="tools-menu">
+          <summary>Tools <span aria-hidden="true">⌄</span></summary>
+          <div class="tools-dropdown"><a href="./race.html">Graduation race</a><a href="./graduated.html" aria-current="page">Graduated coins</a><a href="./flows.html">Flows</a><a href="./unlocks.html">Unlock calendar</a><a href="./followup.html">Alert follow-up</a><a href="./holders.html">Holder snapshot</a><a href="./trades.html">Trade history</a><a href="./coincard.html">Stat card</a><a href="./card.html">Daily flow card</a><a href="./tools.html">All tools</a><a href="./about.html">How it works</a><a href="./gaey.html">$GAEY</a></div>
+        </details>
+        <button type="button" class="nav-ask" data-ask aria-haspopup="dialog" aria-controls="gator-panel"><img src="./assets/img/gator-nerd-head-160.webp" alt="" width="28" height="28"><span>Ask Quagmire</span></button>
+      </nav>
+      <a class="btn btn-sm btn-ghost header-discord" data-link="discord" href="#">Join Discord</a>
+    </div>
+  </header>
+  <div data-platform-bar></div>
+
+    <main id="main" class="dash">
+    <section class="dash-top" aria-labelledby="dash-title">
+      <div class="wrap">
+        <div class="dash-head">
+          <div>
+            <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching Solada and Snek.fun</span></p>
+            <h1 id="dash-title">Graduated coins</h1>
+            <p class="dash-lede">Coins that filled their bonding curve and moved to a regular pool: Minswap for Solada.fun, Splash for Snek.fun. See when each one graduated, how long it took, and how it has traded since. Coins still on the curve are on the <a href="./race.html">Graduation race</a>.</p>
+          </div>
+          <div class="tabs" role="tablist" aria-label="Sort" data-sorts><button class="tab is-on" role="tab" aria-selected="true" data-s="recent">Newest</button><button class="tab" role="tab" data-s="big">Biggest</button><button class="tab" role="tab" data-s="fast">Fastest</button></div>
+        </div>
+        <div class="notice" data-notice hidden role="status"></div>
+      </div>
+    </section>
+
+    <section class="wrap dash-body" aria-label="Graduated coins">
+      <div class="kpis kpis-dash" data-kpis></div>
+      <div class="lp-split-host" data-lp-split></div>
+      <article class="panel">
+        <header class="panel-head panel-head-wrap">
+          <div class="chips" style="margin:0" role="group" aria-label="When they graduated" data-when>
+            <button class="chip is-on" data-t="all">All</button>
+            <button class="chip" data-t="d1">Last 24h</button>
+            <button class="chip" data-t="d7">This week</button>
+            <button class="chip" data-t="d30">Last 30 days</button>
+          </div>
+          <div class="table-tools page-tools">
+            <label class="search"><span class="sr-only">Find a coin</span><input type="search" placeholder="Find a coin" data-search autocomplete="off"></label>
+          </div>
+        </header>
+        <div class="table-wrap">
+          <table class="coin-table grad-table">
+            <thead><tr>
+              <th scope="col" class="star-col"><span class="sr-only">Watchlist</span></th>
+              <th scope="col">Coin</th>
+              <th scope="col">Graduated</th>
+              <th scope="col" class="num"><button data-sort="mc" class="sort">Mkt cap</button><span class="sr-only">, and price in ADA</span></th>
+              <th scope="col" class="num hide-sm"><button data-sort="hold" class="sort">Holders</button></th>
+              <th scope="col" class="num"><button data-sort="v" class="sort">24h volume</button></th>
+              <th scope="col" class="num hide-sm"><button data-sort="ch" class="sort">24h change</button></th>
+              <th scope="col" class="num split-col hide-sm"><button data-sort="net" class="sort">24h net flow</button></th>
+              <th scope="col" class="hide-sm"><span class="sr-only">Tools</span></th>
+            </tr></thead>
+            <tbody data-rows></tbody>
+          </table>
+        </div>
+        <div class="list-foot"><button class="btn btn-ghost btn-sm" data-more hidden>Show all</button></div>
+      </article>
+      <p class="dash-foot">Graduation times come from Solada. Snek.fun does not publish a graduation time, so its coins show as graduated to Splash without one, and only appear here while they have traded in the last 24 hours. Market cap and prices are in ADA. Net flow is ADA bought minus ADA sold. <span class="updated" data-updated></span> Not financial advice.</p>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>Gator Eyes is free and will never charge for access. It's an automated tracker for <a data-link="join" href="#">Solada</a> and Snek.fun. Alerts are not financial advice. $GAEY is the Gator Eyes team's token. Links to Solada include our referral code (6pxznt5n), which may earn the team referral rewards at no extra cost to you. <a href="./about.html#disclosures">Disclosures</a>.</p>
+      <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./tokens.html">Tokens</a><a href="./tools.html">Tools</a><a href="./app.html">Get the app</a></nav>
+    </div>
+  </footer>
+  <script type="module" src="./assets/js/graduated.js?v=20261102-grad"></script>
+</body>
+</html>

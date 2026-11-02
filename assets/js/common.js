@@ -76,6 +76,7 @@ const NAV_TIPS = {
   "./index.html#alerts": ["Alerts", "Whale trades, volume spikes, fast launches and creator sells on Solada.fun and Snek.fun, as they happen."],
   "./tokens.html": ["Tokens", "Every coin in one table: volume, net flow, price change and graduation progress."],
   "./race.html": ["Race", "Coins on the bonding curve, ranked by how close they are to graduating, with pace and a rough ETA."],
+  "./graduated.html": ["Graduated coins", "Coins that graduated on Solada.fun and Snek.fun: when, how long it took, and how they trade now."],
   "./flows.html": ["Flows", "Where the ADA went today: money in and out by coin, by hour and by venue."],
   "./followup.html": ["Follow-up", "What each alert's coin did 1 hour and 24 hours later. Every alert, good and bad."],
   "./watchlist.html": ["Watchlist", "Star coins and see their price, flows, graduation progress and alerts in one place. Saved in your browser, no sign-up."],
