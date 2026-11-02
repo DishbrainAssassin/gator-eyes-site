@@ -1,14 +1,15 @@
 // Gator Eyes web app: registers the service worker on every page, keeps phone alerts in
 // step with the watchlist, and holds the shared alert helpers used by app.html.
-import { CONFIG } from "./config.js?v=20261102-watchcopy";
-import * as watchlist from "./watchlist.js?v=20261102-watchcopy";
+import { CONFIG } from "./config.js?v=20261102-hatch";
+import * as watchlist from "./watchlist.js?v=20261102-hatch";
 
 const PREFS = "ge-push";
 export const KINDS = [
   { k: "big", label: "Whale trades", hint: "Big buys and sells, $1,000+ worth of ADA or a big slice of the coin's market cap" },
   { k: "spike", label: "Volume spikes", hint: "A coin suddenly trading many times its normal pace" },
   { k: "dev", label: "Creator sells", hint: "The wallet that launched a coin selling a meaningful amount" },
-  { k: "launch", label: "Fast launches", hint: "New coins pulling in real buying in their first hour" },
+  { k: "launch", label: "Lunges", hint: "Fast launches: new coins pulling in 1,000+ ADA from 8+ wallets in their first hour" },
+  { k: "hatch", label: "Hatchlings", hint: "Every new coin, once, soon after it goes live. Busy: about 15 a day" },
   { k: "watch", label: "$GAEY trades", hint: "Every $GAEY buy and sell" },
 ];
 export const DEFAULT_PREFS = { kinds: ["big", "spike", "dev", "launch"], src: ["solada", "snek"], watchOnly: false };

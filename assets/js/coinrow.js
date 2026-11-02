@@ -1,12 +1,12 @@
 // One table row for a coin from /tokens. Shared by the Tokens page and the Watchlist
 // so both show the same numbers the same way.
-import { price, pct, signed, hours, age } from "./api.js?v=20261102-watchcopy";
-import { coinUrl } from "./data.js?v=20261102-watchcopy";
-import { esc, fmt, compact, usdcx } from "./ui.js?v=20261102-watchcopy";
-import { pill } from "./platform.js?v=20261102-watchcopy";
-import { starBtn } from "./watchlist.js?v=20261102-watchcopy";
+import { price, pct, signed, hours, age } from "./api.js?v=20261102-hatch";
+import { coinUrl } from "./data.js?v=20261102-hatch";
+import { esc, fmt, compact, usdcx } from "./ui.js?v=20261102-hatch";
+import { pill } from "./platform.js?v=20261102-hatch";
+import { starBtn } from "./watchlist.js?v=20261102-hatch";
 
-export const AL = { big: ["Whale", "var(--color-amber)"], spike: ["Spike", "var(--color-spike)"], launch: ["Fast launch", "var(--color-launch)"], dev: ["Creator sell", "var(--color-sell)"] };
+export const AL = { big: ["Whale", "var(--color-amber)"], spike: ["Spike", "var(--color-spike)"], launch: ["Lunge", "var(--color-launch)"], hatch: ["Hatchling", "var(--color-hatch)"], dev: ["Creator sell", "var(--color-sell)"] };
 
 export function curveCell(c) {
   if (c.src === "snek") {

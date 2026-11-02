@@ -1,10 +1,10 @@
 // Alert follow-up: what each alert's coin did 1 hour and 24 hours later.
-import { getApi, price, pct } from "./api.js?v=20261102-watchcopy";
-import { coinUrl, isSnek, fetchFeed } from "./data.js?v=20261102-watchcopy";
-import { esc, fmt, timeAgo } from "./ui.js?v=20261102-watchcopy";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-watchcopy";
-import * as platform from "./platform.js?v=20261102-watchcopy";
-import { pill } from "./platform.js?v=20261102-watchcopy";
+import { getApi, price, pct } from "./api.js?v=20261102-hatch";
+import { coinUrl, isSnek, fetchFeed } from "./data.js?v=20261102-hatch";
+import { esc, fmt, timeAgo } from "./ui.js?v=20261102-hatch";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-hatch";
+import * as platform from "./platform.js?v=20261102-hatch";
+import { pill } from "./platform.js?v=20261102-hatch";
 
 wireLinks();
 platform.mount();
@@ -16,7 +16,7 @@ const TYPES = {
   bigbuy: { label: "Whale buy", color: "var(--color-buy)", test: (a) => a.kind === "big" && a.side === "buy" },
   bigsell: { label: "Whale sell", color: "var(--color-sell)", test: (a) => a.kind === "big" && a.side === "sell" },
   spike: { label: "Volume spike", color: "var(--color-spike)", test: (a) => a.kind === "spike" },
-  launch: { label: "Fast launch", color: "var(--color-launch)", test: (a) => a.kind === "launch" },
+  launch: { label: "Lunge", color: "var(--color-launch)", test: (a) => a.kind === "launch" },
   dev: { label: "Creator sell", color: "var(--color-amber)", test: (a) => a.kind === "dev" },
 };
 const typeOf = (a) => Object.keys(TYPES).find((k) => TYPES[k].test(a));

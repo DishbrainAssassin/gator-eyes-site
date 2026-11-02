@@ -1,7 +1,7 @@
 // Site-wide coin search and beginner mode. Loaded on every page by common.js.
-import { getApi, price } from "./api.js?v=20261102-watchcopy";
-import { coinUrl, joinUrl } from "./data.js?v=20261102-watchcopy";
-import { esc, compact } from "./ui.js?v=20261102-watchcopy";
+import { getApi, price } from "./api.js?v=20261102-hatch";
+import { coinUrl, joinUrl } from "./data.js?v=20261102-hatch";
+import { esc, compact } from "./ui.js?v=20261102-hatch";
 
 const KEY = "ge-beginner";
 
@@ -157,7 +157,8 @@ const TERMS = [
   ["Whale trade", /\bwhales?\b/i, "Any single trade worth $1,000 or more in ADA, or a trade worth at least 7.5% of the coin's market cap (minimum 250 ADA)."],
   ["Volume spike", /\b(?:volume )?spikes?\b/i, "A coin trading four times its normal pace over 15 minutes, with at least 1,500 ADA moving."],
   ["Creator sell", /\b(?:creator|dev) sells?\b/i, "The wallet that made the coin sold 500 ADA or more, or at least 5% of its market cap. It's posted as a record, not a warning. Creators sell for lots of reasons."],
-  ["Fast launch", /\bfast launch(?:es)?\b/i, "A new coin that pulls in 1,000 ADA from eight or more wallets in its first hour."],
+  ["Lunge", /\b(?:lunges?|fast launch(?:es)?)\b/i, "Gator Eyes' name for a fast launch: a new coin that pulls in 1,000 ADA from eight or more wallets in its first hour."],
+  ["Hatchling", /\bhatchlings?\b/i, "Every new coin, posted once soon after it goes live. A record that it exists, not a pick."],
   ["Volume", /\bvolume\b/i, "All the ADA traded, buys and sells added together."],
   ["Policy ID", /\bpolicy ID\b/i, "A Cardano token's unique ID. Anyone can copy a ticker, but not a policy ID, so it's the safe way to find the right coin."],
   ["Ticker", /\btickers?\b/i, "A coin's short name, like GAEY. Tickers aren't unique, so two coins can share one."],

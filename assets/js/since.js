@@ -2,11 +2,11 @@
 // Worked out in this browser. It remembers when you were last here and a small
 // price snapshot per coin (localStorage) so it can show price moves since then.
 // Nothing is sent anywhere and there is no sign-up.
-import { subscribe } from "./data.js?v=20261102-watchcopy";
-import { getApi } from "./api.js?v=20261102-watchcopy";
-import { fmt, compact, timeAgo, esc, dayLabel } from "./ui.js?v=20261102-watchcopy";
-import * as watchlist from "./watchlist.js?v=20261102-watchcopy";
-import * as platform from "./platform.js?v=20261102-watchcopy";
+import { subscribe } from "./data.js?v=20261102-hatch";
+import { getApi } from "./api.js?v=20261102-hatch";
+import { fmt, compact, timeAgo, esc, dayLabel } from "./ui.js?v=20261102-hatch";
+import * as watchlist from "./watchlist.js?v=20261102-hatch";
+import * as platform from "./platform.js?v=20261102-hatch";
 
 const KEY = "ge-last-seen";
 const GAP = 30 * 60000;   // away at least this long counts as a new visit
@@ -15,7 +15,7 @@ const MIN_MC = 3000;      // ADA market cap floor for price movers (skips dust)
 function read() { try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch { return null; } }
 function write(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch {} }
 
-const KIND = { big: ["whale trade", "whale trades"], spike: ["volume spike", "volume spikes"], dev: ["creator sell", "creator sells"], launch: ["fast launch", "fast launches"], watch: ["$GAEY trade", "$GAEY trades"] };
+const KIND = { big: ["whale trade", "whale trades"], spike: ["volume spike", "volume spikes"], dev: ["creator sell", "creator sells"], launch: ["Lunge", "Lunges"], hatch: ["Hatchling", "Hatchlings"], watch: ["$GAEY trade", "$GAEY trades"] };
 const plural = (n, k) => `${n} ${KIND[k] ? KIND[k][n === 1 ? 0 : 1] : k}`;
 const link = (tk) => `<a href="./tokens.html?q=${encodeURIComponent(tk)}">$${esc(tk)}</a>`;
 const pct = (p) => `<span class="${p >= 0 ? "pos" : "neg"}">${p >= 0 ? "+" : "−"}${Math.abs(p * 100).toFixed(Math.abs(p) < 0.1 ? 1 : 0)}%</span>`;
@@ -60,7 +60,7 @@ export function mountSince() {
     const more = oldest > base && feed.alerts.length >= 60; // the feed only keeps the latest alerts
     const by = {};
     for (const a of alerts) by[a.kind] = (by[a.kind] || 0) + 1;
-    const parts = ["big", "spike", "dev", "launch", "watch"].filter((k) => by[k]).map((k) => plural(by[k], k));
+    const parts = ["big", "spike", "dev", "hatch", "launch", "watch"].filter((k) => by[k]).map((k) => plural(by[k], k));
     cards.push({ k: "Alerts", v: alerts.length ? fmt(alerts.length) + (more ? "+" : "") : "0", s: parts.length ? parts.join(" · ") + ` · <a href="#alerts">see them</a>` : "Quiet while you were gone." });
 
     const big = alerts.filter((a) => a.kind === "big" && a.ada).sort((a, b) => b.ada - a.ada)[0];

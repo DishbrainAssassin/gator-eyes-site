@@ -1,7 +1,7 @@
-import { CONFIG } from "./config.js?v=20261102-watchcopy";
-import { subscribe } from "./data.js?v=20261102-watchcopy";
-import { alertCard, emptyState, skeleton, fmt, usdcx, compact, timeAgo } from "./ui.js?v=20261102-watchcopy";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-watchcopy";
+import { CONFIG } from "./config.js?v=20261102-hatch";
+import { subscribe } from "./data.js?v=20261102-hatch";
+import { alertCard, emptyState, skeleton, fmt, usdcx, compact, timeAgo } from "./ui.js?v=20261102-hatch";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-hatch";
 
 wireLinks();
 const $ = (s) => document.querySelector(s);

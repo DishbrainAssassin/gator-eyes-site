@@ -26,6 +26,7 @@
   --color-sell: #e0705f;
   --color-spike: #7fb0d6;
   --color-launch: #b99be6;
+  --color-hatch: #d9c9a3;
 
   --radius-sm: 0.375rem; --radius-md: 0.5rem; --radius-lg: 0.75rem; --radius-full: 9999px;
   --transition-interactive: 180ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -115,6 +116,7 @@ table { border-collapse: collapse; width: 100%; }
 .k-spike { --k: var(--color-spike); }
 .k-dev { --k: var(--color-sell); }
 .k-launch { --k: var(--color-launch); }
+.k-hatch { --k: var(--color-hatch); }
 .k-gaey, .k-tracks { --k: var(--color-buy); }
 .watch-list li:has(.watch-k) { border-top-color: var(--k, var(--color-border)); }
 .watch-list .watch-k { color: var(--color-text); }

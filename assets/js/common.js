@@ -1,6 +1,6 @@
-import { CONFIG } from "./config.js?v=20261102-watchcopy";
-import { joinUrl, coinUrl } from "./data.js?v=20261102-watchcopy";
-import { timeAgo } from "./ui.js?v=20261102-watchcopy";
+import { CONFIG } from "./config.js?v=20261102-hatch";
+import { joinUrl, coinUrl } from "./data.js?v=20261102-hatch";
+import { timeAgo } from "./ui.js?v=20261102-hatch";
 
 /** Fill every [data-link] with the right URL so links live in one place (config.js). */
 export function wireLinks(root = document) {
@@ -20,11 +20,11 @@ export function wireLinks(root = document) {
   });
   navTips();
   wireToolsMenu();
-  import("./gator.js?v=20261102-watchcopy").then((m) => m.mountGator()).catch(() => {});
-  import("./extras.js?v=20261102-watchcopy").then((m) => m.mountExtras()).catch(() => {});
-  import("./tape.js?v=20261102-watchcopy").then((m) => m.mountTape()).catch(() => {});
-  import("./pwa.js?v=20261102-watchcopy").then((m) => m.mountPwa()).catch(() => {});
-  import("./appnav.js?v=20261102-watchcopy").then((m) => m.mountAppNav()).catch(() => {});
+  import("./gator.js?v=20261102-hatch").then((m) => m.mountGator()).catch(() => {});
+  import("./extras.js?v=20261102-hatch").then((m) => m.mountExtras()).catch(() => {});
+  import("./tape.js?v=20261102-hatch").then((m) => m.mountTape()).catch(() => {});
+  import("./pwa.js?v=20261102-hatch").then((m) => m.mountPwa()).catch(() => {});
+  import("./appnav.js?v=20261102-hatch").then((m) => m.mountAppNav()).catch(() => {});
 }
 
 function wireToolsMenu() {
@@ -73,7 +73,7 @@ export function liveStatus(feed, err) {
 
 // Short hover descriptions for the top navigation.
 const NAV_TIPS = {
-  "./index.html#alerts": ["Alerts", "Whale trades, volume spikes, fast launches and creator sells on Solada.fun and Snek.fun, as they happen."],
+  "./index.html#alerts": ["Alerts", "Whale trades, volume spikes, Hatchlings, Lunges and creator sells on Solada.fun and Snek.fun, as they happen."],
   "./tokens.html": ["Tokens", "Every coin in one table: volume, net flow, price change and graduation progress."],
   "./race.html": ["Race", "Coins on the bonding curve, ranked by how close they are to graduating, with pace and a rough ETA."],
   "./graduated.html": ["Graduated coins", "Coins that graduated on Solada.fun and Snek.fun: when, how long it took, and how they trade now."],

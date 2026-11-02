@@ -1,9 +1,9 @@
 // Stat card: one coin's last 24 hours on Solada.fun or Snek.fun as a 1200x675 PNG.
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261102-watchcopy";
-import { coinUrl, fetchFeed } from "./data.js?v=20261102-watchcopy";
-import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261102-watchcopy";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-watchcopy";
-import * as platform from "./platform.js?v=20261102-watchcopy";
+import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261102-hatch";
+import { coinUrl, fetchFeed } from "./data.js?v=20261102-hatch";
+import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261102-hatch";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-hatch";
+import * as platform from "./platform.js?v=20261102-hatch";
 
 wireLinks();
 platform.mount();
@@ -16,7 +16,7 @@ const ctx = canvas.getContext("2d");
 const W = 1200, H = 675, P = 56;
 const C = { bg: "#06090a", panel: "#0c1112", line: "#1e2a2b", text: "#e4e2db", muted: "#9aa29d", faint: "#5f6b67", amber: "#e3a43c", buy: "#6fbf73", sell: "#e0705f" };
 const F = { d: '"Cabinet Grotesk", "Helvetica Neue", sans-serif', b: '"Satoshi", "Helvetica Neue", sans-serif', m: '"JetBrains Mono", ui-monospace, monospace' };
-const AL = { big: "whale", spike: "volume spike", launch: "fast launch", dev: "creator sell" };
+const AL = { big: "whale", spike: "volume spike", launch: "Lunge", hatch: "Hatchling", dev: "creator sell" };
 
 const avatar = new Image();
 avatar.src = "./assets/img/avatar-256.webp";

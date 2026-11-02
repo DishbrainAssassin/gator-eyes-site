@@ -1,13 +1,14 @@
 // Reusable display pieces. Each takes plain data and returns HTML, so the same
 // pieces can be rearranged into a dashboard later.
-import { withRef, coinUrl } from "./data.js?v=20261102-watchcopy";
-import { pill, srcOf, LP } from "./platform.js?v=20261102-watchcopy";
+import { withRef, coinUrl } from "./data.js?v=20261102-hatch";
+import { pill, srcOf, LP } from "./platform.js?v=20261102-hatch";
 
 export const KINDS = {
   big: { label: "Whale", cls: "k-whale" },
   spike: { label: "Volume spike", cls: "k-spike" },
   dev: { label: "Creator sell", cls: "k-dev" },
-  launch: { label: "Fast launch", cls: "k-launch" },
+  hatch: { label: "Hatchling", cls: "k-hatch" },
+  launch: { label: "Lunge", cls: "k-launch" },
   watch: { label: "$GAEY", cls: "k-gaey" },
   wtrade: { label: "Starred coin", cls: "k-wtrade" },
 };

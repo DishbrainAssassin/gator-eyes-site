@@ -1,12 +1,12 @@
 // Tokens table: every coin on Solada.fun with windowed volume, net flow,
 // price change, graduation progress and each coin's Gator Eyes alerts.
-import { getApi } from "./api.js?v=20261102-watchcopy";
-import { fetchFeed } from "./data.js?v=20261102-watchcopy";
-import { timeAgo } from "./ui.js?v=20261102-watchcopy";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-watchcopy";
-import * as platform from "./platform.js?v=20261102-watchcopy";
-import * as watchlist from "./watchlist.js?v=20261102-watchcopy";
-import { coinRow } from "./coinrow.js?v=20261102-watchcopy";
+import { getApi } from "./api.js?v=20261102-hatch";
+import { fetchFeed } from "./data.js?v=20261102-hatch";
+import { timeAgo } from "./ui.js?v=20261102-hatch";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-hatch";
+import * as platform from "./platform.js?v=20261102-hatch";
+import * as watchlist from "./watchlist.js?v=20261102-hatch";
+import { coinRow } from "./coinrow.js?v=20261102-hatch";
 
 wireLinks();
 platform.mount();
