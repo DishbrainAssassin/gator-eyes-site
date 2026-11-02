@@ -80,7 +80,7 @@
             <p class="dash-lede">Every buy and sell for a Solada.fun or Snek.fun coin, newest first: when it happened, which way, how much ADA, how many tokens, the price paid and the wallet. Filter by side, size or wallet and download the CSV. Free, no sign-up.</p>
           </div>
         </div>
-        <div class="notice notice-dev" data-dev role="note"><strong>Under development.</strong> This page can miss trades or run behind, especially on the Solana side of Pump coins. <a data-dev-link href="https://www.solada.fun/" target="_blank" rel="noopener">The coin's Solada page</a> is the reference while we finish it.</div>
+        <div class="notice notice-dev" data-dev role="note"><strong>Under development.</strong> This page can miss trades or run behind, especially on the Solana side of Pump coins. For Pump coins, trades older than Solada's own record are read from the Cardano chain and marked "from chain". <a data-dev-link href="https://www.solada.fun/" target="_blank" rel="noopener">The coin's Solada page</a> is the reference while we finish it.</div>
         <div class="notice" data-notice hidden role="status"></div>
       </div>
     </section>
@@ -137,7 +137,7 @@
       <article class="panel">
         <header class="panel-head"><h2 class="panel-title">How to read this</h2></header>
         <div class="method">
-          <div><h3>Where the trades come from</h3><p>Solada coins: the trades Solada reports, on its bonding curve before graduation and on the Minswap pool after. Snek.fun coins: trades on its Splash curve and pool. Wallet-to-wallet transfers and trades on other DEXs are not included. Solada Pump coins also trade on Solana (Pump.fun or PumpSwap): for those coins the page adds the Solana pool's trades, marked Solana, with amounts converted to ADA (~) at today's rate. They come from Solada's own record of the pool (the same list its coin page shows) plus GeckoTerminal for the last 24 hours, and Gator Eyes keeps every Solana trade it has seen so the list doesn't shrink as those sources roll forward. This part is under development and can miss trades.</p></div>
+          <div><h3>Where the trades come from</h3><p>Solada coins: the trades Solada reports, on its bonding curve before graduation and on the Minswap pool after. Snek.fun coins: trades on its Splash curve and pool. Wallet-to-wallet transfers and trades on other DEXs are not included. Solada Pump coins also trade on Solana (Pump.fun or PumpSwap): for those coins the page adds the Solana pool's trades, marked Solana, with amounts converted to ADA (~) at today's rate. They come from Solada's own record of the pool (the same list its coin page shows) plus GeckoTerminal for the last 24 hours, and Gator Eyes keeps every Solana trade it has seen so the list doesn't shrink as those sources roll forward. Solada's own record of a Pump coin's ADA trades begins at its Oct 27, 2026 cutover; the trades before that are read from the Cardano chain, where every one of them moved through Solada's reserve wallet, and are marked "from chain" (ADA amounts come from the matching payment or payout; a few early sales show none). This part is under development and can miss trades.</p></div>
           <div><h3>Price</h3><p>ADA paid per token in that single trade (ADA divided by tokens), so it includes slippage and fees. It may not match the chart price at that moment.</p></div>
           <div><h3>How far back</h3><p>The newest trades load first. Load older trades a batch at a time, or load everything, up to the most recent 5,000 trades. Times are Eastern.</p></div>
         </div>
@@ -152,6 +152,6 @@
       <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./tokens.html">Tokens</a><a href="./tools.html">Tools</a><a href="./app.html">Get the app</a></nav>
     </div>
   </footer>
-  <script type="module" src="./assets/js/trades.js?v=20261102-hatch"></script>
+  <script type="module" src="./assets/js/trades.js?v=20261102-chain"></script>
 </body>
 </html>
