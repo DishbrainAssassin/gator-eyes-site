@@ -1,12 +1,12 @@
 // Watchlist page: the coins saved in this browser, with their live numbers from
 // /tokens and every recent alert on them from /feed.
-import { getApi } from "./api.js?v=20261102-statcard";
-import { fetchFeed } from "./data.js?v=20261102-statcard";
-import { esc, fmt, usdcx, usdcxSigned, timeAgo, alertCard, emptyState, skeleton } from "./ui.js?v=20261102-statcard";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-statcard";
-import * as platform from "./platform.js?v=20261102-statcard";
-import * as watchlist from "./watchlist.js?v=20261102-statcard";
-import { coinRow, missingRow } from "./coinrow.js?v=20261102-statcard";
+import { getApi } from "./api.js?v=20261102-watchmin";
+import { fetchFeed } from "./data.js?v=20261102-watchmin";
+import { esc, fmt, usdcx, usdcxSigned, timeAgo, alertCard, emptyState, skeleton } from "./ui.js?v=20261102-watchmin";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-watchmin";
+import * as platform from "./platform.js?v=20261102-watchmin";
+import * as watchlist from "./watchlist.js?v=20261102-watchmin";
+import { coinRow, missingRow } from "./coinrow.js?v=20261102-watchmin";
 
 wireLinks();
 platform.mount();
@@ -103,11 +103,47 @@ function renderRows() {
   fu.href = tks.length === 1 ? `./followup.html?coin=${encodeURIComponent(tks[0])}` : "./followup.html";
 }
 
+/* ---------- starred-coin trades (same size setting as phone alerts) ---------- */
+const VENUE = { curve: "Solada curve", minswap: "Minswap", "snek-curve": "Snek.fun curve", "snek-splash": "Splash pool", splash: "Splash pool" };
+// A trade row from /watch-trades (or the feed tape) shaped like a feed alert, worded like the phone.
+function tradeAlert(t) {
+  const tk = t.tk ? "$" + t.tk : "A starred coin";
+  return { kind: "wtrade", at: t.at, tokenId: t.id, ticker: t.tk, src: t.src, side: t.side, ada: t.ada, img: t.img,
+    title: `Starred: ${tk} ${t.side === "buy" ? "buy" : "sell"} ${fmt(t.ada)} ADA`,
+    desc: [VENUE[t.v] ? "Venue: " + VENUE[t.v] : "", t.p ? "Price " + Number(t.p).toPrecision(3) + " ADA" : ""].filter(Boolean).join(" · ") };
+}
+async function loadTrades() {
+  const min = watchlist.minAda();
+  if (!min || !watchlist.count()) { st.wt = null; return; }
+  try {
+    const j = await getApi("/watch-trades", { min });
+    if (!j || !Array.isArray(j.trades)) throw new Error("no /watch-trades");
+    st.wt = { min, rows: j.trades, full: true };
+  } catch {
+    // Worker without /watch-trades yet, or busy: fall back to the recent trades in the feed.
+    st.wt = { min, rows: ((st.feed && st.feed.tape) || []).filter((t) => t.ada >= min), full: false };
+  }
+}
+const minSel = $("[data-watch-min]");
+const showMin = () => { if (minSel) minSel.value = String(watchlist.minAda()); };
+if (minSel) minSel.addEventListener("change", async () => {
+  watchlist.setMinAda(minSel.value);
+  await loadTrades();
+  renderAlerts();
+});
+
 function renderAlerts() {
   if (!st.feed) return;
+  showMin();
   const ids = new Set(watchlist.ids());
   if (!ids.size) { alertsEl.innerHTML = emptyState("Alerts on your starred coins will show up here."); return; }
-  const mine = st.feed.alerts.filter((a) => ids.has(a.tokenId) && platform.inScope(a));
+  const flagged = st.feed.alerts.filter((a) => ids.has(a.tokenId) && platform.inScope(a));
+  const covered = new Set(flagged.filter((a) => a.ada != null).map((a) => a.tokenId + "|" + Math.round(a.ada)));
+  const min = watchlist.minAda();
+  const trades = st.wt && st.wt.min === min
+    ? st.wt.rows.filter((t) => ids.has(t.id) && t.ada >= min && platform.inScope(t) && !covered.has(t.id + "|" + Math.round(t.ada))).map(tradeAlert)
+    : [];
+  const mine = [...flagged, ...trades].sort((a, b) => (Date.parse(b.at) || b.at || 0) - (Date.parse(a.at) || a.at || 0));
   if (!mine.length) {
     const any = st.feed.alerts.filter((a) => ids.has(a.tokenId)).length;
     alertsEl.innerHTML = emptyState(any ? `No alerts on your ${platform.label(platform.get())} coins in the recent feed.` : "Quiet so far. None of your coins set off a whale, spike, fast-launch or creator-sell alert in the recent feed.", any ? ` <button type="button" class="link" data-platform="all">Show all launchpads</button>.` : "");
@@ -191,7 +227,10 @@ function offerImport() {
   importEl.innerHTML = `<strong>This link carries ${incoming.length} coin${incoming.length === 1 ? "" : "s"}</strong>${names.length ? ` (${names.map((t) => "$" + esc(t)).join(", ")})` : ""} that aren't on your list yet. <span class="notice-actions"><button type="button" class="btn btn-sm btn-amber" data-import-add>Add them</button> <button type="button" class="btn btn-sm btn-ghost" data-import-skip>No thanks</button></span>`;
   importEl.querySelector("[data-import-add]").addEventListener("click", () => {
     for (const id of incoming) watchlist.add(by.get(id) || id);
+    const m = watchlist.minFromLink();
+    if (m && !watchlist.minAda()) watchlist.setMinAda(m);
     finishImport();
+    loadTrades().then(renderAlerts);
     render();
   });
   importEl.querySelector("[data-import-skip]").addEventListener("click", finishImport);
@@ -230,6 +269,7 @@ async function load() {
     const [tok, feed] = await Promise.all([getApi("/tokens"), fetchFeed().catch(() => null)]);
     st.data = tok;
     if (feed) st.feed = feed;
+    await loadTrades();
     notice.hidden = true;
     liveStatus(feed || { updatedAt: new Date(tok.updatedAt), sources: null }, null);
     offerImport();

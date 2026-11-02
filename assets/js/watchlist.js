@@ -7,6 +7,8 @@ const KEY = "ge-watchlist";
 const MAX = 60;
 
 let mem = null;          // in-memory copy when storage is blocked (private mode etc.)
+let memMin = null;       // starred-coin trade size in ADA (0 = off), stored with the list
+export const MIN_CHOICES = [0, 100, 250, 500, 1000];
 let persistent = true;
 const subs = new Set();
 
@@ -16,8 +18,10 @@ function read() {
     const raw = localStorage.getItem(KEY);
     const j = raw ? JSON.parse(raw) : null;
     mem = j && Array.isArray(j.items) ? j.items.filter((x) => x && typeof x.id === "string") : [];
+    memMin = j && MIN_CHOICES.includes(j.min) ? j.min : 0;
   } catch {
     mem = mem || [];
+    memMin = memMin || 0;
     persistent = false;
   }
   return mem;
@@ -26,7 +30,7 @@ function read() {
 function write(items) {
   mem = items;
   try {
-    localStorage.setItem(KEY, JSON.stringify({ v: 1, items }));
+    localStorage.setItem(KEY, JSON.stringify({ v: 1, items, min: memMin || 0 }));
     persistent = true;
   } catch {
     persistent = false;
@@ -42,6 +46,18 @@ export const list = () => read().slice();
 export const ids = () => read().map((x) => x.id);
 export const count = () => read().length;
 export const has = (id) => read().some((x) => x.id === id);
+
+/**
+ * Starred-coin trades: also flag every trade on a starred coin at or above this many ADA.
+ * One setting for this browser: the Watchlist page and phone alerts both read it. 0 = off.
+ */
+export const minAda = () => (read(), memMin || 0);
+export function setMinAda(n) {
+  n = Number(n);
+  if (!MIN_CHOICES.includes(n) || n === minAda()) return;
+  memMin = n;
+  write(read());
+}
 
 function snap(coin) {
   const id = typeof coin === "string" ? coin : coin.id;
@@ -96,6 +112,7 @@ try {
   addEventListener("storage", (e) => {
     if (e.key !== KEY) return;
     mem = null;
+    memMin = null;
     const items = read();
     subs.forEach((f) => f(items));
   });
@@ -110,7 +127,14 @@ export function shareUrl() {
   const u = new URL("./watchlist.html", location.href);
   const w = ids().join(",");
   if (w) u.searchParams.set("w", w);
+  if (w && minAda()) u.searchParams.set("m", String(minAda()));
   return u.toString();
+}
+
+/** Starred-coin trade size carried in ?m= on the current page, or null. */
+export function minFromLink() {
+  const m = Number(new URLSearchParams(location.search).get("m"));
+  return m && MIN_CHOICES.includes(m) ? m : null;
 }
 
 /** Ids carried in ?w= on the current page, minus ones already saved. */

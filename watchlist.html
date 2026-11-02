@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
   <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/css/style.css?v=20261101-tape2">
+  <link rel="stylesheet" href="./assets/css/style.css?v=20261102-watchmin">
   <link rel="stylesheet" href="./assets/css/clean-layout.css?v=20261101-tape2">
 </head>
 <body>
@@ -116,6 +116,7 @@
           <div style="flex:1 1 16rem">
             <h2 class="panel-title">Alerts on your coins</h2>
             <p class="panel-sub">Everything Gator Eyes flagged on a starred coin, newest first, from the recent alerts the feed keeps.</p>
+            <label class="wmin"><span>Also show any trade of at least</span><select data-watch-min aria-label="Starred coin trade size"><option value="0">Off</option><option value="100">100 ADA</option><option value="250">250 ADA</option><option value="500">500 ADA</option><option value="1000">1,000 ADA</option></select><small>Same setting as your <a href="./app.html">phone alerts</a>, so this list matches what your phone gets.</small></label>
           </div>
           <a class="btn btn-ghost btn-sm" href="./followup.html" data-fu-link>Follow-up on these</a>
         </header>
@@ -131,6 +132,6 @@
       <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./tokens.html">Tokens</a><a href="./tools.html">Tools</a><a href="./app.html">Get the app</a></nav>
     </div>
   </footer>
-  <script type="module" src="./assets/js/watch.js?v=20261102-statcard"></script>
+  <script type="module" src="./assets/js/watch.js?v=20261102-watchmin"></script>
 </body>
 </html>
