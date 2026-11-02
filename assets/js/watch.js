@@ -227,7 +227,10 @@ function offerImport() {
   importEl.innerHTML = `<strong>This link carries ${incoming.length} coin${incoming.length === 1 ? "" : "s"}</strong>${names.length ? ` (${names.map((t) => "$" + esc(t)).join(", ")})` : ""} that aren't on your list yet. <span class="notice-actions"><button type="button" class="btn btn-sm btn-amber" data-import-add>Add them</button> <button type="button" class="btn btn-sm btn-ghost" data-import-skip>No thanks</button></span>`;
   importEl.querySelector("[data-import-add]").addEventListener("click", () => {
     for (const id of incoming) watchlist.add(by.get(id) || id);
+    const m = watchlist.minFromLink();
+    if (m && !watchlist.minAda()) watchlist.setMinAda(m);
     finishImport();
+    loadTrades().then(renderAlerts);
     render();
   });
   importEl.querySelector("[data-import-skip]").addEventListener("click", finishImport);
