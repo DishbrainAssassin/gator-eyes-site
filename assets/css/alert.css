@@ -1,0 +1,20 @@
+/* Alert page: where a phone notification tap lands */
+.alert-page .dash-top { padding-bottom: var(--space-10, 2.5rem); }
+.alert-focus { margin-top: var(--space-6); }
+.alert-focus.is-one { grid-template-columns: minmax(0, 46rem); }
+.alert-focus .alert:first-child { box-shadow: 0 0 0 1px var(--k, var(--color-border)); }
+.alert-coins { display: grid; gap: var(--space-3); margin-top: var(--space-8, 2rem); max-width: 46rem; }
+.alert-coins-h { font-size: var(--text-sm); text-transform: uppercase; letter-spacing: .08em; color: var(--color-text-faint); font-weight: 700; margin: 0; }
+.alert-coin { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-4) var(--space-5); display: grid; gap: var(--space-3); }
+.alert-coin-head { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
+.alert-coin-head img { width: 36px; height: 36px; border-radius: var(--radius-md); object-fit: cover; flex: none; background: var(--color-surface-2); }
+.alert-coin-head strong { font-size: var(--text-lg, 1.125rem); }
+.alert-coin-head span { color: var(--color-text-muted); font-size: var(--text-sm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.alert-coin-head .star { margin-left: auto; }
+.alert-coin-links { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.alert-more { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); margin-top: var(--space-8, 2rem); }
+.alert-more-link { font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 640px) {
+  .alert-coin-links .btn { flex: 1 1 auto; justify-content: center; }
+  .alert-coin-links .btn-amber { flex-basis: 100%; }
+}
