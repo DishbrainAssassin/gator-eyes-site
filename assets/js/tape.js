@@ -1,9 +1,9 @@
 // Live trade tape: a stock-ticker strip pinned inside the sticky header on every page. Reads the last
 // 40 trades from /feed (both launchpads), newest first, and scrolls them sideways.
 // Pauses on hover and focus. With reduced motion it becomes a plain side-scrolling row.
-import { subscribe } from "./data.js?v=20261102-statcard";
-import * as platform from "./platform.js?v=20261102-statcard";
-import { fmt, esc } from "./ui.js?v=20261102-statcard";
+import { subscribe } from "./data.js?v=20261102-watchmin";
+import * as platform from "./platform.js?v=20261102-watchmin";
+import { fmt, esc } from "./ui.js?v=20261102-watchmin";
 
 const PX_PER_SEC = 55; // scroll speed
 let host, track, lastKey = "", items = [];

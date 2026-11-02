@@ -1,7 +1,7 @@
 // Gator Eyes web app: registers the service worker on every page, keeps phone alerts in
 // step with the watchlist, and holds the shared alert helpers used by app.html.
-import { CONFIG } from "./config.js?v=20261102-statcard";
-import * as watchlist from "./watchlist.js?v=20261102-statcard";
+import { CONFIG } from "./config.js?v=20261102-watchmin";
+import * as watchlist from "./watchlist.js?v=20261102-watchmin";
 
 const PREFS = "ge-push";
 export const KINDS = [
@@ -59,7 +59,8 @@ async function post(path, body) {
 }
 
 const watchIds = () => watchlist.list().map((x) => x.id);
-const sig = (p) => JSON.stringify([p.kinds, p.src, p.watchOnly, p.watchOnly ? watchIds() : []]);
+const wantsList = (p) => p.watchOnly || watchlist.minAda() > 0;
+const sig = (p) => JSON.stringify([p.kinds, p.src, p.watchOnly, watchlist.minAda(), wantsList(p) ? watchIds() : []]);
 
 /** Ask for permission (must be called straight from a tap), subscribe and save choices. */
 export async function enable(prefs) {
@@ -80,7 +81,7 @@ export async function save(prefs, sub) {
   sub = sub || (await currentSub());
   if (!sub) throw new Error("Alerts aren't on for this device yet.");
   const p = { kinds: prefs.kinds, src: prefs.src, watchOnly: !!prefs.watchOnly };
-  const r = await post("/subscribe", { sub: sub.toJSON(), prefs: { ...p, watch: watchIds() } });
+  const r = await post("/subscribe", { sub: sub.toJSON(), prefs: { ...p, watchMin: watchlist.minAda(), watch: watchIds() } });
   const saved = { ...p, mutedUntil: Number(r.mutedUntil) || 0, synced: sig(p) };
   storePrefs(saved);
   return saved;
@@ -110,10 +111,11 @@ export async function test() {
   return post("/test", { sub: sub.toJSON() });
 }
 
-// If "only my watchlist" is on, send the new list whenever coins are starred or removed.
+// When alerts depend on the watchlist ("only my watchlist" or starred-coin trades), send the
+// new list or size whenever either changes, from any page.
 async function syncWatchlist() {
   const p = savedPrefs();
-  if (!p || !p.watchOnly || p.synced === sig(p)) return;
+  if (!p || p.synced === sig(p)) return;
   if (!pushSupported() || Notification.permission !== "granted") return;
   try { await save(p); } catch {}
 }

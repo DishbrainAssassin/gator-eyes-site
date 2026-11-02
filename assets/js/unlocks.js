@@ -1,8 +1,8 @@
 // Unlock calendar: every Solada token lock the worker has verified on-chain, by the day it opens.
-import { getApi } from "./api.js?v=20261102-statcard";
-import { coinUrl } from "./data.js?v=20261102-statcard";
-import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261102-statcard";
-import { wireLinks } from "./common.js?v=20261102-statcard";
+import { getApi } from "./api.js?v=20261102-watchmin";
+import { coinUrl } from "./data.js?v=20261102-watchmin";
+import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261102-watchmin";
+import { wireLinks } from "./common.js?v=20261102-watchmin";
 
 wireLinks();
 const $ = (s) => document.querySelector(s);

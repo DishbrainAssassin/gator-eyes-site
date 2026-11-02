@@ -1,7 +1,7 @@
 // "Get the app" page: install steps for this device, then phone alert choices.
-import { wireLinks } from "./common.js?v=20261102-statcard";
-import * as watchlist from "./watchlist.js?v=20261102-statcard";
-import * as pwa from "./pwa.js?v=20261102-statcard";
+import { wireLinks } from "./common.js?v=20261102-watchmin";
+import * as watchlist from "./watchlist.js?v=20261102-watchmin";
+import * as pwa from "./pwa.js?v=20261102-watchmin";
 
 wireLinks();
 
@@ -189,4 +189,12 @@ renderInstall();
 renderKinds(pwa.savedPrefs() || pwa.DEFAULT_PREFS);
 watchCount();
 watchlist.on(watchCount);
+
+// Starred-coin trade size: shared with the Watchlist page through the saved watchlist.
+// Changing it re-sends alert settings on its own (pwa.js watches the list).
+const minSel = $("[data-watch-min]");
+const showMin = () => { minSel.value = String(watchlist.minAda()); };
+showMin();
+watchlist.on(showMin);
+minSel.addEventListener("change", () => watchlist.setMinAda(minSel.value));
 renderAlerts();

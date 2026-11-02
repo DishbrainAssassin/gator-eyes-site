@@ -956,3 +956,11 @@ button.link:hover { color: var(--color-amber-hover); }
 .app-nudge span { flex: 1; }
 .app-nudge-x { background: none; border: 0; color: var(--color-text-muted); font-size: 1.5rem; line-height: 1; width: 36px; height: 36px; cursor: pointer; flex: none; }
 @media (max-width: 700px) { .app-form { grid-template-columns: 1fr; } }
+
+/* Starred-coin trade size (Watchlist page + phone alerts share one setting) */
+.k-wtrade { --k: var(--color-text-muted); }
+.alert.k-wtrade.is-buy { --k: var(--color-buy); }
+.alert.k-wtrade.is-sell { --k: var(--color-sell); }
+.wmin { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); margin-top: var(--space-3); font-size: var(--text-sm); color: var(--color-text-muted); }
+.wmin select { min-height: 2.5rem; padding: 0 var(--space-3); border-radius: var(--radius-md, 8px); border: 1px solid var(--color-border); background: var(--color-surface-2, var(--color-surface)); color: var(--color-text); font: inherit; }
+.wmin small { flex-basis: 100%; color: var(--color-text-faint); font-size: var(--text-xs); }
