@@ -192,7 +192,7 @@ const LIVE = [
       const d = await tokens();
       const l = d.coins.filter((c) => c.cs === "graduated" && c.gAt && Date.now() - c.gAt < 7 * 864e5).sort((x, y) => y.gAt - x.gAt);
       if (!l.length) return "No coins graduated in the last 7 days.";
-      return `Graduated this week:${top(l, 6, (c) => `${coinLink(c)}${c.born ? " took " + esc(span(c.gAt - c.born)) : ""}`)}`;
+      return `Graduated this week:${top(l, 6, (c) => `${coinLink(c)}${c.born ? " took " + esc(span(c.gAt - c.born)) : ""}`)}Every graduated coin is on the ${page("graduated.html", "Graduated coins page")}.`;
     },
   },
   {
