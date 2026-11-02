@@ -1,6 +1,6 @@
-import { CONFIG } from "./config.js?v=20261102-watchmin";
-import { joinUrl, coinUrl } from "./data.js?v=20261102-watchmin";
-import { timeAgo } from "./ui.js?v=20261102-watchmin";
+import { CONFIG } from "./config.js?v=20261102-watchcopy";
+import { joinUrl, coinUrl } from "./data.js?v=20261102-watchcopy";
+import { timeAgo } from "./ui.js?v=20261102-watchcopy";
 
 /** Fill every [data-link] with the right URL so links live in one place (config.js). */
 export function wireLinks(root = document) {
@@ -20,11 +20,11 @@ export function wireLinks(root = document) {
   });
   navTips();
   wireToolsMenu();
-  import("./gator.js?v=20261102-watchmin").then((m) => m.mountGator()).catch(() => {});
-  import("./extras.js?v=20261102-watchmin").then((m) => m.mountExtras()).catch(() => {});
-  import("./tape.js?v=20261102-watchmin").then((m) => m.mountTape()).catch(() => {});
-  import("./pwa.js?v=20261102-watchmin").then((m) => m.mountPwa()).catch(() => {});
-  import("./appnav.js?v=20261102-watchmin").then((m) => m.mountAppNav()).catch(() => {});
+  import("./gator.js?v=20261102-watchcopy").then((m) => m.mountGator()).catch(() => {});
+  import("./extras.js?v=20261102-watchcopy").then((m) => m.mountExtras()).catch(() => {});
+  import("./tape.js?v=20261102-watchcopy").then((m) => m.mountTape()).catch(() => {});
+  import("./pwa.js?v=20261102-watchcopy").then((m) => m.mountPwa()).catch(() => {});
+  import("./appnav.js?v=20261102-watchcopy").then((m) => m.mountAppNav()).catch(() => {});
 }
 
 function wireToolsMenu() {
@@ -79,7 +79,7 @@ const NAV_TIPS = {
   "./graduated.html": ["Graduated coins", "Coins that graduated on Solada.fun and Snek.fun: when, how long it took, and how they trade now."],
   "./flows.html": ["Flows", "Where the ADA went today: money in and out by coin, by hour and by venue."],
   "./followup.html": ["Follow-up", "What each alert's coin did 1 hour and 24 hours later. Every alert, good and bad."],
-  "./watchlist.html": ["Watchlist", "Star coins and see their price, flows, graduation progress and alerts in one place. Saved in your browser, no sign-up."],
+  "./watchlist.html": ["Watchlist", "Star coins and see their price, flows, graduation progress and alerts in one place. Saved in this browser; one link copies it to another device."],
   "./tools.html": ["Tools", "Free tools: unlock calendar, holder snapshot with CSV, stat cards, daily flow card and an alerts widget."],
   "./gaey.html": ["$GAEY", "The Gator Eyes team token: live trades, holder rewards and the creator lock."],
   "./about.html": ["How it works", "What sets off each alert, where the data comes from and what each Discord channel is for."],

@@ -1,7 +1,7 @@
 // Gator Eyes web app: registers the service worker on every page, keeps phone alerts in
 // step with the watchlist, and holds the shared alert helpers used by app.html.
-import { CONFIG } from "./config.js?v=20261102-watchmin";
-import * as watchlist from "./watchlist.js?v=20261102-watchmin";
+import { CONFIG } from "./config.js?v=20261102-watchcopy";
+import * as watchlist from "./watchlist.js?v=20261102-watchcopy";
 
 const PREFS = "ge-push";
 export const KINDS = [

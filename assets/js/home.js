@@ -1,13 +1,13 @@
-import { subscribe } from "./data.js?v=20261102-watchmin";
-import { alertCard, emptyState, skeleton, tracks, mergeDays, lpSplit, dayLabel, fmt, usdcx, timeAgo, compact } from "./ui.js?v=20261102-watchmin";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-watchmin";
-import * as platform from "./platform.js?v=20261102-watchmin";
+import { subscribe } from "./data.js?v=20261102-watchcopy";
+import { alertCard, emptyState, skeleton, tracks, mergeDays, lpSplit, dayLabel, fmt, usdcx, timeAgo, compact } from "./ui.js?v=20261102-watchcopy";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-watchcopy";
+import * as platform from "./platform.js?v=20261102-watchcopy";
 
 const SHOW_ALL = ' <button type="button" class="link" data-platform="all">Show all launchpads</button>';
 
 wireLinks();
 platform.mount();
-import("./since.js?v=20261102-watchmin").then((m) => m.mountSince()).catch(() => {});
+import("./since.js?v=20261102-watchcopy").then((m) => m.mountSince()).catch(() => {});
 import("./nest.js?v=20261102-nest2").then((m) => m.mountNest()).catch(() => {});
 platform.on(() => {
   shown = 6;
