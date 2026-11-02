@@ -1,10 +1,10 @@
 // Ask Gator: a small helper that answers common questions about Gator Eyes and
 // the launchpads it tracks (Solada.fun and Snek.fun). Answers are built in (no AI, no running cost). Live questions
 // about coins use the same /tokens data as the Tokens page.
-import { CONFIG } from "./config.js?v=20261101-tape2";
-import { coinUrl, joinUrl } from "./data.js?v=20261101-tape2";
-import { API, getApi, price, pct, signed, hours, span } from "./api.js?v=20261101-tape2";
-import { esc, fmt, compact } from "./ui.js?v=20261101-tape2";
+import { CONFIG } from "./config.js?v=20261102-statcard";
+import { coinUrl, joinUrl } from "./data.js?v=20261102-statcard";
+import { API, getApi, price, pct, signed, hours, span } from "./api.js?v=20261102-statcard";
+import { esc, fmt, compact } from "./ui.js?v=20261102-statcard";
 
 const DISCORD = CONFIG.discord;
 const a = (href, label, ext) => `<a href="${esc(href)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(label)}</a>`;
@@ -79,7 +79,7 @@ function coinAnswer(c) {
   const al = Object.entries(c.al || {}).map(([k, n]) => `${n} ${{ big: "whale", spike: "volume spike", launch: "fast launch", dev: "creator sell" }[k] || k}`);
   list.push(al.length ? `Alerts today: ${al.join(", ")}` : "No Gator Eyes alerts in the last 24 hours");
   bits.push("<ul>" + list.filter(Boolean).map((x) => `<li>${x}</li>`).join("") + "</ul>");
-  bits.push(`${a(coinUrl(c.id), "Open on " + lpName(c), true)} · ${page("coincard.html?coin=" + encodeURIComponent(c.id), "Share card")} · ${page("followup.html?coin=" + encodeURIComponent(c.tk || c.id), "Alert follow-up")} · ${page("holders.html?coin=" + encodeURIComponent(c.tk || c.id), "Holders")} · ${page("trades.html?coin=" + encodeURIComponent(c.tk || c.id), "Trade history")}`);
+  bits.push(`${a(coinUrl(c.id), "Open on " + lpName(c), true)} · ${page("coincard.html?coin=" + encodeURIComponent(c.id), "Stat card")} · ${page("followup.html?coin=" + encodeURIComponent(c.tk || c.id), "Alert follow-up")} · ${page("holders.html?coin=" + encodeURIComponent(c.tk || c.id), "Holders")} · ${page("trades.html?coin=" + encodeURIComponent(c.tk || c.id), "Trade history")}`);
   bits.push(`<small>Just the numbers, not advice.</small>`);
   return bits.join("");
 }
@@ -100,9 +100,9 @@ function walletAnswer(c) {
   return `<strong>${esc(tk(c))}</strong> wallets, last 24 hours:<ul>${list.map((x) => `<li>${x}</li>`).join("")}</ul>To see where the supply sits (creator, pool, biggest wallets): ${page("holders.html?coin=" + encodeURIComponent(c.tk || c.id), "Open " + tk(c) + " holders")}. Gator Eyes doesn't rate coins. For a safety check, ${a("https://suriradar.fun/", "Suri Radar", true)} is built for that.<br><small>Just the numbers, not advice.</small>`;
 }
 
-// "make a share card for $X", "holders of $X", "follow-up for $X": link straight to that tool for the coin.
+// "make a stat card for $X", "holders of $X", "follow-up for $X": link straight to that tool for the coin.
 const COIN_TOOLS = [
-  { re: /\b(share card|coin card|card for|card of|image|picture|pic|graphic|png)\b/, run: (c) => `Here's the share card for <strong>${esc(tk(c))}</strong>: ${page("coincard.html?coin=" + encodeURIComponent(c.id), "Open the " + tk(c) + " share card")}. Tap Download PNG (or Save image on a phone) and Copy caption, then post it.${hasTrades(c) ? "" : c.sol ? " The card shows its Solana trades. " + solLine(c.sol) + "." : noAda(c) ? " Its trades happen on the Solana side, so the card may show 0 ADA traded." : " No ADA trades in the last 24 hours, so the card will show 0."}` },
+  { re: /\b(stat card|share card|coin card|card for|card of|image|picture|pic|graphic|png)\b/, run: (c) => `Here's the stat card for <strong>${esc(tk(c))}</strong>: ${page("coincard.html?coin=" + encodeURIComponent(c.id), "Open the " + tk(c) + " stat card")}. Tap Download PNG (or Save image on a phone) and Copy caption, then post it.${hasTrades(c) ? "" : c.sol ? " The card shows its Solana trades. " + solLine(c.sol) + "." : noAda(c) ? " Its trades happen on the Solana side, so the card may show 0 ADA traded." : " No ADA trades in the last 24 hours, so the card will show 0."}` },
   { re: /\b(wallets?|whales?|buyers?|sellers?|bundl\w*|insiders?|who(?:'s| is) (?:buying|selling))\b/, run: walletAnswer },
   { re: /\b(trade history|trade log|trade list|all (?:the )?trades|every trade|list of trades|recent trades|transactions?|txs?)\b/, run: (c) => `Here's every <strong>${esc(tk(c))}</strong> trade on its launchpad, newest first: ${page("trades.html?coin=" + encodeURIComponent(c.tk || c.id), "Open " + tk(c) + " trade history")}. Filter by buys or sells, size or one wallet, then download the CSV.` },
   { re: /\b(holders?|holder list|snapshot|airdrop)\b/, run: (c) => `Here's the holder snapshot for <strong>${esc(tk(c))}</strong>: ${page("holders.html?coin=" + encodeURIComponent(c.tk || c.id), "Open " + tk(c) + " holders")}.${c.hold ? " It has about " + fmt(c.hold) + " holders right now." : ""} Set your rules there, then download the CSV.` },
@@ -228,7 +228,7 @@ const FAQ = [
   { keys: ["follow-up", "follow up", "followup", "track record", "accurate", "do alerts work", "after an alert"], a: () => `The ${page("followup.html", "Follow-up page")} shows every alert and what the coin's price did 1 hour and 24 hours later. Good and bad, nothing hidden. It's there so you can judge the alerts yourself.` },
   { keys: ["trade history", "trade log", "all trades", "every trade", "list of trades", "see the trades", "see trades", "transactions"], a: () => `The ${page("trades.html", "Trade history")} page lists every buy and sell for one coin on Solada.fun or Snek.fun, newest first, with the ADA, tokens, price paid and wallet. Filter by side, size or a single wallet, load the full history and download the CSV.` },
   { keys: ["holder", "airdrop", "snapshot", "csv"], a: () => `Use the ${page("holders.html", "Holder snapshot")}: type a ticker and it shows where the supply sits, split into the bonding curve, liquidity pool, locked tokens, the creator, other contracts and ordinary wallets. Each group is labelled in the list and can be put in or left out with a click. Add a minimum balance, top-N or a "hasn't sold since" date, then download the CSV.` },
-  { keys: ["share card", "coin card", "image of a coin", "image of $", "image for", "picture of a coin", "picture of $", "picture for", "make an image", "make a picture", "make a graphic", "coin image", "coin picture", "coin graphic", "post an image", "png"], not: ABOUT_ME, a: () => `The ${page("coincard.html", "Coin share card")} makes a ready-to-post image of any coin's last 24 hours. Pick a coin, then tap Download PNG (or Save image on a phone) and Copy caption. For the whole market, use the ${page("card.html", "daily flow card")}.` },
+  { keys: ["stat card", "share card", "coin card", "image of a coin", "image of $", "image for", "picture of a coin", "picture of $", "picture for", "make an image", "make a picture", "make a graphic", "coin image", "coin picture", "coin graphic", "post an image", "png"], not: ABOUT_ME, a: () => `The ${page("coincard.html", "Stat card")} makes a ready-to-post image of any coin's last 24 hours. Pick a coin, then tap Download PNG (or Save image on a phone) and Copy caption. For the whole market, use the ${page("card.html", "daily flow card")}.` },
   { keys: ["tokens page", "tokens table", "table", "all coins", "list of coins"], a: () => `The ${page("tokens.html", "Tokens page")} lists every coin Gator Eyes tracks on Solada.fun and Snek.fun with price, change, volume, trades, net flow, market cap, curve progress and alerts. Switch between Live (15 min), 1h, 6h and 24h, and click a column to sort.` },
   { keys: ["flows", "by hour", "venue"], a: () => `The ${page("flows.html", "Flows page")} shows where the ADA went today: money in and out by coin, by hour and by venue (Solada curve, Minswap, Splash, Pump.fun, the Snek.fun curve and Splash pools). Days run midnight to midnight Eastern.` },
   { keys: ["widget", "embed", "my site", "my website"], a: () => `Run a project? Put a live box with your coin's volume, net flow and latest alerts on your own site. The embed code is on the ${page("about.html#embed", "How it works page")}.` },
@@ -279,7 +279,7 @@ const CAN_DO = ["5 newest coins", "Most traded today", "What's close to graduati
 function notSure(coin) {
   const opts = "<ul>" + CAN_DO.map((x) => `<li><em>${esc(x)}</em></li>`).join("") + "</ul>";
   if (coin) return `I'm not sure what you're after. If you want ${esc(tk(coin))}'s numbers, ask <em>${esc(tk(coin))}</em> on its own. If you want a list, I can do:${opts}`;
-  return `Hmm, that's not in my notes yet. I can answer things like:${opts}Or try a coin ticker like $MEPE, or ask about the alerts, net flow, holder snapshots or share cards. For anything else, ask in ${discord()}.`;
+  return `Hmm, that's not in my notes yet. I can answer things like:${opts}Or try a coin ticker like $MEPE, or ask about the alerts, net flow, holder snapshots or stat cards. For anything else, ask in ${discord()}.`;
 }
 
 async function answer(raw) {
