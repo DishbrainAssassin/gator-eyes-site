@@ -1,9 +1,9 @@
-// Coin share card: one coin's last 24 hours on Solada.fun or Snek.fun as a 1200x675 PNG.
-import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261101-tape2";
-import { coinUrl, fetchFeed } from "./data.js?v=20261101-tape2";
-import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261101-tape2";
-import { wireLinks, liveStatus } from "./common.js?v=20261101-tape2";
-import * as platform from "./platform.js?v=20261101-tape2";
+// Stat card: one coin's last 24 hours on Solada.fun or Snek.fun as a 1200x675 PNG.
+import { getApi, price, pct, signed, hours, span } from "./api.js?v=20261102-statcard";
+import { coinUrl, fetchFeed } from "./data.js?v=20261102-statcard";
+import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261102-statcard";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-statcard";
+import * as platform from "./platform.js?v=20261102-statcard";
 
 wireLinks();
 platform.mount();
@@ -293,7 +293,7 @@ function holdToSave(file) {
   const url = URL.createObjectURL(file);
   const box = document.createElement("div");
   box.className = "save-sheet";
-  box.innerHTML = `<div class="save-sheet-in"><p>Press and hold the image, then choose <strong>Save</strong>.</p><img alt="Coin share card" src="${url}"><button class="btn btn-ghost" type="button">Done</button></div>`;
+  box.innerHTML = `<div class="save-sheet-in"><p>Press and hold the image, then choose <strong>Save</strong>.</p><img alt="Stat card" src="${url}"><button class="btn btn-ghost" type="button">Done</button></div>`;
   const close = () => { box.remove(); URL.revokeObjectURL(url); };
   box.querySelector("button").onclick = close;
   box.addEventListener("click", (e) => { if (e.target === box) close(); });

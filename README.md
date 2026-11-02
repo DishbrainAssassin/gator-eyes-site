@@ -1,5 +1,15 @@
 # Gator Eyes website
 
+## Stat cards
+
+The coin image tool is named **Stat card** throughout navigation, page titles,
+accessibility labels, and Quagmire replies. Its existing `coincard.html` address
+and coin query parameters remain unchanged so previously shared links work.
+Quagmire also accepts the older “share card” and “coin card” phrases.
+Daily flow cards retain their separate name. Historical social posts are unchanged.
+
+Run `node tests/stat-card-name.cjs` to check naming and backward-compatible aliases.
+
 Static site for Gator Eyes, the free Solada tracker. No build step.
 
 - Pages: index.html, tokens.html, race.html, flows.html, followup.html, watchlist.html (browser-saved watchlist), tools.html, holders.html, coincard.html, gaey.html, about.html (How it works), card.html (daily flow card), embed.html (widget)

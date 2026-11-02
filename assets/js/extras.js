@@ -1,7 +1,7 @@
 // Site-wide coin search and beginner mode. Loaded on every page by common.js.
-import { getApi, price } from "./api.js?v=20261101-tape2";
-import { coinUrl, joinUrl } from "./data.js?v=20261101-tape2";
-import { esc, compact } from "./ui.js?v=20261101-tape2";
+import { getApi, price } from "./api.js?v=20261102-statcard";
+import { coinUrl, joinUrl } from "./data.js?v=20261102-statcard";
+import { esc, compact } from "./ui.js?v=20261102-statcard";
 
 const KEY = "ge-beginner";
 
