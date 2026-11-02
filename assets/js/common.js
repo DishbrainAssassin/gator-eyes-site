@@ -73,7 +73,7 @@ export function liveStatus(feed, err) {
 
 // Short hover descriptions for the top navigation.
 const NAV_TIPS = {
-  "./index.html#alerts": ["Alerts", "Whale trades, volume spikes, Hatchlings, Lunges and creator sells on Solada.fun and Snek.fun, as they happen."],
+  "./index.html#alerts": ["Alerts", "Whale trades, volume spikes, Hatchlings, Fast Lunges and creator sells on Solada.fun and Snek.fun, as they happen."],
   "./tokens.html": ["Tokens", "Every coin in one table: volume, net flow, price change and graduation progress."],
   "./race.html": ["Race", "Coins on the bonding curve, ranked by how close they are to graduating, with pace and a rough ETA."],
   "./graduated.html": ["Graduated coins", "Coins that graduated on Solada.fun and Snek.fun: when, how long it took, and how they trade now."],

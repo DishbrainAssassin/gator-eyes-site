@@ -16,7 +16,7 @@ const TYPES = {
   bigbuy: { label: "Whale buy", color: "var(--color-buy)", test: (a) => a.kind === "big" && a.side === "buy" },
   bigsell: { label: "Whale sell", color: "var(--color-sell)", test: (a) => a.kind === "big" && a.side === "sell" },
   spike: { label: "Volume spike", color: "var(--color-spike)", test: (a) => a.kind === "spike" },
-  launch: { label: "Lunge", color: "var(--color-launch)", test: (a) => a.kind === "launch" },
+  launch: { label: "Fast Lunge", color: "var(--color-launch)", test: (a) => a.kind === "launch" },
   dev: { label: "Creator sell", color: "var(--color-amber)", test: (a) => a.kind === "dev" },
 };
 const typeOf = (a) => Object.keys(TYPES).find((k) => TYPES[k].test(a));

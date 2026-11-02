@@ -15,7 +15,7 @@ function renderRules(r) {
     ["k-whale", "Whale trade", `Any single trade worth $${fmt(r.bigUsd || 1000)} or more in ADA (about ${fmt(r.bigAda)} ADA at today's price), or a trade worth at least ${fmt(r.mcapPct)}% of a coin's market cap (minimum ${fmt(r.mcapMinAda)} ADA).`, "#whale-alerts"],
     ["k-spike", "Volume spike", `At least ${fmt(r.spikeMinAda)} ADA traded in ${fmt(r.spikeWindowMin)} minutes, at ${fmt(r.spikeMult)} times or more the coin's normal pace, from two or more wallets. One per coin per hour.`, "#whale-alerts"],
     ["k-dev", "Creator sell", `The wallet that created a coin sells ${fmt(r.creatorMinAda || 500)} ADA or more, or at least ${fmt(r.creatorMcapPct || 5)}% of the coin's market cap (minimum ${fmt(r.mcapMinAda || 250)} ADA). Posted for transparency. Creators sell for lots of reasons.`, "#creator-sells"],
-    ["k-launch", "Fast launch", `A new coin pulls in ${fmt(r.launchMinAda)} ADA of buys from ${fmt(r.launchMinBuyers)} or more wallets within its first ${fmt(r.launchWindowMin)} minutes.`, "#fast-launch"],
+    ["k-launch", "Fast launch", `A new coin pulls in ${fmt(r.launchMinAda)} ADA of buys from ${fmt(r.launchMinBuyers)} or more wallets within its first ${fmt(r.launchWindowMin)} minutes.`, "#fast-lunge"],
     ["k-tracks", "Gator Tracks", `The day's recap at ${hour(r.recapHourET, r.recapMinET)} Eastern, right after midnight: volume, net flow, busiest hour, top venue, most traded coins, and where the money went.`, "#gator-tracks"],
     ["k-gaey", "$GAEY trades", "Every buy and sell of $GAEY, the team's own token, in its own channel so it never crowds the others.", "#gaey-trades"],
   ];

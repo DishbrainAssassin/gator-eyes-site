@@ -16,7 +16,7 @@ const ctx = canvas.getContext("2d");
 const W = 1200, H = 675, P = 56;
 const C = { bg: "#06090a", panel: "#0c1112", line: "#1e2a2b", text: "#e4e2db", muted: "#9aa29d", faint: "#5f6b67", amber: "#e3a43c", buy: "#6fbf73", sell: "#e0705f" };
 const F = { d: '"Cabinet Grotesk", "Helvetica Neue", sans-serif', b: '"Satoshi", "Helvetica Neue", sans-serif', m: '"JetBrains Mono", ui-monospace, monospace' };
-const AL = { big: "whale", spike: "volume spike", launch: "Lunge", hatch: "Hatchling", dev: "creator sell" };
+const AL = { big: "whale", spike: "volume spike", launch: "Fast Lunge", hatch: "Hatchling", dev: "creator sell" };
 
 const avatar = new Image();
 avatar.src = "./assets/img/avatar-256.webp";

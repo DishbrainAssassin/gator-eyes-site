@@ -15,7 +15,7 @@ const MIN_MC = 3000;      // ADA market cap floor for price movers (skips dust)
 function read() { try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch { return null; } }
 function write(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch {} }
 
-const KIND = { big: ["whale trade", "whale trades"], spike: ["volume spike", "volume spikes"], dev: ["creator sell", "creator sells"], launch: ["Lunge", "Lunges"], hatch: ["Hatchling", "Hatchlings"], watch: ["$GAEY trade", "$GAEY trades"] };
+const KIND = { big: ["whale trade", "whale trades"], spike: ["volume spike", "volume spikes"], dev: ["creator sell", "creator sells"], launch: ["Fast Lunge", "Fast Lunges"], hatch: ["Hatchling", "Hatchlings"], watch: ["$GAEY trade", "$GAEY trades"] };
 const plural = (n, k) => `${n} ${KIND[k] ? KIND[k][n === 1 ? 0 : 1] : k}`;
 const link = (tk) => `<a href="./tokens.html?q=${encodeURIComponent(tk)}">$${esc(tk)}</a>`;
 const pct = (p) => `<span class="${p >= 0 ? "pos" : "neg"}">${p >= 0 ? "+" : "−"}${Math.abs(p * 100).toFixed(Math.abs(p) < 0.1 ? 1 : 0)}%</span>`;

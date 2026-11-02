@@ -6,7 +6,7 @@ import { esc, fmt, compact, usdcx } from "./ui.js?v=20261102-hatch";
 import { pill } from "./platform.js?v=20261102-hatch";
 import { starBtn } from "./watchlist.js?v=20261102-hatch";
 
-export const AL = { big: ["Whale", "var(--color-amber)"], spike: ["Spike", "var(--color-spike)"], launch: ["Lunge", "var(--color-launch)"], hatch: ["Hatchling", "var(--color-hatch)"], dev: ["Creator sell", "var(--color-sell)"] };
+export const AL = { big: ["Whale", "var(--color-amber)"], spike: ["Spike", "var(--color-spike)"], launch: ["Fast Lunge", "var(--color-launch)"], hatch: ["Hatchling", "var(--color-hatch)"], dev: ["Creator sell", "var(--color-sell)"] };
 
 export function curveCell(c) {
   if (c.src === "snek") {

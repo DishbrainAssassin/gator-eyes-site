@@ -8,7 +8,7 @@ export const KINDS = {
   spike: { label: "Volume spike", cls: "k-spike" },
   dev: { label: "Creator sell", cls: "k-dev" },
   hatch: { label: "Hatchling", cls: "k-hatch" },
-  launch: { label: "Lunge", cls: "k-launch" },
+  launch: { label: "Fast Lunge", cls: "k-launch" },
   watch: { label: "$GAEY", cls: "k-gaey" },
   wtrade: { label: "Starred coin", cls: "k-wtrade" },
 };
