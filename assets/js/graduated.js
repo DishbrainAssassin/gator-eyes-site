@@ -1,14 +1,14 @@
 // Graduated coins: every coin that left its bonding curve for a regular pool, on Cardano
 // (Solada.fun to Minswap, Snek.fun to Splash) or Solana (Solada Pump coins to PumpSwap),
 // with when it graduated, how long it took and how it trades now.
-import { getApi, price, pct, signed, span } from "./api.js?v=20261102-hatch";
-import { coinUrl } from "./data.js?v=20261102-hatch";
-import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261102-hatch";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-hatch";
-import * as platform from "./platform.js?v=20261102-hatch";
-import * as watchlist from "./watchlist.js?v=20261102-hatch";
-import { pill, LP } from "./platform.js?v=20261102-hatch";
-import { starBtn } from "./watchlist.js?v=20261102-hatch";
+import { getApi, price, pct, signed, span, usdcxPrice } from "./api.js?v=20261102-usdcx";
+import { coinUrl } from "./data.js?v=20261102-usdcx";
+import { esc, fmt, compact, timeAgo, usdcxShort, usdcxOf } from "./ui.js?v=20261102-usdcx";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx";
+import * as platform from "./platform.js?v=20261102-usdcx";
+import * as watchlist from "./watchlist.js?v=20261102-usdcx";
+import { pill, LP } from "./platform.js?v=20261102-usdcx";
+import { starBtn } from "./watchlist.js?v=20261102-usdcx";
 
 wireLinks();
 platform.mount();
@@ -73,6 +73,10 @@ function actions(c) {
   return `<span class="row-actions">${a.join("")}</span>`;
 }
 
+let RATE = null;
+const ux = (ada) => { const s = ada ? usdcxShort(Math.abs(ada), RATE) : ""; return s ? ` (${s})` : ""; };
+const solUsd = (v) => `${usdcxOf(v)} on Solana`;
+
 function row(c, rate, showPill) {
   const w = h24(c);
   const tot = (w.b || 0) + (w.s || 0);
@@ -82,11 +86,11 @@ function row(c, rate, showPill) {
     <td class="star-col">${starBtn(c)}</td>
     <td><div class="coin-cell">${img}<div><a href="${esc(coinUrl(c.id))}" target="_blank" rel="noopener">${esc(c.tk || "?")}</a>${showPill && c.src === "snek" ? pill("snek") : ""}${st.ch !== "solana" && chainOf(c) === "solana" ? `<span class="chain-pill" title="Graduated on Solana"><i></i>Solana</span>` : ""}<span class="cell-sub">${esc((c.name || "").slice(0, 22))}</span></div></div></td>
     <td class="grad-cell">${gradCell(c)}</td>
-    <td class="num">${compact(c.mc)}<span class="cell-sub">${c.price != null ? esc(price(c.price)) : ""}</span></td>
+    <td class="num"${rate && c.price != null ? ` title="Price ${esc(price(c.price))} ADA (${esc(usdcxPrice(c.price, rate))})"` : ""}>${compact(c.mc)}${rate ? `<span class="cell-sub">${esc(usdcxShort(c.mc, rate))}</span>` : ""}<span class="cell-sub">${c.price != null ? esc(price(c.price)) : ""}</span></td>
     <td class="num hide-sm">${c.hold != null ? fmt(c.hold) : "–"}</td>
-    <td class="num">${fmt(w.v)}<span class="cell-sub">${fmt(w.n)} ${w.n === 1 ? "trade" : "trades"}${c.solV != null ? ` · $${esc(compact(c.solV))} on Solana` : ""}</span></td>
+    <td class="num">${fmt(w.v)}${rate && w.v ? `<span class="cell-sub">${esc(usdcxShort(w.v, rate))}</span>` : ""}<span class="cell-sub">${fmt(w.n)} ${w.n === 1 ? "trade" : "trades"}${c.solV != null ? ` · ${esc(solUsd(c.solV))}` : ""}</span></td>
     <td class="num hide-sm ${w.ch > 0 ? "pos" : w.ch < 0 ? "neg" : ""}">${pct(w.ch)}</td>
-    <td class="num split-col hide-sm"><span class="${w.net > 0 ? "pos" : w.net < 0 ? "neg" : ""}">${signed(w.net)}</span><span class="rowsplit" title="${fmt(w.b)} ADA bought, ${fmt(w.s)} ADA sold"><span class="split-buy" style="width:${bp}%"></span></span></td>
+    <td class="num split-col hide-sm"><span class="${w.net > 0 ? "pos" : w.net < 0 ? "neg" : ""}">${signed(w.net)}</span><span class="cell-sub">${w.net && rate ? esc(usdcxShort(w.net, rate)) : ""}</span><span class="rowsplit" title="${fmt(w.b)} ADA bought, ${fmt(w.s)} ADA sold"><span class="split-buy" style="width:${bp}%"></span></span></td>
     <td class="hide-sm">${actions(c)}</td>
   </tr>`;
 }
@@ -107,7 +111,7 @@ function kpis(all) {
     ["Graduated", fmt(all.length), split],
     ["This week", fmt(week.length), latest ? "latest: " + (latest.tk || "") + ", " + timeAgo(latest.gAt) : "none with a time"],
     ["Typical time", median != null ? span(median) : "–", tooks.length ? `launch to graduation, median of ${tooks.length}` : "no graduation times"],
-    ["24h volume", fmt(vol) + " ADA", `net flow ${signed(net)} ADA${solV ? ` · $${compact(solV)} on Solana` : ""}`],
+    ["24h volume", fmt(vol) + " ADA", `${RATE ? usdcxShort(vol, RATE) + " · " : ""}net ${signed(net)} ADA${ux(net)}${solV ? ` · plus ${solUsd(solV)}` : ""}`],
   ].map(([l, v, s]) => `<div class="kpi"><span class="kpi-label">${esc(l)}</span><span class="kpi-value">${esc(v)}</span><span class="kpi-sub">${esc(s)}</span></div>`).join("");
 }
 
@@ -126,7 +130,7 @@ function split(all) {
     return `<div class="lp-row ${lp.cls} ${scope !== "all" && scope !== key ? "is-dim" : ""}">
       <button type="button" class="lp-name" data-platform-pick="${key}" title="Show ${esc(lp.label)} graduates only"><i></i>${esc(lp.label)}</button>
       <div class="lp-bar" style="--share:${share}%" role="img" aria-label="${esc(lp.label)}: ${list.length} graduated coins, ${Math.round(share)}% of the total"><span class="b" style="width:${v ? (b / v) * 100 : 0}%"></span><span class="s" style="width:${v ? (s / v) * 100 : 0}%"></span></div>
-      <span class="lp-num">${fmt(list.length)} graduated · ${Math.round(share)}%<small>${key === "snek" ? "no graduation times" : fmt(week) + " this week"} · ${compact(v)} ADA 24h · net ${net >= 0 ? "+" : "−"}${fmt(Math.abs(net))}</small></span>
+      <span class="lp-num">${fmt(list.length)} graduated · ${Math.round(share)}%<small>${key === "snek" ? "no graduation times" : fmt(week) + " this week"} · ${compact(v)} ADA${ux(v)} 24h · net ${net >= 0 ? "+" : "−"}${fmt(Math.abs(net))}${ux(net)}</small></span>
     </div>`;
   };
   return `<div class="lp-split-wrap"><div class="sub-row"><h3 class="sub">By launchpad</h3>${scope !== "all" ? `<button type="button" class="link" data-platform="all">Compare all</button>` : `<span class="sub-hint">Pick one to focus on it</span>`}</div><div class="lp-split">${keys.map(rowFor).join("")}</div></div>`;
@@ -135,6 +139,7 @@ function split(all) {
 function render() {
   const d = st.data;
   if (!d) return;
+  RATE = d.adaUsd || null;
   const now = Date.now();
   const allGrads = (d.coins || []).filter((c) => isGrad(c) && inChain(c)).map(withSol);
   $("[data-lp-split]").innerHTML = st.ch === "solana" ? "" : split(allGrads);

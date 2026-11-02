@@ -2,11 +2,11 @@
 // (?i= base64url JSON [[kind, tokenId, at, ada, src, title, body], ...], written by the worker's
 // pushMsg). We show the full alert from /feed when it's still there, otherwise the notification's
 // own words, plus quick links to the coin.
-import { getApi } from "./api.js?v=20261102-hatch";
-import { fetchFeed, coinUrl } from "./data.js?v=20261102-hatch";
-import { esc, alertCard, emptyState } from "./ui.js?v=20261102-hatch";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-hatch";
-import * as watchlist from "./watchlist.js?v=20261102-hatch";
+import { getApi } from "./api.js?v=20261102-usdcx";
+import { fetchFeed, coinUrl } from "./data.js?v=20261102-usdcx";
+import { esc, alertCard, emptyState } from "./ui.js?v=20261102-usdcx";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx";
+import * as watchlist from "./watchlist.js?v=20261102-usdcx";
 
 wireLinks();
 watchlist.wire();

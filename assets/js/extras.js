@@ -1,22 +1,23 @@
 // Site-wide coin search and beginner mode. Loaded on every page by common.js.
-import { getApi, price } from "./api.js?v=20261102-hatch";
-import { coinUrl, joinUrl } from "./data.js?v=20261102-hatch";
-import { esc, compact } from "./ui.js?v=20261102-hatch";
+import { getApi, price, usdcxPrice } from "./api.js?v=20261102-usdcx";
+import { coinUrl, joinUrl } from "./data.js?v=20261102-usdcx";
+import { esc, compact, usdcxShort } from "./ui.js?v=20261102-usdcx";
 
 const KEY = "ge-beginner";
 
 /* ---------- Search ---------- */
 
-let coins = null, loading = null;
+let coins = null, loading = null, RATE = null;
 async function loadCoins() {
   if (coins) return coins;
   try {
     const c = JSON.parse(sessionStorage.getItem("ge-coins") || "null");
-    if (c && Date.now() - c.at < 120000) return (coins = c.list);
+    if (c && Date.now() - c.at < 120000) { RATE = c.rate || null; return (coins = c.list); }
   } catch {}
   loading = loading || getApi("/tokens").then((j) => {
     coins = j.coins || [];
-    try { sessionStorage.setItem("ge-coins", JSON.stringify({ at: Date.now(), list: coins })); } catch {}
+    RATE = Number(j.adaUsd) || null;
+    try { sessionStorage.setItem("ge-coins", JSON.stringify({ at: Date.now(), list: coins, rate: RATE })); } catch {}
     return coins;
   }).finally(() => (loading = null));
   return loading;
@@ -44,7 +45,7 @@ function resultRow(c, i) {
   const tk = c.tk || "?";
   const v = c.w && c.w.h24 ? c.w.h24.v : 0;
   const img = c.img ? `<img src="${esc(c.img)}" alt="" width="32" height="32" loading="lazy">` : `<span class="sr-ph" aria-hidden="true">${esc(tk.slice(0, 1))}</span>`;
-  const meta = [c.price != null ? price(c.price) + " ADA" : "", v ? compact(v) + " ADA 24h" : "No trades in 24h", curve(c)].filter(Boolean).join(" · ");
+  const meta = [c.price != null ? price(c.price) + " ADA" + (RATE ? ` (${usdcxPrice(c.price, RATE)})` : "") : "", v ? compact(v) + " ADA" + (RATE ? ` (${usdcxShort(v, RATE)})` : "") + " 24h" : "No trades in 24h", curve(c)].filter(Boolean).join(" · ");
   const al = Object.keys(c.al || {}).length;
   return `<li class="sr-item" role="option" id="sr-${i}" aria-selected="false">
     <a class="sr-main" href="./tokens.html?q=${encodeURIComponent(tk)}">${img}<span><strong>${esc(tk)}</strong> <span class="sr-name">${esc((c.name || "").slice(0, 28))}</span><span class="sr-meta">${esc(meta)}</span></span></a>

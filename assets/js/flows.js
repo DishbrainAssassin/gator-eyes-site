@@ -1,9 +1,9 @@
 // Flows dashboard. Reads the same feed as the home page through data.js.
-import { subscribe, coinUrl } from "./data.js?v=20261102-hatch";
-import { alertCard, emptyState, skeleton, dayLabel, fmt, usdcx, usdcxSigned, rateNote, compact, clock, timeAgo, esc, mergeDays, lpSplit } from "./ui.js?v=20261102-hatch";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-hatch";
-import * as platform from "./platform.js?v=20261102-hatch";
-import { pill } from "./platform.js?v=20261102-hatch";
+import { subscribe, coinUrl } from "./data.js?v=20261102-usdcx";
+import { alertCard, emptyState, skeleton, dayLabel, fmt, usdcx, usdcxSigned, rateNote, compact, clock, timeAgo, esc, mergeDays, lpSplit, usdcxShort } from "./ui.js?v=20261102-usdcx";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx";
+import * as platform from "./platform.js?v=20261102-usdcx";
+import { pill } from "./platform.js?v=20261102-usdcx";
 
 wireLinks();
 platform.mount();
@@ -117,7 +117,7 @@ function renderKpis(d, rate) {
   el.kpis.innerHTML = [
     k("Volume", compact(d.volAda) + " ADA", usdcx(d.volAda, rate)),
     k("Net flow", signed(net) + " ADA", [usdcxSigned(net, rate), `${buyPct}% buys`].filter(Boolean).join(" · "), net >= 0 ? "pos" : "neg"),
-    k("Trades", fmt(d.trades), d.trades && d.volAda ? `avg ${fmt(d.volAda / d.trades)} ADA` : ""),
+    k("Trades", fmt(d.trades), d.trades && d.volAda ? `avg ${fmt(d.volAda / d.trades)} ADA${rate ? " · " + usdcxShort(d.volAda / d.trades, rate) : ""}` : ""),
     k("Wallets", fmt(d.wallets), "traded at least once"),
     k("Biggest trade", d.big ? compact(d.big.ada) + " ADA" : "–", d.big ? `${esc(d.big.side)} <a href="${esc(coinUrl(d.big.id))}" target="_blank" rel="noopener">$${esc(d.big.tk)}</a>${d.big.lp && platform.get() === "all" ? pill(d.big.lp) : ""}${rate ? " · " + usdcx(d.big.ada, rate) : ""}` : ""),
     k("Creator sells", fmt(d.dev ? d.dev.n : 0), d.dev ? fmt(d.dev.ada) + " ADA" + (d.dev.ada && rate ? " · " + usdcx(d.dev.ada, rate) : "") : ""),
@@ -225,7 +225,7 @@ function renderCoins(d, rate) {
         <td class="num ${k.net >= 0 ? "pos" : "neg"}">${signed(k.net)}<span class="cell-sub">${usdcxSigned(k.net, rate)}</span></td>
         <td class="split-col">${
           hasB
-            ? `<div class="rowsplit" title="Bought ${fmt(k.b)} ADA, sold ${fmt(s)} ADA"><span class="buy" style="width:${bp}%"></span><span class="sell" style="width:${100 - bp}%"></span></div><span class="cell-sub">${fmt(k.b)} / ${fmt(s)}</span>`
+            ? `<div class="rowsplit" title="Bought ${fmt(k.b)} ADA, sold ${fmt(s)} ADA"><span class="buy" style="width:${bp}%"></span><span class="sell" style="width:${100 - bp}%"></span></div><span class="cell-sub">${fmt(k.b)} / ${fmt(s)}</span>${rate ? `<span class="cell-sub">${usdcxShort(k.b, rate)} / ${usdcxShort(s, rate).replace(/^~/, "")}</span>` : ""}`
             : `<span class="muted">–</span>`
         }</td>
         <td class="num hide-sm">${fmt(k.n)}</td>
@@ -252,7 +252,7 @@ function weekSummary(opts) {
   }
   const last = (feed.weeks || []).filter((w) => w.src !== "snek").slice(-1)[0];
   const vs = last && last.vol && days.length >= 7 ? ` <span class="${vol >= last.vol ? "pos" : "neg"}">(${vol >= last.vol ? "+" : "−"}${Math.round(Math.abs(vol - last.vol) / last.vol * 100)}% vs last week)</span>` : "";
-  return `<p class="week-sum"><span>This week so far (Sun–Sat, ET): <b>${fmt(vol)} ADA</b>${vs}</span><span>Trades <b>${fmt(trades)}</b></span><span>Net <b class="${net >= 0 ? "pos" : "neg"}">${shortSigned(net)}</b></span>${busiest && days.length > 1 ? `<span>Busiest <b>${busiest.live ? "today" : esc(dayLabel(busiest.d.key).slice(0, 3))}</b></span>` : ""}${last ? `<span>Last week <b>${fmt(last.vol)} ADA</b></span>` : ""}</p>`;
+  return `<p class="week-sum"><span>This week so far (Sun–Sat, ET): <b>${fmt(vol)} ADA</b>${feed.rate ? ` <small class="muted">${usdcxShort(vol, feed.rate)}</small>` : ""}${vs}</span><span>Trades <b>${fmt(trades)}</b></span><span>Net <b class="${net >= 0 ? "pos" : "neg"}">${shortSigned(net)}</b>${feed.rate && net ? ` <small class="muted">${usdcxShort(Math.abs(net), feed.rate)}</small>` : ""}</span>${busiest && days.length > 1 ? `<span>Busiest <b>${busiest.live ? "today" : esc(dayLabel(busiest.d.key).slice(0, 3))}</b></span>` : ""}${last ? `<span>Last week <b>${fmt(last.vol)} ADA</b>${feed.rate ? ` <small class="muted">${usdcxShort(last.vol, feed.rate)}</small>` : ""}</span>` : ""}</p>`;
 }
 
 function renderWeek(opts) {
@@ -266,7 +266,7 @@ function renderWeek(opts) {
     .map((o) => {
       const d = o.d;
       const net = d.buyAda - d.sellAda;
-      const tip = `${dayLabel(d.key)}: ${fmt(d.volAda)} ADA (${usdcx(d.volAda, feed.rate)}), bought ${fmt(d.buyAda)}, sold ${fmt(d.sellAda)}, net ${signed(net)}`;
+      const tip = `${dayLabel(d.key)}: ${fmt(d.volAda)} ADA (${usdcx(d.volAda, feed.rate)}), bought ${fmt(d.buyAda)}, sold ${fmt(d.sellAda)}, net ${signed(net)} (${usdcxSigned(net, feed.rate)})`;
       return `<button class="wcol ${o.id === day ? "is-on" : ""}" data-week-day="${o.id}" title="${esc(tip)}" aria-label="${esc(tip)}">
         <span class="wval num">${compact(d.volAda)}</span>
         <span class="wbar" style="height:${(d.volAda / max) * 100}%"><span class="buy" style="height:${d.volAda ? (d.buyAda / d.volAda) * 100 : 0}%"></span></span>

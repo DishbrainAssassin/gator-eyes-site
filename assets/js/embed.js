@@ -1,7 +1,7 @@
 // Embeddable live-flows box. Use ?coin=<Solada coin id> for one coin, or leave it
 // off for all of Solada. Add &theme=light for light backgrounds.
-import { subscribe, setFeedParams } from "./data.js?v=20261102-hatch";
-import { esc, fmt, compact, timeAgo, KINDS, usdcx, usdcxSigned } from "./ui.js?v=20261102-hatch";
+import { subscribe, setFeedParams } from "./data.js?v=20261102-usdcx";
+import { esc, fmt, compact, timeAgo, KINDS, usdcx, usdcxSigned, usdcxShort } from "./ui.js?v=20261102-usdcx";
 
 const p = new URLSearchParams(location.search);
 const coinId = (p.get("coin") || "").trim();
@@ -49,11 +49,11 @@ function render(f, err) {
   $("[data-split]").hidden = $("[data-legend]").hidden = !hasSplit;
   if (hasSplit) {
     $("[data-split] .b").style.width = (x.b / x.v) * 100 + "%";
-    $("[data-legend]").innerHTML = `<span class="pos">Bought ${compact(x.b)}</span><span class="neg">Sold ${compact(x.s)}</span>`;
+    $("[data-legend]").innerHTML = `<span class="pos">Bought ${compact(x.b)}${f.rate ? ` <small>${usdcxShort(x.b, f.rate)}</small>` : ""}</span><span class="neg">Sold ${compact(x.s)}${f.rate ? ` <small>${usdcxShort(x.s, f.rate)}</small>` : ""}</span>`;
   }
   const list = f.alerts.filter((a) => a.kind !== "watch" && (!coinId || a.tokenId === coinId)).slice(0, 4);
   $("[data-alerts]").innerHTML = list.length
-    ? list.map((a) => `<li><span class="t">${esc((KINDS[a.kind] || {}).label || a.kind)}${a.ticker && !coinId ? " · $" + esc(a.ticker) : ""}${a.ada ? " · " + compact(a.ada) + " ADA" : ""}</span><span class="a">${timeAgo(a.at)}</span></li>`).join("")
+    ? list.map((a) => `<li><span class="t">${esc((KINDS[a.kind] || {}).label || a.kind)}${a.ticker && !coinId ? " · $" + esc(a.ticker) : ""}${a.ada ? " · " + compact(a.ada) + " ADA" + (f.rate ? ` (${usdcxShort(a.ada, f.rate)})` : "") : ""}</span><span class="a">${timeAgo(a.at)}</span></li>`).join("")
     : `<li class="empty">No alerts${coinId ? " for this coin" : ""} in the last few hours.</li>`;
 }
 

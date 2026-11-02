@@ -2,8 +2,8 @@
 // Each return visit shows the next one; arrows and dots browse all of them.
 // Items are typed so a future "coin" slot (featured coins) can join the rotation
 // without changing the rotation or layout code.
-import { esc } from "./ui.js?v=20261102-hatch";
-import * as watchlist from "./watchlist.js?v=20261102-hatch";
+import { esc } from "./ui.js?v=20261102-usdcx";
+import * as watchlist from "./watchlist.js?v=20261102-usdcx";
 
 export const ITEMS = [
   { type: "feature", key: "phone", tag: "Phone alerts", title: "Alerts on your phone", href: "./app.html", cta: "Set up phone alerts",

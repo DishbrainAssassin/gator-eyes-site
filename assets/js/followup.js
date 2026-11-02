@@ -1,10 +1,10 @@
 // Alert follow-up: what each alert's coin did 1 hour and 24 hours later.
-import { getApi, price, pct } from "./api.js?v=20261102-hatch";
-import { coinUrl, isSnek, fetchFeed } from "./data.js?v=20261102-hatch";
-import { esc, fmt, timeAgo } from "./ui.js?v=20261102-hatch";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-hatch";
-import * as platform from "./platform.js?v=20261102-hatch";
-import { pill } from "./platform.js?v=20261102-hatch";
+import { getApi, price, pct, usdcxPrice } from "./api.js?v=20261102-usdcx";
+import { coinUrl, isSnek, fetchFeed } from "./data.js?v=20261102-usdcx";
+import { esc, fmt, timeAgo, usdcxShort } from "./ui.js?v=20261102-usdcx";
+import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx";
+import * as platform from "./platform.js?v=20261102-usdcx";
+import { pill } from "./platform.js?v=20261102-usdcx";
 
 wireLinks();
 platform.mount();
@@ -21,7 +21,7 @@ const TYPES = {
 };
 const typeOf = (a) => Object.keys(TYPES).find((k) => TYPES[k].test(a));
 const params = new URLSearchParams(location.search);
-const st = { days: 7, k: "", q: params.get("coin") || "", more: false, list: [], imgs: {}, updatedAt: null };
+const st = { days: 7, k: "", q: params.get("coin") || "", more: false, list: [], imgs: {}, updatedAt: null, rate: null };
 if (st.q) $("[data-search]").value = st.q;
 
 const chg = (a, b) => (a && b ? (b / a - 1) * 100 : null);
@@ -72,8 +72,8 @@ function render() {
       <td><span class="cell-sub" style="font-size:var(--text-xs)">${esc(when(a.at))}</span></td>
       <td><div class="coin-cell">${im}<a href="${esc(coinUrl(a.id))}" target="_blank" rel="noopener">${esc(a.tk || "?")}</a>${lp === "all" && isSnek(a.id) ? pill("snek") : ""}</div></td>
       <td><span class="badge-k" style="--k:${t.color}">${esc(t.label)}</span></td>
-      <td class="num hide-sm">${a.ada != null ? fmt(a.ada) + " ADA" : "–"}</td>
-      <td class="num hide-sm">${price(a.p0)}</td>
+      <td class="num hide-sm">${a.ada != null ? fmt(a.ada) + " ADA" : "–"}${a.ada != null && st.rate ? `<span class="cell-sub">${usdcxShort(a.ada, st.rate)}</span>` : ""}</td>
+      <td class="num hide-sm">${price(a.p0)}${st.rate ? `<span class="cell-sub">${usdcxPrice(a.p0, st.rate)}</span>` : ""}</td>
       <td class="num">${later(a, "p1", 36e5)}</td>
       <td class="num">${later(a, "p24", 864e5)}</td>
     </tr>`;
@@ -104,7 +104,7 @@ async function load() {
   try {
     const j = await getApi("/followup");
     rows = j.alerts || []; imgs = j.imgs || {}; at = j.updatedAt ? Date.parse(j.updatedAt) : null;
-    let sources; try { sources = (await fetchFeed()).sources || undefined; } catch {}
+    let sources; try { const f = await fetchFeed(); sources = f.sources || undefined; st.rate = f.rate || null; } catch {}
     liveStatus({ updatedAt: new Date(at || Date.now()), sources });
   } catch (e) { liveStatus(null, e); }
   if (!rows.length) {
