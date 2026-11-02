@@ -243,6 +243,7 @@ const FAQ = [
   { keys: ["solana", "dual", "pump.fun", "pumpfun"], a: () => "Gator Eyes counts Solada.fun trades on Cardano (the Solada curve, Minswap and Splash) plus Pump.fun trades of Solada coins that are also on Solana. Holder snapshots are Cardano-side only." },
   { keys: ["eastern", "time zone", "timezone", "midnight"], a: () => "All times on Gator Eyes are Eastern (New York). Days run midnight to midnight Eastern." },
   { keys: ["contact", "bug", "suggest", "idea", "feedback", "who made", "who runs", "owner"], a: () => `Ideas or bugs? Drop them in ${discord()}. The team reads everything.` },
+  { keys: ["solada markets", "markets", "chart", "charts", "portfolio", "pnl", "p&l", "follow a wallet", "follow wallet", "wallet tracking"], a: () => `Charts, portfolio P&L and following wallets live on ${a("https://www.solada.fun/markets?r=6pxznt5n", "Solada Markets", true)}, Solada's own market page. Buys made there earn daily $SOLADA rewards. Gator Eyes does the other half: it watches every trade around the clock and sends the big ones to Discord, X and your phone.` },
   { keys: ["suri"], a: () => `${a("https://suriradar.fun/", "Suri Radar", true)} is built for checking coin safety. Gator Eyes sticks to reporting what traded.` },
 ];
 
