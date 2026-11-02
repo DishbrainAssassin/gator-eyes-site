@@ -197,13 +197,14 @@ document.querySelectorAll("[data-ch]").forEach((b) => b.addEventListener("click"
 // GeckoTerminal: PumpSwap pool open time (graduation) and Solana-side 24h volume, one request for all pools.
 // Graduation times never change, so they are kept in the browser; volumes refresh every 10 minutes.
 const SOL_KEY = "ge-grad-sol", AT_KEY = "ge-grad-sol-at";
-const readJ = (store, k) => { try { return JSON.parse(store.getItem(k) || "null"); } catch { return null; } };
-const saveJ = (store, k, v) => { try { store.setItem(k, JSON.stringify(v)); } catch {} };
+// Storage can be blocked (private mode, some preview hosts): touching it at all must stay inside try.
+const readJ = (where, k) => { try { return JSON.parse(window[where].getItem(k) || "null"); } catch { return null; } };
+const saveJ = (where, k, v) => { try { window[where].setItem(k, JSON.stringify(v)); } catch {} };
 async function loadSol(coins) {
   const pairs = coins.filter(isSolGrad).map((c) => c.pair).filter(Boolean);
   if (!pairs.length) return;
-  const ats = readJ(localStorage, AT_KEY) || {};
-  const hit = readJ(sessionStorage, SOL_KEY);
+  const ats = readJ("localStorage", AT_KEY) || {};
+  const hit = readJ("sessionStorage", SOL_KEY);
   const d = {};
   for (const p of pairs) d[p] = { at: ats[p] || null, v: hit && hit.d[p] ? hit.d[p].v : null };
   st.sol = d;
@@ -220,8 +221,8 @@ async function loadSol(coins) {
       if (at) ats[a.address] = at;
     }
     st.sol = { ...d };
-    saveJ(localStorage, AT_KEY, ats);
-    saveJ(sessionStorage, SOL_KEY, { t: Date.now(), d });
+    saveJ("localStorage", AT_KEY, ats);
+    saveJ("sessionStorage", SOL_KEY, { t: Date.now(), d });
   } catch {
     // Rate-limited or offline: rows still show, just without the Solana time and volume.
   } finally {
@@ -236,7 +237,7 @@ async function load() {
     const j = await getApi("/tokens");
     st.data = j;
     notice.hidden = true;
-    loadSol(j.coins || []).then(render);
+    loadSol(j.coins || []).catch(() => {}).then(() => { st.solTried = true; render(); });
     liveStatus({ updatedAt: new Date(j.updatedAt), sources: { snek: { on: (j.coins || []).some((c) => c.src === "snek") } } });
     render();
   } catch (e) {
