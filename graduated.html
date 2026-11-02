@@ -28,6 +28,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/css/style.css?v=20261101-tape2">
   <link rel="stylesheet" href="./assets/css/clean-layout.css?v=20261101-tape2">
+  <link rel="stylesheet" href="./assets/css/graduated.css?v=20261102-chain">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -58,7 +59,8 @@
           <div>
             <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching Solada and Snek.fun</span></p>
             <h1 id="dash-title">Graduated coins</h1>
-            <p class="dash-lede">Coins that filled their bonding curve and moved to a regular pool: Minswap for Solada.fun, Splash for Snek.fun. See when each one graduated, how long it took, and how it has traded since. Coins still on the curve are on the <a href="./race.html">Graduation race</a>.</p>
+            <div class="seg chain-seg" role="group" aria-label="Filter by chain" data-chain><button type="button" data-ch="all" aria-pressed="true" class="is-on">All</button><button type="button" data-ch="cardano" aria-pressed="false" class="ch-ada"><i></i>Cardano</button><button type="button" data-ch="solana" aria-pressed="false" class="ch-sol"><i></i>Solana</button></div>
+            <p class="dash-lede">Coins that filled their bonding curve and moved to a regular pool: Minswap for Solada.fun, Splash for Snek.fun, and PumpSwap for Solada's Pump coins on Solana. See when each one graduated, how long it took, and how it has traded since. Coins still on the curve are on the <a href="./race.html">Graduation race</a>.</p>
           </div>
           <div class="tabs" role="tablist" aria-label="Sort" data-sorts><button class="tab is-on" role="tab" aria-selected="true" data-s="recent">Newest</button><button class="tab" role="tab" data-s="big">Biggest</button><button class="tab" role="tab" data-s="fast">Fastest</button></div>
         </div>
@@ -99,7 +101,7 @@
         </div>
         <div class="list-foot"><button class="btn btn-ghost btn-sm" data-more hidden>Show all</button></div>
       </article>
-      <p class="dash-foot">Graduation times come from Solada. Snek.fun does not publish a graduation time, so its coins show as graduated to Splash without one, and only appear here while they have traded in the last 24 hours. Market cap and prices are in ADA. Net flow is ADA bought minus ADA sold. <span class="updated" data-updated></span> Not financial advice.</p>
+      <p class="dash-foot">Cardano graduation times come from Solada. Solana graduation times are when the coin's PumpSwap pool opened, read from GeckoTerminal. Market cap, holders and flows for Pump coins are Gator Eyes' usual ADA figures; their Solana-side volume is shown underneath in dollars. Snek.fun does not publish a graduation time, so its coins show as graduated to Splash without one, and only appear here while they have traded in the last 24 hours. Market cap and prices are in ADA. Net flow is ADA bought minus ADA sold. <span class="updated" data-updated></span> Not financial advice.</p>
     </section>
   </main>
   <footer class="site-footer">
@@ -108,6 +110,6 @@
       <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./tokens.html">Tokens</a><a href="./tools.html">Tools</a><a href="./app.html">Get the app</a></nav>
     </div>
   </footer>
-  <script type="module" src="./assets/js/graduated.js?v=20261102-grad"></script>
+  <script type="module" src="./assets/js/graduated.js?v=20261102-chain"></script>
 </body>
 </html>

@@ -1,5 +1,6 @@
-// Graduated coins: every coin that left the Solada.fun or Snek.fun bonding curve
-// for a regular pool, with when it graduated, how long it took and how it trades now.
+// Graduated coins: every coin that left its bonding curve for a regular pool, on Cardano
+// (Solada.fun to Minswap, Snek.fun to Splash) or Solana (Solada Pump coins to PumpSwap),
+// with when it graduated, how long it took and how it trades now.
 import { getApi, price, pct, signed, span } from "./api.js?v=20261102-statcard";
 import { coinUrl } from "./data.js?v=20261102-statcard";
 import { esc, fmt, compact, timeAgo } from "./ui.js?v=20261102-statcard";
@@ -18,10 +19,21 @@ const $ = (s) => document.querySelector(s);
 const rowsEl = $("[data-rows]"), moreBtn = $("[data-more]"), notice = $("[data-notice]");
 const params = new URLSearchParams(location.search);
 const WHEN = { all: Infinity, d1: 864e5, d7: 7 * 864e5, d30: 30 * 864e5 };
-const st = { s: "recent", sort: null, dir: -1, t: WHEN[params.get("t")] ? params.get("t") : "all", q: (params.get("q") || "").trim(), more: false, data: null };
+const CHAINS = ["all", "cardano", "solana"];
+const st = { ch: CHAINS.includes(params.get("chain")) ? params.get("chain") : "all", sol: {}, s: "recent", sort: null, dir: -1, t: WHEN[params.get("t")] ? params.get("t") : "all", q: (params.get("q") || "").trim(), more: false, data: null };
 document.querySelectorAll("[data-t]").forEach((x) => x.classList.toggle("is-on", x.dataset.t === st.t));
 if (st.q) $("[data-search]").value = st.q;
 
+// Solada Pump coins graduate on Solana when their Pump.fun curve fills (100% = 10,000 bps).
+const isSolGrad = (c) => c.kind === "pump" && Number(c.prog) >= 10000;
+const chainOf = (c) => (c.kind === "pump" ? "solana" : "cardano");
+const isGrad = (c) => c.cs === "graduated" || isSolGrad(c);
+const inChain = (c) => st.ch === "all" || chainOf(c) === st.ch;
+// Solana graduation time = when the coin's PumpSwap pool opened. Filled in from GeckoTerminal.
+const withSol = (c) => {
+  const x = c.pair && st.sol[c.pair];
+  return x ? { ...c, gAt: c.gAt || x.at || null, solV: x.v } : c;
+};
 const took = (c) => (c.gAt && c.born && c.gAt > c.born ? c.gAt - c.born : null);
 const h24 = (c) => (c.w && c.w.h24) || { v: 0, n: 0, b: 0, s: 0, net: 0, wal: 0, ch: null };
 
@@ -40,6 +52,11 @@ function val(c, k) {
 }
 
 function gradCell(c) {
+  if (chainOf(c) === "solana") {
+    if (!c.gAt) return `<span title="Graduated on Solana to a PumpSwap pool">To PumpSwap</span><span class="cell-sub">${st.solTried ? "time unavailable" : "time loading"}</span>`;
+    const t = took(c);
+    return `<span title="Graduated on Solana to a PumpSwap pool on ${esc(new Date(c.gAt).toLocaleString())}">${esc(timeAgo(c.gAt))}</span><span class="cell-sub">${t != null ? "took " + esc(span(t)) : "to PumpSwap"}</span>`;
+  }
   const venue = c.src === "snek" ? "Splash pool" : "Minswap pool";
   if (!c.gAt) return `<span title="Graduated to the ${venue}. Snek.fun does not publish a graduation time.">To Splash</span><span class="cell-sub">time not published</span>`;
   const t = took(c);
@@ -63,11 +80,11 @@ function row(c, rate, showPill) {
   const img = c.img ? `<img src="${esc(c.img)}" alt="" loading="lazy" width="28" height="28">` : `<span class="coin-dot"></span>`;
   return `<tr data-id="${esc(c.id)}">
     <td class="star-col">${starBtn(c)}</td>
-    <td><div class="coin-cell">${img}<div><a href="${esc(coinUrl(c.id))}" target="_blank" rel="noopener">${esc(c.tk || "?")}</a>${showPill && c.src === "snek" ? pill("snek") : ""}<span class="cell-sub">${esc((c.name || "").slice(0, 22))}</span></div></div></td>
+    <td><div class="coin-cell">${img}<div><a href="${esc(coinUrl(c.id))}" target="_blank" rel="noopener">${esc(c.tk || "?")}</a>${showPill && c.src === "snek" ? pill("snek") : ""}${st.ch !== "solana" && chainOf(c) === "solana" ? `<span class="chain-pill" title="Graduated on Solana"><i></i>Solana</span>` : ""}<span class="cell-sub">${esc((c.name || "").slice(0, 22))}</span></div></div></td>
     <td class="grad-cell">${gradCell(c)}</td>
     <td class="num">${compact(c.mc)}<span class="cell-sub">${c.price != null ? esc(price(c.price)) : ""}</span></td>
     <td class="num hide-sm">${c.hold != null ? fmt(c.hold) : "–"}</td>
-    <td class="num">${fmt(w.v)}<span class="cell-sub">${fmt(w.n)} trades</span></td>
+    <td class="num">${fmt(w.v)}<span class="cell-sub">${fmt(w.n)} ${w.n === 1 ? "trade" : "trades"}${c.solV != null ? ` · $${esc(compact(c.solV))} on Solana` : ""}</span></td>
     <td class="num hide-sm ${w.ch > 0 ? "pos" : w.ch < 0 ? "neg" : ""}">${pct(w.ch)}</td>
     <td class="num split-col hide-sm"><span class="${w.net > 0 ? "pos" : w.net < 0 ? "neg" : ""}">${signed(w.net)}</span><span class="rowsplit" title="${fmt(w.b)} ADA bought, ${fmt(w.s)} ADA sold"><span class="split-buy" style="width:${bp}%"></span></span></td>
     <td class="hide-sm">${actions(c)}</td>
@@ -82,15 +99,15 @@ function kpis(all) {
   const median = tooks.length ? tooks[Math.floor((tooks.length - 1) / 2)] : null;
   const vol = all.reduce((s, c) => s + (h24(c).v || 0), 0);
   const net = all.reduce((s, c) => s + (h24(c).net || 0), 0);
+  const solV = all.reduce((s, c) => s + (c.solV || 0), 0);
   const latest = timed.sort((a, b) => b.gAt - a.gAt)[0];
-  const counts = { solada: all.filter((c) => c.src !== "snek").length, snek: all.filter((c) => c.src === "snek").length };
-  const scope = platform.get();
-  const split = scope === "all" ? `${fmt(counts.solada)} Solada · ${fmt(counts.snek)} Snek.fun` : "being tracked";
+  const ada = all.filter((c) => chainOf(c) === "cardano").length, sol = all.length - ada;
+  const split = st.ch === "all" ? `${fmt(ada)} Cardano · ${fmt(sol)} Solana` : st.ch === "solana" ? "Pump coins on PumpSwap" : platform.get() === "all" ? `${fmt(all.filter((c) => c.src === "snek").length)} on Snek.fun` : "being tracked";
   return [
     ["Graduated", fmt(all.length), split],
     ["This week", fmt(week.length), latest ? "latest: " + (latest.tk || "") + ", " + timeAgo(latest.gAt) : "none with a time"],
     ["Typical time", median != null ? span(median) : "–", tooks.length ? `launch to graduation, median of ${tooks.length}` : "no graduation times"],
-    ["24h volume", fmt(vol) + " ADA", `net flow ${signed(net)} ADA`],
+    ["24h volume", fmt(vol) + " ADA", `net flow ${signed(net)} ADA${solV ? ` · $${compact(solV)} on Solana` : ""}`],
   ].map(([l, v, s]) => `<div class="kpi"><span class="kpi-label">${esc(l)}</span><span class="kpi-value">${esc(v)}</span><span class="kpi-sub">${esc(s)}</span></div>`).join("");
 }
 
@@ -119,8 +136,8 @@ function render() {
   const d = st.data;
   if (!d) return;
   const now = Date.now();
-  const allGrads = (d.coins || []).filter((c) => c.cs === "graduated");
-  $("[data-lp-split]").innerHTML = split(allGrads);
+  const allGrads = (d.coins || []).filter((c) => isGrad(c) && inChain(c)).map(withSol);
+  $("[data-lp-split]").innerHTML = st.ch === "solana" ? "" : split(allGrads);
   const grads = allGrads.filter((c) => platform.inScope(c));
   $("[data-kpis]").innerHTML = kpis(grads.slice());
   const q = st.q.toLowerCase().replace(/^\$/, "");
@@ -135,7 +152,7 @@ function render() {
   list.sort((a, b) => dir * (val(a, key) - val(b, key)) || (b.mc || 0) - (a.mc || 0));
   const shown = st.more ? list : list.slice(0, 50);
   const showPill = platform.get() === "all";
-  const emptyMsg = q ? `No graduated coin matches "${esc(st.q)}".` : st.t !== "all" ? "No coins graduated in this window." : "No graduated coins on this launchpad right now.";
+  const emptyMsg = st.ch === "solana" && platform.get() === "snek" ? `Snek.fun coins are Cardano-only. <button type="button" class="link" data-platform="all">Show all launchpads</button>` : q ? `No graduated coin matches "${esc(st.q)}".` : st.t !== "all" ? "No coins graduated in this window." : "No graduated coins on this launchpad right now.";
   rowsEl.innerHTML = shown.length ? shown.map((c) => row(c, d.adaUsd, showPill)).join("") : `<tr><td colspan="9"><div class="empty"><p>${emptyMsg}</p></div></td></tr>`;
   watchlist.wire();
   moreBtn.hidden = st.more || list.length <= 50;
@@ -165,6 +182,53 @@ document.querySelectorAll("[data-t]").forEach((b) => b.addEventListener("click",
 $("[data-search]").addEventListener("input", (e) => { st.q = e.target.value.trim(); render(); });
 moreBtn.addEventListener("click", () => { st.more = true; render(); });
 
+const paintChain = () => document.querySelectorAll("[data-ch]").forEach((b) => { const on = b.dataset.ch === st.ch; b.classList.toggle("is-on", on); b.setAttribute("aria-pressed", String(on)); });
+paintChain();
+document.querySelectorAll("[data-ch]").forEach((b) => b.addEventListener("click", () => {
+  st.ch = b.dataset.ch;
+  st.more = false;
+  paintChain();
+  const u = new URL(location.href);
+  if (st.ch === "all") u.searchParams.delete("chain"); else u.searchParams.set("chain", st.ch);
+  history.replaceState(null, "", u);
+  render();
+}));
+
+// GeckoTerminal: PumpSwap pool open time (graduation) and Solana-side 24h volume, one request for all pools.
+// Graduation times never change, so they are kept in the browser; volumes refresh every 10 minutes.
+const SOL_KEY = "ge-grad-sol", AT_KEY = "ge-grad-sol-at";
+const readJ = (store, k) => { try { return JSON.parse(store.getItem(k) || "null"); } catch { return null; } };
+const saveJ = (store, k, v) => { try { store.setItem(k, JSON.stringify(v)); } catch {} };
+async function loadSol(coins) {
+  const pairs = coins.filter(isSolGrad).map((c) => c.pair).filter(Boolean);
+  if (!pairs.length) return;
+  const ats = readJ(localStorage, AT_KEY) || {};
+  const hit = readJ(sessionStorage, SOL_KEY);
+  const d = {};
+  for (const p of pairs) d[p] = { at: ats[p] || null, v: hit && hit.d[p] ? hit.d[p].v : null };
+  st.sol = d;
+  if (hit && Date.now() - hit.t < 10 * 6e4 && pairs.every((p) => hit.d[p])) return;
+  try {
+    const r = await fetch("https://api.geckoterminal.com/api/v2/networks/solana/pools/multi/" + pairs.slice(0, 30).join(","), { headers: { accept: "application/json" } });
+    if (!r.ok) return;
+    const j = await r.json();
+    for (const p of j.data || []) {
+      const a = p.attributes || {};
+      if (!a.address) continue;
+      const at = a.pool_created_at ? Date.parse(a.pool_created_at) : null;
+      d[a.address] = { at: at || ats[a.address] || null, v: a.volume_usd && a.volume_usd.h24 != null ? Number(a.volume_usd.h24) : null };
+      if (at) ats[a.address] = at;
+    }
+    st.sol = { ...d };
+    saveJ(localStorage, AT_KEY, ats);
+    saveJ(sessionStorage, SOL_KEY, { t: Date.now(), d });
+  } catch {
+    // Rate-limited or offline: rows still show, just without the Solana time and volume.
+  } finally {
+    st.solTried = true;
+  }
+}
+
 rowsEl.innerHTML = Array.from({ length: 8 }, () => `<tr><td colspan="9"><div class="skel-block" style="min-height:36px"></div></td></tr>`).join("");
 
 async function load() {
@@ -172,6 +236,7 @@ async function load() {
     const j = await getApi("/tokens");
     st.data = j;
     notice.hidden = true;
+    loadSol(j.coins || []).then(render);
     liveStatus({ updatedAt: new Date(j.updatedAt), sources: { snek: { on: (j.coins || []).some((c) => c.src === "snek") } } });
     render();
   } catch (e) {
