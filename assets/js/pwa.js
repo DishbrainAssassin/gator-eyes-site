@@ -82,7 +82,7 @@ export async function save(prefs, sub) {
   sub = sub || (await currentSub());
   if (!sub) throw new Error("Alerts aren't on for this device yet.");
   const p = { kinds: prefs.kinds, src: prefs.src, watchOnly: !!prefs.watchOnly };
-  const r = await post("/subscribe", { sub: sub.toJSON(), prefs: { ...p, watchMin: watchlist.minAda(), watch: watchIds() } });
+  const r = await post("/subscribe", { sub: sub.toJSON(), prefs: { ...p, watchMin: watchlist.minAda(), watch: watchIds() }, dev: deviceType() });
   const saved = { ...p, mutedUntil: Number(r.mutedUntil) || 0, synced: sig(p) };
   storePrefs(saved);
   return saved;
@@ -137,7 +137,24 @@ function nudge() {
   document.body.appendChild(bar);
 }
 
+// Anonymous install count. Sends only the device type (iPhone, Android or desktop) and how the
+// install was seen, once per device. No id, no watchlist, nothing else. See privacy.html#counts.
+// Android and desktop Chrome/Edge report "appinstalled"; iPhones don't, so there the first open
+// from the home-screen icon is counted instead (the home-screen app has its own storage on iOS).
+const COUNTED = "ge-install-counted";
+export const deviceType = () => isIOS() ? "iphone" : isAndroid() ? "android" : "desktop";
+function countInstall(how) {
+  try {
+    if (localStorage.getItem(COUNTED)) return;
+    localStorage.setItem(COUNTED, String(Date.now()));
+  } catch { return; }
+  const url = CONFIG.pushUrl.replace(/\/push$/, "") + "/stats/install";
+  fetch(url, { method: "POST", headers: { "content-type": "text/plain" }, body: JSON.stringify({ dev: deviceType(), how }), keepalive: true }).catch(() => {});
+}
+
 export function mountPwa() {
+  addEventListener("appinstalled", () => countInstall("installed"));
+  if (isStandalone()) countInstall("first-open");
   if (!("serviceWorker" in navigator)) return;
   registration();
   if (navigator.clearAppBadge && isStandalone()) navigator.clearAppBadge().catch(() => {});
