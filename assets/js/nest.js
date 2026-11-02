@@ -21,7 +21,7 @@ export const ITEMS = [
   { type: "feature", key: "race", tag: "Graduation race", title: "Who graduates next", href: "./race.html", cta: "Watch the race",
     text: "Coins closest to graduating from the bonding curve, with their pace and a rough time to finish." },
   { type: "feature", key: "graduated", tag: "Graduated coins", title: "Every coin that made it", href: "./graduated.html", cta: "See graduated coins",
-    text: "Every Solada.fun and Snek.fun graduate: when it graduated, how long it took, and how it has traded since." },
+    text: "Every graduate on Solada.fun, Snek.fun and Solada's Pump coins on Solana: when it graduated, how long it took, and how it has traded since. Switch between Cardano and Solana." },
   { type: "feature", key: "ask", tag: "Ask Quagmire", title: "Ask about any coin", ask: "What's close to graduating?", cta: "Ask Quagmire",
     text: "Ask in plain English about market cap, holders, inflows or what's close to graduating. Quagmire answers from the same live data as the site." },
   { type: "feature", key: "flows", tag: "Flows", title: "Follow the money", href: "./flows.html", cta: "Open Flows",
