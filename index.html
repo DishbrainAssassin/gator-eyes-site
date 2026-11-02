@@ -28,9 +28,10 @@
   <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/css/style.css?v=20261101-tape2">
-  <link rel="stylesheet" href="./assets/css/nest.css?v=20261102-nest">
+  <link rel="stylesheet" href="./assets/css/nest.css?v=20261102-nest2">
   <link rel="stylesheet" href="./assets/css/feature-map.css?v=20261030b">
   <link rel="stylesheet" href="./assets/css/clean-layout.css?v=20261101-tape2">
+  <link rel="stylesheet" href="./assets/css/home-hero.css?v=20261102-hero">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -55,24 +56,22 @@
   <div data-platform-bar></div>
 
   <main id="main">
-    <section class="hero" aria-labelledby="hero-title">
+    <section class="hero hero-v2" aria-labelledby="hero-title">
       <picture class="hero-art">
-        <img src="./assets/img/keyart-1600.webp" srcset="./assets/img/keyart-900.webp 900w, ./assets/img/keyart-1600.webp 1600w" sizes="100vw" alt="A gator's amber eyes watching from just above dark water" width="1600" height="800">
+        <img src="./assets/img/keyart-1600.webp" srcset="./assets/img/keyart-900.webp 900w, ./assets/img/keyart-1600.webp 1600w" sizes="(max-width: 760px) 100vw, 65vw" alt="A gator's amber eyes watching from just above dark water" width="1600" height="800">
       </picture>
       <div class="wrap hero-inner">
-        <p class="promise-line"><strong>Free forever.</strong> No paywall, no subscriptions, no sign-up and no coin required.</p>
         <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching Solada and Snek.fun</span></p>
         <h1 id="hero-title">Lurking so you don't have to.</h1>
-        <p class="lede">Whale buys, volume spikes and fast launches on Solada.fun and Snek.fun, as they happen. Not financial advice.</p>
-        <div class="cta-row hero-primary">
+        <div class="hero-actions">
           <a class="btn btn-amber" href="./tokens.html">Explore tokens <span aria-hidden="true">&rarr;</span></a>
+          <div class="hero-secondary" role="group" aria-label="Follow Gator Eyes">
+            <a class="phone-alerts-link" href="./app.html">Get alerts on your phone <span aria-hidden="true">→</span></a>
+            <a data-link="discord" href="https://discord.gg/8vq4NkAj6v">Discord</a>
+            <a data-link="x" href="https://x.com/GatorEyesADA">X</a>
+          </div>
         </div>
-        <div class="hero-secondary" role="group" aria-label="Follow Gator Eyes">
-          <a data-link="discord" href="https://discord.gg/8vq4NkAj6v">Discord</a>
-          <a data-link="x" href="https://x.com/GatorEyesADA">X</a>
-          <a class="phone-alerts-link" href="./app.html">Get alerts on your phone <span aria-hidden="true">→</span></a>
-        </div>
-
+        <p class="promise-line"><strong>Free forever.</strong> No paywall, no sign-up, no coin required. Not financial advice.</p>
       </div>
     </section>
 

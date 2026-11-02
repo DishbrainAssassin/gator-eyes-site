@@ -1,0 +1,35 @@
+/* Homepage hero v2: compact, eyes visible beside the text, actions on one row. index.html only. */
+.hero-v2 { min-height: 0; display: block; }
+.hero-v2 .hero-art { inset: 0 0 0 auto; width: 64%; }
+.hero-v2 .hero-art img { object-position: 50% 48%; opacity: 1; }
+.hero-v2::after { inset: 0; height: auto; background:
+  linear-gradient(90deg, var(--color-bg) 36%, color-mix(in oklab, var(--color-bg) 70%, transparent) 46%, transparent 62%),
+  linear-gradient(0deg, var(--color-bg) 0%, transparent 32%); }
+.hero-v2 .hero-inner { padding-block: var(--space-12) var(--space-8); }
+.hero-v2 .eyebrow { margin-bottom: var(--space-3); }
+.hero-v2 h1 { max-width: 14ch; font-size: clamp(2.4rem, 1.4rem + 2.6vw, 3.6rem); line-height: 1.02; }
+.hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-5); margin-top: var(--space-6); }
+.hero-v2 .hero-secondary { margin: 0; gap: var(--space-5); }
+.hero-v2 .promise-line { margin: var(--space-4) 0 0; font-size: var(--text-xs); color: var(--color-text-faint); max-width: none; }
+.hero-v2 .promise-line strong { color: var(--color-amber); }
+/* Pull the Nest up so the hero flows straight into it. */
+.hero-v2 + .since[hidden] + .nest-wrap, .hero-v2 + .since + .nest-wrap { padding-top: 0; }
+.home-market { padding-top: var(--space-12); }
+@media (max-width: 1100px) {
+  .hero-v2 .hero-art { width: 72%; }
+  .hero-v2::after { background: linear-gradient(90deg, var(--color-bg) 30%, color-mix(in oklab, var(--color-bg) 70%, transparent) 44%, transparent 64%), linear-gradient(0deg, var(--color-bg) 0%, transparent 32%); }
+}
+@media (max-width: 760px) {
+  /* Phone: the eyes get their own short band above the text. */
+  .hero-v2 .hero-art { inset: 0 0 auto 0; width: 100%; height: 52vw; }
+  .hero-v2 .hero-art img { object-position: 50% 46%; opacity: 1; }
+  .hero-v2::after { inset: 0 0 auto 0; height: 52vw; background: linear-gradient(0deg, var(--color-bg) 4%, transparent 55%); }
+  .hero-v2 .hero-inner { padding-block: calc(52vw - var(--space-8)) var(--space-6); }
+  .hero-v2 h1 { font-size: clamp(2rem, 9vw, 2.6rem); max-width: 13ch; }
+  .hero-actions { margin-top: var(--space-5); gap: var(--space-2) var(--space-4); }
+  .hero-actions .btn { width: 100%; justify-content: center; }
+  .hero-v2 .hero-secondary { gap: var(--space-4); width: 100%; }
+  .hero-v2 .hero-secondary .phone-alerts-link { font-size: var(--text-sm); }
+  .hero-v2 .hero-secondary .phone-alerts-link span { display: inline; }
+  .home-market { padding-top: var(--space-10); }
+}

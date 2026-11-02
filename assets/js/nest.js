@@ -87,6 +87,7 @@ export function mountNest(root = document.querySelector("[data-nest]")) {
       <header class="nest-head">
         <div><h2 class="nest-name">Gator Nest</h2><p class="nest-meta">New on Gator Eyes this week · <span data-nest-pos></span></p></div>
         <div class="nest-nav">
+          <div class="nest-dots" role="group" aria-label="Choose a feature">${items.map((it, k) => `<button type="button" data-nest-go="${k}" aria-label="${esc(it.tag)}"></button>`).join("")}</div>
           <button type="button" class="nest-arrow" data-nest-step="-1" aria-label="Previous feature">&larr;</button>
           <button type="button" class="nest-arrow" data-nest-step="1" aria-label="Next feature">&rarr;</button>
         </div>
@@ -95,7 +96,6 @@ export function mountNest(root = document.querySelector("[data-nest]")) {
         <div class="nest-body" data-nest-body aria-live="polite"></div>
         <div class="nest-next"><p class="nest-next-h">Up next</p><ol data-nest-next></ol></div>
       </div>
-      <div class="nest-dots" role="group" aria-label="Choose a feature">${items.map((it, k) => `<button type="button" data-nest-go="${k}" aria-label="${esc(it.tag)}"></button>`).join("")}</div>
     </div></div>`;
   const body = root.querySelector("[data-nest-body]");
   const pos = root.querySelector("[data-nest-pos]");
