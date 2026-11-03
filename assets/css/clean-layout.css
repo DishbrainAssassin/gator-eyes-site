@@ -196,8 +196,15 @@ html.is-app .site-header .hdr-search { display: inline-flex !important; min-widt
 .more-kinds > summary small { color: var(--color-text-muted); font-weight: 400; }
 .more-kinds .checks { margin-top: var(--space-2); }
 
-/* Installed phone app: no Gator Nest carousel or Browse all tools button (the bottom bar has Tools),
-   and no "Get alerts on your phone" button once this device already gets alerts. */
-html.is-app .nest-wrap,
-html.is-app .browse-tools-link,
-html.is-app.alerts-on .phone-alerts-link { display: none !important; }
+/* Installed phone app: no Gator Nest carousel. */
+html.is-app .nest-wrap { display: none !important; }
+
+/* Installed phone app home: alerts first, no intro hero. */
+html.app-home .hero { display: none; }
+html.app-home #alerts { padding-top: var(--space-3); }
+html.app-home #alerts .section-head { align-items: center; margin-bottom: var(--space-3); }
+html.app-home #alerts .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: calc(-1 * var(--space-4)); padding-inline: var(--space-4); }
+html.app-home #alerts .chips::-webkit-scrollbar { display: none; }
+html.app-home #alerts .chip { flex: none; }
+.my-alerts-edit { margin-left: auto; min-height: 44px; display: inline-flex; align-items: center; padding-inline: var(--space-2); color: var(--color-amber); font-weight: 600; font-size: var(--text-sm); }
+.my-alerts-setup { display: flex; align-items: center; gap: var(--space-2); min-height: 44px; margin-bottom: var(--space-3); color: var(--color-amber); font-weight: 600; }

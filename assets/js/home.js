@@ -2,6 +2,8 @@ import { subscribe } from "./data.js?v=20261102-usdcx2";
 import { alertCard, emptyState, skeleton, tracks, mergeDays, lpSplit, dayLabel, fmt, usdcx, timeAgo, compact } from "./ui.js?v=20261102-usdcx2";
 import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx2";
 import * as platform from "./platform.js?v=20261102-usdcx2";
+import * as watchlist from "./watchlist.js?v=20261102-usdcx2";
+import { savedPrefs } from "./pwa.js?v=20261102-stats";
 
 const SHOW_ALL = ' <button type="button" class="link" data-platform="all">Show all launchpads</button>';
 
@@ -29,6 +31,35 @@ let filter = "all";
 let shown = 6;
 let day = "today";
 
+// Installed phone app: open straight to the alerts this device signed up for.
+const inApp = (() => {
+  if (matchMedia("(display-mode: standalone)").matches || navigator.standalone === true) return true;
+  try { return new URLSearchParams(location.search).get("source") === "app" || sessionStorage.getItem("ge-app-mode") === "1"; } catch { return false; }
+})();
+const prefs = inApp ? savedPrefs() : null;
+const NEW_COIN = ["hatch", "launch"];
+const isMine = (a) => !!prefs && prefs.kinds.includes(a.kind) && prefs.src.includes(platform.srcOf(a)) &&
+  (!prefs.watchOnly || a.kind === "watch" || NEW_COIN.includes(a.kind) || watchlist.has(a.tokenId));
+if (inApp) {
+  document.documentElement.classList.add("app-home");
+  const main = $("#main"), alerts = $("#alerts");
+  main.prepend(alerts);
+  const since = $("[data-since]");
+  if (since) alerts.after(since);
+  const head = alerts.querySelector(".section-head");
+  const chips = alerts.querySelector(".chips");
+  if (prefs) {
+    filter = "mine";
+    $("#alerts-title").textContent = "My alerts";
+    chips.querySelector('[data-filter="all"]').classList.remove("is-on");
+    chips.querySelector('[data-filter="all"]').setAttribute("aria-pressed", "false");
+    chips.insertAdjacentHTML("afterbegin", '<button class="chip is-on" data-filter="mine" aria-pressed="true">Mine</button>');
+    head.insertAdjacentHTML("beforeend", '<a class="my-alerts-edit" href="./app.html">Edit</a>');
+  } else {
+    head.insertAdjacentHTML("afterend", '<a class="my-alerts-setup" href="./app.html">Pick the alerts you want on this phone <span aria-hidden="true">&rarr;</span></a>');
+  }
+}
+
 listEl.innerHTML = skeleton(4);
 tracksEl.innerHTML = `<div class="kpis">${'<div class="kpi skel-block"></div>'.repeat(4)}</div>`;
 
@@ -52,14 +83,16 @@ moreBtn.addEventListener("click", () => {
 function renderAlerts() {
   if (!feed) return;
   const scoped = feed.alerts.filter(platform.inScope);
-  const list = scoped.filter((a) => filter === "all" || a.kind === filter);
+  const list = scoped.filter((a) => filter === "all" || (filter === "mine" ? isMine(a) : a.kind === filter));
   if (!list.length) {
     const lp = platform.get();
     const other = lp !== "all" && feed.alerts.length > scoped.length ? SHOW_ALL : "";
     listEl.innerHTML = emptyState(
       lp !== "all"
         ? `No ${platform.label(lp)} alerts in the last few hours.`
-        : filter === "all" ? "Quiet water. No alerts in the last few hours." : "Nothing in this category yet. The gator is still watching.",
+        : filter === "all" ? "Quiet water. No alerts in the last few hours."
+        : filter === "mine" ? "None of your alerts in the last few hours. The gator is still watching."
+        : "Nothing in this category yet. The gator is still watching.",
       other
     );
   } else {
