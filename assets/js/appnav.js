@@ -61,6 +61,12 @@ export function mountAppNav() {
     `<button type="button" class="app-nav-item app-nav-ask" data-ask aria-haspopup="dialog" aria-controls="gator-panel"><img src="./assets/img/gator-nerd-head-160.webp" alt="" width="24" height="24"><span>Ask</span></button>`;
   document.body.appendChild(nav);
 
+  // Once this device already gets alerts, the homepage "Get alerts on your phone" button is redundant.
+  navigator.serviceWorker?.getRegistration?.()
+    .then((reg) => reg?.pushManager?.getSubscription())
+    .then((sub) => { if (sub) document.documentElement.classList.add("alerts-on"); })
+    .catch(() => {});
+
   nav.querySelector("[data-app-back]").addEventListener("click", () => {
     if (canGoBack()) history.back();
     else location.href = "./index.html";

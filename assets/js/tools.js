@@ -2,6 +2,12 @@ import { wireLinks } from "./common.js?v=20261102-usdcx2";
 wireLinks();
 
 const search = document.querySelector("#tool-search");
+// In the installed phone app, drop tools that suit a desktop better.
+const inApp = (() => {
+  if (matchMedia("(display-mode: standalone)").matches || navigator.standalone === true) return true;
+  try { return new URLSearchParams(location.search).get("source") === "app" || sessionStorage.getItem("ge-app-mode") === "1"; } catch { return false; }
+})();
+if (inApp) document.querySelectorAll("[data-app-hide]").forEach((el) => el.remove());
 const groups = [...document.querySelectorAll(".directory-category")];
 const items = [...document.querySelectorAll(".directory-tool")];
 const count = document.querySelector("[data-tool-count]");
@@ -21,6 +27,7 @@ function filterTools() {
   empty.hidden = visible !== 0;
 }
 document.querySelector("[data-directory-search]").hidden = false;
+if (inApp) count.textContent = `${items.length} tools & destinations`;
 search.addEventListener("input", filterTools);
 document.querySelector("[data-directory-reset]").addEventListener("click", () => {
   search.value = "";

@@ -195,3 +195,9 @@ html.is-app .site-header .hdr-search { display: inline-flex !important; min-widt
 .more-kinds[open] > summary::after { content: "\2212"; }
 .more-kinds > summary small { color: var(--color-text-muted); font-weight: 400; }
 .more-kinds .checks { margin-top: var(--space-2); }
+
+/* Installed phone app: no Gator Nest carousel or Browse all tools button (the bottom bar has Tools),
+   and no "Get alerts on your phone" button once this device already gets alerts. */
+html.is-app .nest-wrap,
+html.is-app .browse-tools-link,
+html.is-app.alerts-on .phone-alerts-link { display: none !important; }

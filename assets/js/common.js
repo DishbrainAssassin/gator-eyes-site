@@ -24,7 +24,7 @@ export function wireLinks(root = document) {
   import("./extras.js?v=20261102-usdcx2").then((m) => m.mountExtras()).catch(() => {});
   import("./tape.js?v=20261102-usdcx2").then((m) => m.mountTape()).catch(() => {});
   import("./pwa.js?v=20261102-stats").then((m) => m.mountPwa()).catch(() => {});
-  import("./appnav.js?v=20261102-usdcx2").then((m) => m.mountAppNav()).catch(() => {});
+  import("./appnav.js?v=20261103-apptrim2").then((m) => m.mountAppNav()).catch(() => {});
 }
 
 function wireToolsMenu() {
