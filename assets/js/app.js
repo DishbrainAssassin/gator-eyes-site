@@ -92,7 +92,12 @@ function renderInstall(justInstalled = false) {
 }
 
 function renderKinds(p) {
-  $("[data-kinds]").innerHTML = pwa.KINDS.map((x) => `<label class="toggle"><input type="checkbox" name="kind" value="${x.k}"${p.kinds.includes(x.k) ? " checked" : ""}><span>${x.label}<small>${x.hint}</small></span></label>`).join("");
+  const MORE = ["hatch", "watch"];
+  const box = (x) => `<label class="toggle"><input type="checkbox" name="kind" value="${x.k}"${p.kinds.includes(x.k) ? " checked" : ""}><span>${x.label}<small>${x.hint}</small></span></label>`;
+  const main = pwa.KINDS.filter((x) => !MORE.includes(x.k)), extra = pwa.KINDS.filter((x) => MORE.includes(x.k));
+  const openMore = extra.some((x) => p.kinds.includes(x.k));
+  $("[data-kinds]").innerHTML = main.map(box).join("") +
+    (extra.length ? `<details class="more-kinds"${openMore ? " open" : ""}><summary>More alert types <small>${extra.map((x) => x.label).join(", ")}</small></summary><div class="checks">${extra.map(box).join("")}</div></details>` : "");
   form.querySelectorAll('[name="src"]').forEach((i) => { i.checked = p.src.includes(i.value); });
   form.querySelector('[name="watchOnly"]').checked = !!p.watchOnly;
 }

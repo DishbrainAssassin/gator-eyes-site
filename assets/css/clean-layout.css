@@ -176,3 +176,22 @@ html.is-app .gator { bottom: calc(var(--app-nav-h) + env(safe-area-inset-bottom)
 html.is-app .gator-panel { height: min(72vh, 600px, calc(100dvh - var(--app-nav-h) - env(safe-area-inset-bottom) - 96px)); }
 html.is-app .toast { bottom: calc(var(--app-nav-h) + env(safe-area-inset-bottom) + var(--space-3)); }
 html.is-app .app-nudge { bottom: calc(var(--app-nav-h) + env(safe-area-inset-bottom) + var(--space-3)); }
+
+/* Installed phone app: the bottom bar already covers Tokens, Watchlist, Tools and Ask,
+   so the top bar keeps only the logo, launchpad selector and search. Beginner mode stays in the footer. */
+html.is-app .site-header .nav,
+html.is-app .site-header .header-discord,
+html.is-app .site-header .hdr-beginner { display: none !important; }
+html.is-app .header-inner { gap: var(--space-3); }
+html.is-app .header-platform { margin-left: auto; }
+html.is-app .site-header .hdr-tools { display: flex !important; }
+html.is-app .site-header .hdr-search { display: inline-flex !important; min-width: 44px; min-height: 44px; }
+
+/* Phone alert settings: less-common alert types tucked under a disclosure. */
+.more-kinds { margin-top: var(--space-2); }
+.more-kinds > summary { min-height: 44px; display: inline-flex; align-items: center; gap: var(--space-2); cursor: pointer; color: var(--color-amber); font-weight: 600; list-style: none; }
+.more-kinds > summary::-webkit-details-marker { display: none; }
+.more-kinds > summary::after { content: "+"; font-weight: 700; }
+.more-kinds[open] > summary::after { content: "\2212"; }
+.more-kinds > summary small { color: var(--color-text-muted); font-weight: 400; }
+.more-kinds .checks { margin-top: var(--space-2); }
