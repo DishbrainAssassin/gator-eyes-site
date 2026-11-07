@@ -2,7 +2,7 @@
 export const CONFIG = {
   feedUrl: "https://gator-eyes.nlunn6731.workers.dev/feed",
   refreshMs: 60000,
-  ref: "6pxznt5n",
+  ref: "gatoreyesada",
   solada: "https://www.solada.fun",
   discord: "https://discord.gg/8vq4NkAj6v",
   x: "https://x.com/GatorEyesADA",
