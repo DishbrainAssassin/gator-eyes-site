@@ -10,7 +10,7 @@ for (const id of groupIds) {
   assert(html.includes(`href="#${id}"`), `Missing category shortcut: ${id}`);
 }
 const tools = [...html.matchAll(/<(a|button)\b[^>]*class="directory-tool(?: [^"]*)?"[^>]*>/g)];
-assert.equal(tools.length, 20, "Keep the displayed tool count accurate");
+assert.equal(tools.length, 21, "Keep the displayed tool count accurate");
 for (const [tag] of tools) {
   const href = tag.match(/href="([^"]+)"/)?.[1];
   if (!href?.startsWith("./")) continue;
@@ -31,4 +31,4 @@ for (const file of fs.readdirSync(root).filter(f => f.endsWith(".html"))) {
   if (!content.includes('class="tools-dropdown"')) continue;
   assert(/class="tools-dropdown">\s*<a class="all-tools-link"/.test(content), `All tools must be first: ${file}`);
 }
-console.log("PASS: five categories, 20 tools, local destinations, Discord setup, website chat, homepage entry and All tools ordering.");
+console.log("PASS: five categories, 21 tools, local destinations, Discord setup, website chat, homepage entry and All tools ordering.");

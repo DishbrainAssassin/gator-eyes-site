@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gator Eyes | Burn tracker for Solada.fun tokens</title>
+  <meta name="description" content="Every Solada.fun token sent to the Cardano Graveyard, read from the chain: how much of each coin is burned, who sent it, and which coins burn automatically.">
+  <meta property="og:title" content="Gator Eyes | Lurking so you don't have to">
+  <meta property="og:description" content="Free, live tracker for Solada.fun and Snek.fun: whale buys, volume spikes, new launches, money flows and holder checks. No sign-up, no wallet. Just ask Quagmire the gator.">
+  <meta property="og:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta property="og:url" content="https://www.gatoreyes.fun/burns.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Gator Eyes">
+  <link rel="canonical" href="https://www.gatoreyes.fun/burns.html">
+  <meta name="twitter:site" content="@GatorEyesADA">
+  <meta name="theme-color" content="#06090a">
+  <link rel="icon" href="./assets/img/favicon-64.png">
+  <link rel="apple-touch-icon" href="./assets/img/apple-touch-icon.png">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Gator Eyes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/style.css?v=20261107-burns">
+  <link rel="stylesheet" href="./assets/css/clean-layout.css?v=20261103-apphome">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./index.html" aria-label="Gator Eyes home">
+        <img src="./assets/img/avatar-256.webp" alt="" width="32" height="32">
+        <span>Gator Eyes</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="./tokens.html">Tokens</a>
+        <a href="./watchlist.html">Watchlist</a>
+        <details class="tools-menu">
+          <summary>Tools <span aria-hidden="true">⌄</span></summary>
+          <div class="tools-dropdown"><a class="all-tools-link" href="./tools.html">All tools</a><a href="./race.html">Graduation race</a><a href="./graduated.html">Graduated coins</a><a href="./flows.html">Flows</a><a href="./unlocks.html">Unlock calendar</a><a href="./burns.html" aria-current="page">Burn tracker</a><a href="./followup.html">Alert follow-up</a><a href="./holders.html">Holder snapshot</a><a href="./trades.html">Trade history</a><a href="./coincard.html">Stat card</a><a href="./card.html">Daily flow card</a><a href="./about.html">How it works</a><a href="./gaey.html">$GAEY</a></div>
+        </details>
+        <button type="button" class="nav-ask" data-ask aria-haspopup="dialog" aria-controls="gator-panel"><img src="./assets/img/gator-nerd-head-160.webp" alt="" width="28" height="28"><span>Ask Quagmire</span></button>
+      </nav>
+      <a class="btn btn-sm btn-ghost header-discord" data-link="discord" href="#">Join Discord</a>
+    </div>
+  </header>
+  <div data-platform-bar></div>
+
+    <main id="main" class="dash">
+    <section class="dash-top" aria-labelledby="dash-title">
+      <div class="wrap">
+        <div class="dash-head">
+          <div>
+            <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching the Graveyard</span></p>
+            <h1 id="dash-title">Burn tracker</h1>
+            <p class="dash-lede">Every Solada.fun token sent to the Cardano Graveyard, read from the chain. Tokens sent there can never come back out. See how much of each coin is gone, who sent it, and which coins burn automatically. Free, no sign-up.</p>
+          </div>
+          <div class="tabs" role="tablist" aria-label="Period" data-periods><button class="tab is-on" data-p="7">7 days</button><button class="tab" data-p="30">30 days</button><button class="tab" data-p="0">All</button></div>
+        </div>
+        <div class="notice" data-notice hidden role="status"></div>
+      </div>
+    </section>
+
+    <section class="wrap dash-body" aria-label="Burn tracker">
+      <div class="kpis kpis-unl" data-kpis></div>
+      <article class="panel" data-auto-panel hidden>
+        <header class="panel-head panel-head-wrap"><div><h2 class="panel-title">Automatic buyback and burn</h2><p class="panel-meta">Coins whose launcher picked Solada's "Buy back &amp; burn" route. Solada uses the coin's rewards to buy it back and send it to the Graveyard, but only after the coin bonds.</p></div></header>
+        <div class="burn-auto" data-auto></div>
+      </article>
+      <article class="panel">
+        <header class="panel-head panel-head-wrap">
+          <div><h2 class="panel-title">By coin</h2><p class="panel-meta" data-coins-meta></p></div>
+          <div class="unl-tools">
+            <label class="search"><span class="sr-only">Find a coin</span><input type="search" placeholder="Find a coin" data-search autocomplete="off"></label>
+          </div>
+        </header>
+        <div class="table-wrap">
+          <table class="coin-table unl-table burn-table">
+            <thead><tr>
+              <th scope="col">Coin</th><th scope="col" class="num">Burned</th><th scope="col" class="num hide-sm">Tokens</th><th scope="col" class="num">≈ ADA now</th><th scope="col" class="num hide-sm">Burns</th><th scope="col" class="hide-sm">Last burn</th>
+            </tr></thead>
+            <tbody data-coins></tbody>
+          </table>
+        </div>
+        <div class="list-foot"><button class="btn btn-ghost btn-sm" data-more-coins hidden>Show all coins</button></div>
+      </article>
+      <article class="panel">
+        <header class="panel-head panel-head-wrap">
+          <div><h2 class="panel-title" data-ev-title>Burns in the last 7 days</h2><p class="panel-meta" data-ev-meta></p></div>
+          <label class="toggle toggle-inline"><input type="checkbox" data-creator-only><span>Creator burns only</span></label>
+        </header>
+        <div class="burn-list" data-events></div>
+        <div class="list-foot"><button class="btn btn-ghost btn-sm" data-more hidden>Show more burns</button></div>
+      </article>
+      <article class="panel">
+        <header class="panel-head"><h2 class="panel-title">How this is checked</h2></header>
+        <div class="method">
+          <div><h3>The Graveyard</h3><p>The Cardano Graveyard is the <code>$burnsnek</code> address made by the SNEK team. It is a script that can never release anything, so tokens sent there are gone for good. Its balance of a coin is that coin's burned total. <a data-grave href="#" target="_blank" rel="noopener">See the address on Cardanoscan</a>.</p></div>
+          <div><h3>Who sent it</h3><p><span class="burn-who is-creator">Creator</span> means the coin's own launcher wallet sent the burn. <span class="burn-who is-solada">Solada</span> means one of Solada's published wallets did (from its proof-of-reserves page). Anything else is shown as the sending address. A burn from a wallet is not an automatic burn unless Solada's wallet sent it.</p></div>
+          <div><h3>Coverage</h3><p>Every Solada coin and the $SOLADA platform token. The history starts Oct 8, 2026, the day before Solada's first coin; $SOLADA's total also includes burns from before then. New burns show up within about 5 minutes, and every total is re-read from the chain once a day. Burns to other addresses are not counted.</p></div>
+          <div><h3>Value</h3><p>≈ ADA is the burned share of supply times the coin's market cap right now, so it moves with price. It is what the burned tokens would be worth today, not what was paid for them. Burning does not change a coin's price by itself.</p></div>
+        </div>
+      </article>
+      <p class="dash-foot">Burns, balances and senders come from Cardano through Koios. Coin names, market caps and burn settings come from Solada.fun. Transaction and address links open Cardanoscan; coin links open Solada with our referral code.</p>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>Gator Eyes is free and will never charge for access. It's an automated tracker for <a data-link="join" href="#">Solada</a> and Snek.fun. Alerts are not financial advice. $GAEY is the Gator Eyes team's token. Links to Solada include our referral code (GatorEyesADA), which may earn the team referral rewards at no extra cost to you. <a href="./about.html#disclosures">Disclosures</a>.</p>
+      <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./tokens.html">Tokens</a><a href="./tools.html">Tools</a><a href="./app.html">Get the app</a></nav>
+    </div>
+  </footer>
+  <script type="module" src="./assets/js/burns.js?v=20261107-burns"></script>
+</body>
+</html>
