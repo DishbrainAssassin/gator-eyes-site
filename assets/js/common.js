@@ -20,7 +20,7 @@ export function wireLinks(root = document) {
   });
   navTips();
   wireToolsMenu();
-  import("./gator.js?v=20261103-followup").then((m) => m.mountGator()).catch(() => {});
+  import("./gator.js?v=20261109-rundowns").then((m) => m.mountGator()).catch(() => {});
   import("./extras.js?v=20261102-usdcx2").then((m) => m.mountExtras()).catch(() => {});
   import("./tape.js?v=20261102-usdcx2").then((m) => m.mountTape()).catch(() => {});
   import("./pwa.js?v=20261102-stats").then((m) => m.mountPwa()).catch(() => {});
