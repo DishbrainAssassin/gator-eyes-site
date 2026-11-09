@@ -26,3 +26,9 @@ Hosted on Render as a static site (render.yaml). Upload changed files to GitHub 
 - `app.html` + `assets/js/app.js`: install steps for the visitor's device, then alert choices (types, launchpads, "only my watchlist"), Turn on / Send a test / Turn off.
 - `assets/js/pwa.js`: loaded on every page via common.js. Registers the service worker, re-sends the watchlist to the worker when "only my watchlist" is on and the list changes, and shows a one-time "Turn on alerts" nudge inside the installed app. Also sends the anonymous install count once per device (`appinstalled`, or the first home-screen open on iPhone) to the worker's `/stats/install`; see privacy.html#counts.
 - Choices are saved in localStorage `ge-push`; the worker keeps the phone's push address and choices (see the worker README, `/push/*`). `pushUrl` and `pushKey` live in config.js.
+
+## Quagmire and Gator Run Downs (added 2026-11-09)
+
+- Quagmire answers Run Downs questions from the worker's `/rundowns` (open races, close times, targets, points-only rules) and adds the Paddock link when a looked-up coin is racing.
+- `watchRaces()` in `assets/js/gator.js` shows a small "New race up" bubble by Quagmire's corner when a race is open (polls every 60s while the tab is visible, hidden while chat is open; × hides that race via localStorage `ge-race-seen`).
+- Tests: `tests/rundowns-quagmire.cjs`.

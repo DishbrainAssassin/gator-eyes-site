@@ -224,7 +224,7 @@ const FAQ = [
   { keys: ["alerts mean", "types of alert", "what alerts", "alert types", "kinds of alert", "what triggers", "alert rules"], a: () => `Five kinds of alert:<ul><li><strong>Whale trade</strong>: a trade worth $1,000 or more in ADA, or one worth at least 7.5% of the coin's market cap (minimum 250 ADA).</li><li><strong>Volume spike</strong>: a coin trading 4 times its normal pace over 15 minutes, with at least 1,500 ADA moving.</li><li><strong>Hatchling</strong>: every new coin, posted once soon after it goes live. A record, not a pick.</li><li><strong>Fast Lunge</strong> (fast launch): a new coin pulling in 1,000 ADA from 8 or more wallets in its first hour.</li><li><strong>Creator sell</strong>: the wallet that created a coin selling 500 ADA or more, or at least 5% of the coin's market cap. Posted as a record, not a warning.</li></ul>More on the ${page("about.html", "How it works page")}.` },
   { keys: ["whale"], a: () => `A whale alert is any single trade worth $1,000 or more in ADA (the ADA amount moves with the price), or a trade worth at least 7.5% of the coin's market cap (minimum 250 ADA). They post in #whale-alerts on ${discord()}.` },
   { keys: ["spike"], a: () => "A volume spike means a coin traded at 4 times its normal pace over 15 minutes, with at least 1,500 ADA moving. Each coin can spike at most once an hour so the channel doesn't flood." },
-  { keys: ["fast launch", "lunge"], a: () => `A Fast Lunge is Gator Eyes' fast-launch alert: a new coin that pulls in 1,000 ADA from 8 or more different wallets in its first hour. They post in #fast-lunge on ${discord()}.` },
+  { keys: ["fast launch", "lunge"], a: () => `A Fast Lunge is Gator Eyes' fast-launch alert: a new coin that pulls in 1,000 ADA from 8 or more different wallets in its first hour. They post in #fast-lunge on ${discord()}. The Gator Run Downs game uses its own Fast Lunge target (8 buyers and 500 net ADA by the end of the Sprint); ask me about Run Downs for that.` },
   { keys: ["hatchling"], a: () => `A Hatchling is every new coin on Solada or Snek.fun, posted once soon after it goes live. It's a record that the coin exists, not a pick. If it then pulls in 1,000 ADA from 8+ wallets in its first hour, a Fast Lunge alert follows. They post in #hatchlings on ${discord()}.` },
   { keys: ["creator sell", "dev sell", "creator wallet", "dev wallet", "rug"], a: () => `A creator sell is the wallet that made a coin selling 500 ADA or more, or at least 5% of the coin's market cap. It's posted for transparency, not as a warning. Creators sell for lots of reasons. Gator Eyes doesn't rate coins or call rugs. For a safety check, a tool like ${a("https://suriradar.fun/", "Suri Radar", true)} is built for that.` },
   { keys: ["gator tracks", "daily recap", "recap"], a: () => `Gator Tracks is the daily recap: one post with volume, most traded coins and where the money went, split by launchpad (Solada.fun and Snek.fun) with a combined total, for the previous day midnight to midnight Eastern. It posts at 12:01 AM Eastern, right after the day closes, in #gator-tracks and on ${a(CONFIG.x, "X", true)}. Make your own day image with the ${page("card.html", "daily flow card")}.` },
@@ -299,6 +299,7 @@ async function answer(raw) {
   if (/\b(thanks|thank you|thx|ty)\b/.test(q)) return "Happy to help. I'll be here, recalculating.";
   const advice = ADVICE.some((k) => q.includes(k));
   let coin = await findCoin(raw);
+  if (!advice && RD_RE.test(q)) return rdAnswer(q, coin);
   if (SOCIAL_RE.test(q) && !/\b(gator eyes|your|you)\b/.test(q)) {
     if (coin) return socialsAnswer(coin);
     if (!/\b(alert|graduat|net flow|holder|card|follow|embed|widget)\b/.test(q)) return `Which coin? Ask like <em>socials $MEPE</em> and I'll list what the creator put on Solada.fun or Snek.fun.`;
@@ -324,9 +325,9 @@ async function answer(raw) {
   if (coin && (!/\b(what is|what's|how do|how does)\b/.test(q) || q.includes("$" + coin.tk.toLowerCase()) || new RegExp("\\b(of|for|about|on|with) \\$?" + coin.tk.toLowerCase() + "\\b").test(q))) {
     // Looks like a list question we don't have an answer for: ask instead of guessing.
     if (listAsk && !q.includes("$" + coin.tk.toLowerCase())) return notSure(coin);
-    return coinAnswer(coin);
+    return coinAnswer(coin) + await rdCoinTail(coin);
   }
-  if (coin && !best) return listAsk ? notSure(coin) : coinAnswer(coin);
+  if (coin && !best) return listAsk ? notSure(coin) : coinAnswer(coin) + await rdCoinTail(coin);
   if (best) return run(best);
   return notSure(null);
 }
@@ -344,8 +345,74 @@ async function answerFollowUp(q, prev) {
   return both && !/not in my notes yet/.test(both) ? both : html;
 }
 
+// ---------- Gator Run Downs (Quagmire) ----------
+// Races open right now come from the Gator Eyes worker's /rundowns (it reads gatorrundowns.fun and caches it).
+let rdCache = null, rdAt = 0;
+async function rdData() {
+  if (rdCache && Date.now() - rdAt < 20000) return rdCache;
+  rdCache = await getApi("/rundowns");
+  rdAt = Date.now();
+  return rdCache;
+}
+// The free pick game built on Gator Eyes data. Live races come from gatorrundowns.fun/api/now (via rdData),
+// everything else is the game's posted rules. Game facts only: no Quagmire pick, no crowd split, no advice.
+const RD_SITE = "https://gatorrundowns.fun";
+const RD_RE = /\b(run ?downs?|gator ?run|gatorrundowns|paddock|race ?calls?|new races?|next race|open races?|live races?|any races?|current race|races? (up|open|on|live|running|going|today|now|right now)|races? (are|is) (up|open|on|live|running|going)|racing (now|right now|today)|what'?s racing|\$?[a-z0-9]{2,12} racing|lunge or no lunge|no lunge|make a pick|my picks|your (pick|call)|quagmire'?s (pick|call)|picks? (close|open)|points|streaks?|leaderboard|standings|season 1|test week|forecast(er|ers|ing)?|handicapper|stewards)\b/;
+const rdEt = (ms) => new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", minute: "2-digit" }).format(new Date(ms));
+const rdPlay = (d, label) => a((d && d.play) || RD_SITE + "/paddock.html", label || "Pick at Gator Run Downs", true);
+const rdOpen = (d) => ((d && d.open) || []).filter((x) => !x.called && x.closesAt > Date.now());
+const rdLine = (x) => `<strong>$${esc(x.ticker || "?")}</strong>${x.buyers != null ? `: ${fmt(x.buyers)} buyer${x.buyers === 1 ? "" : "s"}, ${fmt(x.net)} net ADA in so far` : ""}, picks close ${esc(rdEt(x.closesAt))} ET`;
+function rdTopic(q) {
+  const now = /\b(up|open|now|right now|any|new|next|current|live|link|where|racing)\b/.test(q);
+  if (/\b(prizes?|purse|win (money|gaey|ada|anything)|paid|payouts?|rewards?|cash)\b/.test(q)) return "prize";
+  if (/\b(points|streaks?|scor(e|es|ing)|leaderboard|standings)\b/.test(q)) return "points";
+  if (/\b(season|test week|open test|reset)\b/.test(q)) return "season";
+  if (/\b(your (pick|call)|quagmire'?s (pick|call)|you pick|beat you|handicapper|fade you|follow you)\b/.test(q)) return "quag";
+  if (/\b(rules?|fair play|hedg\w*|bans?|banned|stewards|cheat\w*|appeal)\b/.test(q)) return "rules";
+  if (/\b(lunge|target|targets|buyers|net ada)\b/.test(q) && !now) return "target";
+  if (/\b(cost|free|wallet|sign ?up|account|token|need to hold)\b/.test(q) && !now) return "free";
+  if (/\b(what is|what's|whats|how (do|does|to|can)|explain|tell me about|about)\b/.test(q) && !now) return "what";
+  return "live";
+}
+const RD_FAQ = {
+  what: () => `Gator Run Downs is a free pick game built on Gator Eyes data. Every new Solada coin runs its own race. In its first 7½ minutes you pick <strong>Lunge</strong> or <strong>No Lunge</strong>: will it reach at least 8 different buyers (not counting the creator) and 500 net ADA in by the end of its Sprint? The Sprint is the first 60 minutes, or less if the coin graduates first. Right calls earn points, wrong calls cost nothing. No wallet or token needed.`,
+  target: () => `In Gator Run Downs, a Fast Lunge means the coin ends its Sprint with at least <strong>8 different buyers</strong> (the creator doesn't count) and <strong>500 net ADA in</strong> (buys minus sells). The Sprint is the first 60 minutes, or less if it graduates first. If both targets are hit early, picks close right then, but it still settles at the end of the Sprint. That's the game's rule. The Gator Eyes Fast Lunge alert is different: 1,000 ADA from 8+ wallets in the first hour.`,
+  points: () => `A right call earns 10 to 100 points: 10 × pickers ÷ right pickers, so a right call on the less popular side earns more. Picks in the first 2 minutes get full points, sliding to half at 7½ minutes, and changing a pick resets its time. Streaks add 5 points per right call in a row, up to 25. Wrong calls never cost points. Weekly standings start fresh every Monday just after midnight Eastern. Points have no cash value.`,
+  prize: () => `Right now Gator Run Downs is points only. No prizes are offered during the open test, and test calls don't count toward any future prize. If prizes are added later, the prize rules get posted first and only calls after that count. Points can't be bought, sold or traded.`,
+  season: () => Date.now() < Date.UTC(2026, 10, 16, 5) ? `The open test runs through Sunday, Nov 15, 2026. Test points and streaks reset before Season 1, which runs Nov 16, 2026 to Jan 10, 2027 (eight Monday-to-Sunday weeks). You need 25 settled calls in the season to be ranked.` : `Season 1 runs Nov 16, 2026 to Jan 10, 2027: eight Monday-to-Sunday weeks, Eastern time. You need 25 settled calls in the season to be ranked, and the season board ranks by Edge (how often you beat the crowd), not just points.`,
+  quag: () => `I'm the house handicapper. I make my own call on each race at 5 minutes using a fixed rule, so you can follow me or fade me and see who's right. If both targets are already hit before 5 minutes, I sit that one out. My calls show in the Paddock. It's a game call, not a trade tip.`,
+  rules: () => `Picks are free and players must be adults. Opposite calls on the same race from the same device or network get the accounts banned for hedging, and bans are listed on the Stewards' Board with an appeal. Full rules: ${a(RD_SITE + "/rules.html", "House rules", true)} · ${a(RD_SITE + "/fair-play.html", "Fair play", true)}.`,
+  free: () => `Gator Run Downs is free. You need a username to save picks, but no wallet, no token and no purchase. It's points only during the open test.`,
+};
+async function rdAnswer(q, coin) {
+  const topic = rdTopic(q);
+  const d = await rdData().catch(() => null);
+  const open = rdOpen(d);
+  if (topic !== "live") {
+    const tail = open.length ? `<br><br>Open right now: ${rdLine(open[0])}${open.length > 1 ? ` (+${open.length - 1} more)` : ""}. ${rdPlay(d, "Pick now")}` : ` ${rdPlay(d, "Play at Gator Run Downs")}`;
+    return RD_FAQ[topic]() + tail;
+  }
+  if (!d) return `I can't see the track right now. Check ${a(RD_SITE + "/paddock.html", "Gator Run Downs", true)} directly; every new race is also posted in #race-calls on ${discord()}.`;
+  if (coin) {
+    const mine = open.find((x) => x.coinId === coin.id || (x.ticker || "").toUpperCase() === (coin.tk || "").toUpperCase());
+    if (mine) return `Yes, <strong>$${esc(mine.ticker)}</strong> is racing now. ${rdLine(mine).replace(/^<strong>[^<]*<\/strong>:? ?/, "").replace(/^./, (c) => c.toUpperCase())}. ${rdPlay(d)}`;
+  }
+  if (!open.length) {
+    const last = d.last ? ` Last result: <strong>$${esc(d.last.ticker)}</strong>, ${d.last.lunge ? "Fast Lunge" : "No Lunge"}.` : "";
+    return `No race is open for picks right now. A new one starts every time a Solada coin launches, and picks stay open for its first 7½ minutes.${last} Every new race posts in #race-calls on ${discord()}, or keep ${a(d.play || RD_SITE + "/paddock.html", "the Paddock", true)} open.`;
+  }
+  return `${open.length === 1 ? "One race is" : open.length + " races are"} open for picks right now:<ul>${open.slice(0, 5).map((x) => `<li>${rdLine(x)}</li>`).join("")}</ul>Will it Fast Lunge? ${rdPlay(d)}. Free, points only.`;
+}
+// One line under a coin's numbers when that coin is in the Paddock right now.
+async function rdCoinTail(coin) {
+  if (!coin) return "";
+  const d = await rdData().catch(() => null);
+  const x = rdOpen(d).find((r) => r.coinId === coin.id);
+  return x ? `<br>It's racing in Gator Run Downs right now, picks close ${esc(rdEt(x.closesAt))} ET: ${rdPlay(d)}.` : "";
+}
+
 // ---------- widget ----------
-const SUGGEST = ["What do the alerts mean?", "What's close to graduating?", "Most traded today", "How do I make a holder list?", "What is net flow?"];
+const SUGGEST = ["What do the alerts mean?", "What's close to graduating?", "Any Run Downs races open?", "Most traded today", "How do I make a holder list?", "What is net flow?"];
 const KEY = "gator-chat-v1";
 
 // Save the question and a plain-text copy of the answer for the daily review (no names or wallets).
@@ -424,6 +491,7 @@ export function mountGator() {
     else (opener?.isConnected ? opener : document.querySelector("[data-ask]") || btn).focus();
   };
   if (hist.length) chips.hidden = true;
+  watchRaces(root, panel);
   btn.addEventListener("click", () => open(panel.hidden));
   root.querySelector(".gator-x").addEventListener("click", () => open(false));
   addEventListener("keydown", (e) => { if (e.key === "Escape" && !panel.hidden) open(false); });
@@ -440,5 +508,51 @@ export function mountGator() {
   });
 }
 
+
+// "New race up" bubble: when a Gator Run Downs race is open for picks, Quagmire shows its Paddock link above the
+// chat corner. Checks once a minute while the tab is visible. Closing it hides that race; the next race shows again.
+const RACE_SEEN = "ge-race-seen";
+function watchRaces(root, panel) {
+  if (!document.getElementById("gator-race-css")) {
+    // Styles live here so a cached style.css can't leave the bubble unstyled.
+    const st = document.createElement("style");
+    st.id = "gator-race-css";
+    st.textContent = `.gator-race { display: flex; align-items: flex-start; gap: var(--space-2); max-width: min(340px, calc(100vw - 2 * var(--space-5))); padding: var(--space-3); border: 1px solid var(--color-amber); border-radius: var(--radius-lg, 14px); background: var(--color-surface); color: var(--color-text); font-size: var(--text-sm); line-height: 1.4; box-shadow: 0 10px 28px rgba(0,0,0,.45); }
+.gator-race[hidden] { display: none; }
+.gator-race img { flex: none; width: 36px; height: 36px; border-radius: 50%; background: #1b2a1c; object-fit: cover; }
+.gator-race p { margin: 0; }
+.gator-race a { color: var(--color-amber); font-weight: 700; }
+.gator-race-x { flex: none; width: 28px; height: 28px; margin: -4px -4px 0 0; border: 0; border-radius: 50%; background: none; color: var(--color-text-muted); font-size: 20px; line-height: 1; cursor: pointer; }
+.gator-race-x:hover { color: var(--color-text); }
+.gator.is-open .gator-race { display: none; }`;
+    document.head.appendChild(st);
+  }
+  const box = document.createElement("aside");
+  box.className = "gator-race";
+  box.setAttribute("aria-label", "Gator Run Downs");
+  box.hidden = true;
+  root.appendChild(box);
+  let shown = null;
+  const seen = () => { try { return localStorage.getItem(RACE_SEEN) || ""; } catch { return ""; } };
+  const check = async () => {
+    if (document.hidden) return;
+    let d = null;
+    try { d = await rdData(); } catch { d = null; }
+    const open = rdOpen(d).filter((x) => x.closesAt - Date.now() > 30000);
+    const x = open[0];
+    if (!x || x.coinId === seen() || !panel.hidden) { box.hidden = true; shown = null; return; }
+    if (shown !== x.coinId) {
+      box.innerHTML = `<img src="./assets/img/gator-nerd-head-160.webp" alt="" width="36" height="36"><p><strong>New race up:</strong> $${esc(x.ticker || "?")} is in the Paddock. Picks close ${esc(rdEt(x.closesAt))} ET${open.length > 1 ? ` (+${open.length - 1} more)` : ""}. <a href="${esc(d.play || RD_SITE + "/paddock.html")}" target="_blank" rel="noopener">Pick at Gator Run Downs</a></p><button type="button" class="gator-race-x" aria-label="Hide until the next race">×</button>`;
+      box.querySelector(".gator-race-x").addEventListener("click", () => { try { localStorage.setItem(RACE_SEEN, x.coinId); } catch {} box.hidden = true; shown = null; });
+      shown = x.coinId;
+    }
+    box.hidden = false;
+  };
+  check();
+  setInterval(check, 60000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) check(); });
+  new MutationObserver(() => { if (!panel.hidden) box.hidden = true; else check(); }).observe(panel, { attributes: true, attributeFilter: ["hidden"] });
+}
+
 // Exposed for testing.
-export { answer, answerFollowUp };
+export { answer, answerFollowUp, rdTopic, RD_RE };
