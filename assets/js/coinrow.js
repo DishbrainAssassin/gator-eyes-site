@@ -34,16 +34,18 @@ export function alertsCell(c) {
   return bits.length ? `<span class="al-dots">${bits.join("")}</span>` : `<span class="cell-sub">–</span>`;
 }
 
-/** Links for the last column: card (Solada) or Snek.fun page on Tokens; Follow-up and Holders on the Watchlist. */
+/** Links for the last column: Profile plus card (Solada) or Snek.fun page on Tokens; Follow-up, Holders, Trades and Profile on the Watchlist. */
 export function actionsCell(c, { more = false } = {}) {
   const a = [];
   if (more) {
     a.push(`<a class="icon-btn" href="./followup.html?coin=${encodeURIComponent(c.tk || c.id)}" title="Follow-up on ${esc(c.tk || "")} alerts">Follow-up</a>`);
     a.push(`<a class="icon-btn" href="./holders.html?coin=${encodeURIComponent(c.tk || c.id)}" title="Holder snapshot for ${esc(c.tk || "")}">Holders</a>`);
     a.push(`<a class="icon-btn" href="./trades.html?coin=${encodeURIComponent(c.tk || c.id)}" title="Every ${esc(c.tk || "")} trade">Trades</a>`);
+    a.push(`<a class="icon-btn" href="./coincard.html?coin=${encodeURIComponent(c.id)}#profile" title="${esc(c.tk || "")} profile: the creator's description and links">Profile</a>`);
   }
   // The ticker already opens the coin's own page, so the Watchlist (more=true) stops at Follow-up, Holders and Trades.
   if (more) return `<span class="row-actions">${a.join("")}</span>`;
+  a.push(`<a class="icon-btn" href="./coincard.html?coin=${encodeURIComponent(c.id)}#profile" title="${esc(c.tk || "")} profile: the creator's description and links">Profile</a>`);
   if (c.src === "snek") a.push(`<a class="icon-btn" href="${esc(coinUrl(c.id))}" target="_blank" rel="noopener" title="Open ${esc(c.tk || "")} on Snek.fun">Snek.fun</a>`);
   else a.push(`<a class="icon-btn" href="./coincard.html?coin=${encodeURIComponent(c.id)}" title="Make a stat card for ${esc(c.tk || "")}">Card</a>`);
   return `<span class="row-actions">${a.join("")}</span>`;

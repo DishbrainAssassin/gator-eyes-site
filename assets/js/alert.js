@@ -4,6 +4,7 @@
 // own words, plus quick links to the coin.
 import { getApi } from "./api.js?v=20261102-usdcx2";
 import { fetchFeed, coinUrl } from "./data.js?v=20261102-usdcx2";
+import { mountCompact } from "./profile.js?v=20261109-profile";
 import { esc, alertCard, emptyState } from "./ui.js?v=20261102-usdcx2";
 import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx2";
 import * as watchlist from "./watchlist.js?v=20261102-usdcx2";
@@ -48,7 +49,7 @@ function coinActions(id, coin, src) {
   const tk = coin && coin.tk ? "$" + coin.tk : "this coin";
   const pad = src === "snek" ? "Snek.fun" : "Solada";
   const star = watchlist.starBtn(coin ? { id, tk: coin.tk, name: coin.name, img: coin.img, src: coin.src } : id);
-  return `<div class="alert-coin">
+  return `<div class="alert-coin" data-coin-id="${esc(id)}" data-coin-src="${esc((coin && coin.src) || src || "solada")}">
     <div class="alert-coin-head">${coin && coin.img ? `<img src="${esc(coin.img)}" alt="" width="36" height="36" loading="lazy" onerror="this.style.visibility='hidden'">` : ""}<strong>${esc(tk)}</strong>${coin && coin.name ? `<span>${esc(coin.name)}</span>` : ""}${star}</div>
     <div class="alert-coin-links">
       <a class="btn btn-amber btn-sm" href="${esc(coinUrl(id))}" target="_blank" rel="noopener">Open on ${pad} <span aria-hidden="true">&rarr;</span></a>
@@ -92,6 +93,11 @@ function render(feed, tokens) {
   coinsEl.innerHTML = ids.length
     ? `<h2 class="alert-coins-h">${ids.length === 1 ? "The coin" : "The coins"}</h2>` + ids.map((id) => coinActions(id, coins.get(id), (shown.find((a) => a.tokenId === id) || {}).src)).join("")
     : "";
+  // Creator description and links under each coin's buttons.
+  coinsEl.querySelectorAll("[data-coin-id]").forEach((el) => {
+    const id = el.dataset.coinId, c = coins.get(id) || { id, src: el.dataset.coinSrc };
+    mountCompact(el.querySelector(".alert-coin-links"), c);
+  });
 }
 
 async function load() {

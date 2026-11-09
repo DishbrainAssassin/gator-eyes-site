@@ -6,7 +6,7 @@ import { esc, fmt, usdcx, usdcxSigned, usdcxShort, timeAgo, alertCard, emptyStat
 import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx2";
 import * as platform from "./platform.js?v=20261102-usdcx2";
 import * as watchlist from "./watchlist.js?v=20261102-usdcx2";
-import { coinRow, missingRow } from "./coinrow.js?v=20261102-usdcx2";
+import { coinRow, missingRow } from "./coinrow.js?v=20261109-profile";
 
 wireLinks();
 platform.mount();

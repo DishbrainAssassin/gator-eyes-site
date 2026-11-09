@@ -264,8 +264,10 @@ function socialsAnswer(c) {
   const names = { twitter: "X", website: "Website", telegram: "Telegram", discord: "Discord" };
   const items = ["twitter", "website", "telegram", "discord"].filter((k) => L[k]).map((k) => `<li>${names[k]}: ${a(L[k], L[k].replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, ""), true)}</li>`);
   const head = `<strong>${a(coinUrl(c.id), tk(c), true)}</strong>${c.name && c.name !== c.tk ? " (" + esc(c.name) + ")" : ""}`;
-  if (!items.length) return `${head} has no socials listed on Solada.fun. That's what the creator filled in, so nothing is hiding. ${a(coinUrl(c.id), "Check the coin page", true)} in case they add some.`;
-  return `${head} socials from Solada.fun:<ul>${items.join("")}</ul>These are whatever the creator listed. Make sure they're real before trusting them.`;
+  const site = c.src === "snek" ? "Snek.fun" : "Solada.fun";
+  const prof = `See the full ${page("coincard.html?coin=" + encodeURIComponent(c.id) + "#profile", "token profile")} too.`;
+  if (!items.length) return `${head} has no socials listed on ${site}. That's what the creator filled in, so nothing is hiding. ${a(coinUrl(c.id), "Check the coin page", true)} in case they add some.`;
+  return `${head} socials from ${site}:<ul>${items.join("")}</ul>These are whatever the creator listed. Make sure they're real before trusting them. ${prof}`;
 }
 var SOCIAL_RE = /\b(social|socials|twitter|x account|x page|x link|x profile|website|web site|telegram|discord link|discord server)\b/;
 async function findCoin(q) {
@@ -299,7 +301,7 @@ async function answer(raw) {
   let coin = await findCoin(raw);
   if (SOCIAL_RE.test(q) && !/\b(gator eyes|your|you)\b/.test(q)) {
     if (coin) return socialsAnswer(coin);
-    if (!/\b(alert|graduat|net flow|holder|card|follow|embed|widget)\b/.test(q)) return `Which coin? Ask like <em>socials $MEPE</em> and I'll list what the creator put on Solada.fun.`;
+    if (!/\b(alert|graduat|net flow|holder|card|follow|embed|widget)\b/.test(q)) return `Which coin? Ask like <em>socials $MEPE</em> and I'll list what the creator put on Solada.fun or Snek.fun.`;
   }
   if (coin && !hasTrades(coin) && coin.kind === "pump") {
     var td = await tokens().catch(() => null);

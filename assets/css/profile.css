@@ -1,0 +1,24 @@
+/* Token profile: creator description and links (Stat card page, Holders, Trades, alert page). */
+.profile { margin-top: var(--space-8); padding: var(--space-5) var(--space-6); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); max-width: 60rem; min-width: 0; }
+.profile-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-2) var(--space-4); margin-bottom: var(--space-3); }
+.profile-head .panel-title { margin: 0; }
+.profile-about { margin: 0 0 var(--space-4); color: var(--color-text); font-size: var(--text-base); line-height: 1.55; overflow-wrap: anywhere; max-width: 68ch; }
+.profile-links { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.profile-link, .profile-more { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 40px; padding: var(--space-1) var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-full); font-size: var(--text-sm); color: var(--color-text); text-decoration: none; max-width: 100%; min-width: 0; transition: border-color var(--transition-interactive), background var(--transition-interactive); }
+.profile-link:hover, .profile-more:hover { border-color: var(--color-amber); }
+.profile-link-k { font-weight: 700; color: var(--color-amber); flex: none; }
+.profile-link-v { color: var(--color-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.profile-more { color: var(--color-amber); font-weight: 700; border-style: dashed; }
+.profile-src { font-size: var(--text-xs); color: var(--color-text-faint); margin: 0; }
+.profile-note { margin: var(--space-4) 0 0; font-size: var(--text-xs); color: var(--color-text-faint); max-width: 68ch; }
+.profile.is-compact { margin: var(--space-4) 0; padding: var(--space-3) var(--space-4); max-width: none; background: var(--color-bg); }
+.profile.is-compact .profile-about { font-size: var(--text-sm); margin-bottom: var(--space-3); color: var(--color-text-muted); }
+.profile.is-compact .profile-src { margin-top: var(--space-2); }
+.profile.is-compact.is-empty { padding: var(--space-2) var(--space-4); }
+.alert-coin .profile.is-compact { margin-top: 0; }
+.card-profile-opt { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); color: var(--color-text-muted); min-height: 44px; cursor: pointer; }
+.card-profile-opt input { width: 18px; height: 18px; accent-color: var(--color-amber); }
+@media (max-width: 640px) {
+  .profile { padding: var(--space-4); }
+  .profile-link, .profile-more { flex: 1 1 auto; justify-content: flex-start; min-height: 44px; }
+}

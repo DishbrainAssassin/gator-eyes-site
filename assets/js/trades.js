@@ -6,6 +6,7 @@ import { esc, fmt, compact, usdcxShort, usdcxOf } from "./ui.js?v=20261102-usdcx
 import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx2";
 import * as platform from "./platform.js?v=20261102-usdcx2";
 import { pill } from "./platform.js?v=20261102-usdcx2";
+import { mountCompact } from "./profile.js?v=20261109-profile";
 
 wireLinks();
 platform.mount();
@@ -222,6 +223,7 @@ async function loadCoin(e) {
   const cc = st.coin, snek = cc.src === "snek";
   const im = cc.img ? `<img src="${esc(cc.img)}" alt="" width="36" height="36">` : "";
   $("[data-head]").innerHTML = `${im}<div><h2 class="panel-title">Every <a href="${esc(coinUrl(snek ? cc.id : cc.slug || cc.id))}" target="_blank" rel="noopener">${esc(cc.tk || "?")}</a> trade ${pill(snek ? "snek" : "solada", { button: false })}</h2><span class="cell-sub">${esc(cc.name || "")}${cc.name ? " · " : ""}<a href="./holders.html?coin=${encodeURIComponent(cc.tk || cc.id)}">Holder snapshot</a> · <a href="./followup.html?coin=${encodeURIComponent(cc.tk || cc.id)}">Alert follow-up</a></span></div>`;
+    mountCompact($("[data-head]").closest(".panel-head"), cc);
   // The under-development note points at this coin's own launchpad page (the reference list).
   const dl = $("[data-dev-link]");
   if (dl) { dl.href = coinUrl(snek ? cc.id : cc.slug || cc.id); dl.textContent = `${cc.tk || "The coin"} on ${snek ? "Snek.fun" : "Solada"}`; }
