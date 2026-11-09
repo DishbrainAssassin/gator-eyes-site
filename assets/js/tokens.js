@@ -6,7 +6,7 @@ import { timeAgo } from "./ui.js?v=20261102-usdcx2";
 import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx2";
 import * as platform from "./platform.js?v=20261102-usdcx2";
 import * as watchlist from "./watchlist.js?v=20261102-usdcx2";
-import { coinRow } from "./coinrow.js?v=20261102-usdcx2";
+import { coinRow } from "./coinrow.js?v=20261109-profile";
 
 wireLinks();
 platform.mount();

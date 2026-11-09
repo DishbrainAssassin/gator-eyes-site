@@ -6,6 +6,7 @@ import { esc, fmt, compact } from "./ui.js?v=20261102-usdcx2";
 import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx2";
 import * as platform from "./platform.js?v=20261102-usdcx2";
 import { pill } from "./platform.js?v=20261102-usdcx2";
+import { mountCompact } from "./profile.js?v=20261109-profile";
 
 wireLinks();
 platform.mount();
@@ -127,6 +128,7 @@ async function loadCoin(e) {
     const im = c.img ? `<img src="${esc(c.img)}" alt="" width="36" height="36">` : "";
     const snek = c.src === "snek";
     $("[data-head]").innerHTML = `${im}<div><h2 class="panel-title">Where <a href="${esc(coinUrl(snek ? c.id : c.slug || c.id))}" target="_blank" rel="noopener">${esc(c.tk || "?")}</a>'s supply sits ${pill(snek ? "snek" : "solada", { button: false })}</h2><span class="cell-sub">${esc(c.name || "")} · ${plural(j.holders.length, "address", "addresses")} on Cardano hold the coin</span></div>`;
+    mountCompact($("[data-head]").closest(".panel-head"), c);
     $("[data-taken]").textContent = "Snapshot taken " + new Date(j.at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" }) + " ET";
     $("[data-story]").hidden = false;
     $("[data-rules]").hidden = false;

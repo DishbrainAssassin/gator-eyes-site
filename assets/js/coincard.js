@@ -4,6 +4,7 @@ import { coinUrl, fetchFeed } from "./data.js?v=20261102-usdcx2";
 import { esc, fmt, compact, timeAgo, usdcxShort, usdcxOf } from "./ui.js?v=20261102-usdcx2";
 import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx2";
 import * as platform from "./platform.js?v=20261102-usdcx2";
+import { loadProfile, profileHtml, shortLink, LINK_NAMES } from "./profile.js?v=20261109-profile";
 
 wireLinks();
 platform.mount();
@@ -26,7 +27,9 @@ const ready = Promise.all([
   new Promise((r) => (avatar.complete ? r() : ((avatar.onload = r), (avatar.onerror = r)))),
 ]).catch(() => {});
 
-let data = null, coin = null, series = [], art = null, tainted = false, sol = null;
+let data = null, coin = null, series = [], art = null, tainted = false, sol = null, prof = null;
+// Creator links that fit on the image: X handle and website first.
+const cardLinks = (p) => (p && p.links ? ["twitter", "website", "telegram", "discord"].filter((k) => p.links[k]).slice(0, 2).map((k) => (k === "twitter" ? "X " : "") + shortLink(k, p.links[k])) : []);
 
 // Solana side: Solada coins that also trade on Pump.fun/PumpSwap (kind "pump") can trade in SOL or USDC,
 // which the ADA tracker can't see. For those, the card uses DexScreener's 24h totals and GeckoTerminal's
@@ -121,7 +124,8 @@ function draw() {
   else { rrect(P, iy, is, is, 18, C.panel, C.line); text((c.tk || "?").slice(0, 2), P + is / 2, iy + 62, { font: `800 38px ${F.d}`, color: C.amber, align: "center" }); }
   const tx = P + is + 24;
   text(fit(c.tk || "?", 520, `800 64px ${F.d}`), tx, iy + 58, { font: `800 64px ${F.d}` });
-  text(fit(c.name || "", 520, `500 20px ${F.b}`), tx, iy + 90, { font: `500 20px ${F.b}`, color: C.muted });
+  const sub = [c.name && c.name !== c.tk ? c.name : "", ...cardLinks(prof)].filter(Boolean).join("  ·  ");
+  text(fit(sub, 520, `500 20px ${F.b}`), tx, iy + 90, { font: `500 20px ${F.b}`, color: C.muted });
   text(price(c.price) + " ADA", W - P, iy + 50, { font: `500 40px ${F.m}`, align: "right" });
   const R = data && data.adaUsd;
   const pu = usdcxPrice(c.price, R);
@@ -212,9 +216,14 @@ function draw() {
   text("gatoreyes.fun  ·  @GatorEyesADA  ·  Not financial advice", W - P, H - 32, { font: `500 14px ${F.b}`, color: C.muted, align: "right" });
 }
 
+function creatorLines() {
+  const on = $("[data-profile-caption]");
+  if (!on || !on.checked || !prof || !prof.links) return [];
+  return ["twitter", "website", "telegram", "discord"].filter((k) => prof.links[k]).map((k) => `${LINK_NAMES[k]}: ${prof.links[k]}`);
+}
 function caption() {
   const c = coin, w = c.w.h24 || {};
-  const link = linkOf(c);
+  const link = [linkOf(c), ...creatorLines()].join("\n");
   if (sol) {
     const chg = sol.ch != null ? pct(sol.ch) : "flat";
     return [`$${c.tk} on Solana (${sol.dex}), last 24 hours`, `${fmt(sol.b + sol.s)} trades: ${fmt(sol.b)} buys, ${fmt(sol.s)} sells. About ${usd(sol.vUsd)} traded${sol.vAda ? ` (~${fmt(sol.vAda)} ADA)` : ""}. Price ${chg}.`, link].join("\n");
@@ -244,10 +253,15 @@ async function show(s) {
   coin = c;
   $("[data-coin]").value = c.tk || c.id;
   const u = new URL(location.href); u.searchParams.set("coin", c.id); history.replaceState(null, "", u);
-  sol = null;
-  const [im, , sw] = await Promise.all([loadImg(c.img), loadSeries(c), loadSol(c)]);
+  sol = null; prof = null;
+  $("[data-profile]").innerHTML = "";
+  $("[data-profile-opt]").hidden = true;
+  const [im, , sw, pf] = await Promise.all([loadImg(c.img), loadSeries(c), loadSol(c), loadProfile(c)]);
   if (coin !== c) return;
-  sol = sw;
+  sol = sw; prof = pf;
+  $("[data-profile]").innerHTML = profileHtml(prof, c);
+  $("[data-profile-opt]").hidden = !(prof && prof.links && Object.keys(prof.links).length);
+  if (location.hash === "#profile") requestAnimationFrame(() => document.getElementById("profile")?.scrollIntoView({ block: "start" }));
   if (sol && series.length < 2) series = await loadSolSeries(sol);
   if (coin !== c) return;
   art = safeImage(im);
@@ -272,7 +286,7 @@ async function show(s) {
   dl.onclick = async () => {
     if (!file) { n.hidden = false; n.innerHTML = "<strong>This coin's image blocks downloads.</strong> Press and hold (or right-click) the card to save it."; return; }
     if (canShare && mobile) {
-      try { await navigator.share({ files: [file], text: cap }); return; }
+      try { await navigator.share({ files: [file], text: caption() }); return; }
       catch (e) { if (e && e.name === "AbortError") return; }
     }
     if (!mobile) {
@@ -284,7 +298,9 @@ async function show(s) {
     }
     holdToSave(file);
   };
+  $("[data-profile-caption]").onchange = () => { $("[data-caption-preview]").textContent = caption(); };
   cp.onclick = async () => {
+    const cap = caption();
     try { await navigator.clipboard.writeText(cap); cp.textContent = "Copied"; } catch { cp.textContent = "Select and copy below"; }
     setTimeout(() => (cp.textContent = "Copy caption"), 1600);
   };
