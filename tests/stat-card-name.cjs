@@ -7,10 +7,6 @@ for (const file of fs.readdirSync(root).filter(f => f.endsWith(".html"))) {
   assert.doesNotMatch(text, /(?:coin )?share cards?/i, file);
   if (text.includes('href="./coincard.html"')) assert.match(text, />Stat card<\/a>/, file);
 }
-const helper = fs.readFileSync(path.join(root,"assets/js/gator.js"), "utf8");
-assert.match(helper, /stat card\|share card\|coin card/);
-assert.match(helper, /"stat card", "share card", "coin card"/);
-assert.match(helper, /Here's the stat card/);
-assert.match(helper, /"Stat card"/);
+// Quagmire's stat card answers live in the worker now (gator-eyes-worker tests/stat-card-name.cjs).
 assert.match(fs.readFileSync(path.join(root,"coincard.html"),"utf8"), /aria-label="Stat card"/);
 console.log("PASS: Stat card labels across all HTML pages and helper aliases.");
