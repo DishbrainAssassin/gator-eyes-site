@@ -382,7 +382,7 @@ const RD_FAQ = {
   season: () => Date.now() < Date.UTC(2026, 10, 16, 5) ? `The open test runs through Sunday, Nov 15, 2026. Test points and streaks reset before Season 1, which runs Nov 16, 2026 to Jan 10, 2027 (eight Monday-to-Sunday weeks). You need 25 settled calls in the season to be ranked.` : `Season 1 runs Nov 16, 2026 to Jan 10, 2027: eight Monday-to-Sunday weeks, Eastern time. You need 25 settled calls in the season to be ranked, and the season board ranks by Edge (how often you beat the crowd), not just points.`,
   quag: () => `I'm the house handicapper. I make my own call on each race at 5 minutes using a fixed rule, so you can follow me or fade me and see who's right. If both targets are already hit before 5 minutes, I sit that one out. My calls show in the Paddock. It's a game call, not a trade tip.`,
   rules: () => `Picks are free and players must be adults. Opposite calls on the same race from the same device or network get the accounts banned for hedging, and bans are listed on the Stewards' Board with an appeal. Full rules: ${a(RD_SITE + "/rules.html", "House rules", true)} · ${a(RD_SITE + "/fair-play.html", "Fair play", true)}.`,
-  free: () => `Gator Run Downs is free. You need a username to save picks, but no wallet, no token and no purchase. It's points only during the open test.`,
+  free: () => `Gator Run Downs is free. You need a username to save picks, but no wallet, no token gate and no purchase. It's points only during the open test.`,
 };
 async function rdAnswer(q, coin) {
   const topic = rdTopic(q);
