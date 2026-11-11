@@ -57,7 +57,7 @@ function render() {
   if (st.f === "watch") {
     const n = watchlist.count();
     emptyMsg = n ? (lp === "all" ? "None of your starred coins are in the live list right now." : `None of your starred coins are on ${platform.label(lp)}.`) : "You haven't starred any coins yet.";
-    emptyHint = n ? `See them all on your <a href="./watchlist.html">Watchlist</a>.` : "Tap the star next to a coin to save it in this browser. No sign-up, no wallet. Starred somewhere else? Open that list's link here.";
+    emptyHint = n ? `See them all on your <a href="./watchlist.html">Watchlist</a>.` : "Tap the star next to a coin to save it in this browser. No sign-up needed. Starred somewhere else? Open that list's link here.";
   }
   rowsEl.innerHTML = shown.length ? shown.map((c) => coinRow(c, { win: st.win, rate: st.data.adaUsd, showPill: platform.get() === "all" })).join("") : `<tr><td colspan="11"><div class="empty"><p>${emptyMsg} ${emptyHint}</p></div></td></tr>`;
   watchlist.wire();

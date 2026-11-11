@@ -1,5 +1,5 @@
 // Browser-saved watchlist. The list lives in this browser only (localStorage), so
-// there's no sign-up and no wallet. Coins are stored by their Gator Eyes id
+// there's no sign-up. Coins are stored by their Gator Eyes id
 // ("draft-xxx" for Solada, "snek:<policy>.<hex>" for Snek.fun) with a small
 // snapshot (ticker, name, image, launchpad) so a coin can still be shown after
 // it drops out of the live coin list.
