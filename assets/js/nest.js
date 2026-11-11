@@ -6,6 +6,8 @@ import { esc } from "./ui.js?v=20261102-usdcx2";
 import * as watchlist from "./watchlist.js?v=20261102-usdcx2";
 
 export const ITEMS = [
+  { type: "feature", key: "liquidity", tag: "Liquidity tracker", title: "Who holds the liquidity", href: "./liquidity.html", cta: "Open the liquidity tracker",
+    text: "Every graduated Solada.fun coin's Minswap pool, read from the chain. See how much ADA backs each coin, how much a 1,000 ADA buy moves its price, and who holds the LP tokens that could pull it." },
   { type: "feature", key: "burns", tag: "Burn tracker", title: "See what's been burned", href: "./burns.html", cta: "Open the burn tracker",
     text: "Every Solada.fun token sent to the Cardano Graveyard, read from the chain. See how much of each coin is gone for good, who sent it, and which coins buy back and burn automatically." },
   { type: "feature", key: "phone", tag: "Phone alerts", title: "Alerts on your phone", href: "./app.html", cta: "Set up phone alerts",

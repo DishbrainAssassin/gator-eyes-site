@@ -994,3 +994,56 @@ button.link:hover { color: var(--color-amber-hover); }
   .burn-auto-row { grid-template-columns: 1fr auto; }
   .burn-auto-text { grid-column: 1 / -1; }
 }
+
+/* Liquidity tracker */
+.burn-who.is-burned { color: var(--color-sell); }
+.burn-who.is-other, .burn-who.is-order { color: #7fa7d9; }
+.liq-auto-tag { color: #7fa7d9; }
+.liq-share { display: grid; gap: 4px; min-width: 9rem; }
+.liq-share small { font-size: var(--text-xs); color: var(--color-text-faint); }
+.liq-bar { display: flex; height: 8px; border-radius: var(--radius-full); overflow: hidden; background: var(--color-divider); }
+.liq-seg { display: block; height: 100%; }
+.liq-seg.is-solada { background: var(--color-buy); }
+.liq-seg.is-creator { background: var(--color-amber); }
+.liq-seg.is-other, .liq-seg.is-order { background: #7fa7d9; }
+.liq-seg.is-burned { background: var(--color-sell); }
+.liq-key { white-space: nowrap; }
+.liq-key.is-solada { color: var(--color-buy); }
+.liq-key.is-creator { color: var(--color-amber); }
+.liq-key.is-other, .liq-key.is-order { color: #7fa7d9; }
+.liq-key.is-burned { color: var(--color-sell); }
+.liq-coin-row { cursor: pointer; }
+.liq-coin-row:focus-visible { outline: 2px solid var(--color-amber); outline-offset: -2px; }
+.liq-coin-row.is-open td { border-bottom-color: transparent; }
+.liq-detail td { background: color-mix(in oklab, var(--color-text) 3%, transparent); }
+.liq-holders { display: grid; gap: var(--space-2); padding: var(--space-2) 0; }
+.liq-holder { display: grid; grid-template-columns: minmax(6rem, auto) minmax(0, 1fr) auto; gap: var(--space-3); align-items: center; font-size: var(--text-sm); }
+.liq-holder .unl-addr { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.liq-holder-num { text-align: right; }
+.liq-holder-num strong { font-family: var(--font-mono); font-weight: 500; display: block; }
+.liq-holder-num small { display: block; font-size: var(--text-xs); color: var(--color-text-faint); }
+.liq-holders .cell-sub { margin: 0; font-size: var(--text-xs); color: var(--color-text-faint); }
+.liq-kind { display: inline-block; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 8px; border-radius: var(--radius-full); border: 1px solid currentColor; color: var(--color-text-muted); white-space: nowrap; }
+.liq-kind.is-add, .liq-kind.is-open { color: var(--color-buy); }
+.liq-kind.is-remove { color: var(--color-sell); }
+.liq-kind.is-burn { color: var(--color-amber); }
+.liq-row .unl-size small { margin-top: 4px; }
+.liq-ada-cell strong { white-space: nowrap; }
+.liq-ada-cell small { display: block; font-size: var(--text-xs); color: var(--color-text-faint); white-space: nowrap; }
+.liq-detail td { white-space: normal; }
+.liq-holders .cell-sub { overflow-wrap: anywhere; }
+.liq-row .unl-who .unl-addr { display: block; }
+@media (max-width: 640px) {
+  .liq-share { min-width: 0; }
+  .liq-share small .liq-key + .liq-key, .liq-share small .liq-n { display: none; }
+  .burn-table td.liq-ada-cell small { display: none; }
+  .liq-coin-row .coin-cell small, .liq-coin-row .cell-sub { display: none; }
+  .liq-coin-row .liq-auto-tag { display: inline-block; margin: 2px 0 0; font-size: 0.625rem; padding: 0 6px; }
+  .liq-coin-row .coin-cell { gap: var(--space-2); }
+  .liq-key { white-space: normal; }
+  .liq-table th { white-space: normal; }
+  .liq-table th:last-child, .liq-coin-row td:last-child { width: 36%; }
+  .liq-table td, .liq-table th { padding-inline: var(--space-1); }
+  .liq-holder { grid-template-columns: 1fr auto; }
+  .liq-holder .unl-addr { grid-column: 1 / -1; grid-row: 2; }
+}
