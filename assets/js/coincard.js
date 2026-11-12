@@ -28,6 +28,38 @@ const ready = Promise.all([
 ]).catch(() => {});
 
 let data = null, coin = null, series = [], art = null, tainted = false, sol = null, prof = null;
+// Extra facts from the burn, unlock and liquidity trackers, keyed by coin id. Loaded once; any failure just hides those badges.
+const extra = { burns: new Map(), unlocks: new Map(), liq: new Map() };
+let extraReady = null;
+function loadExtras() {
+  if (extraReady) return extraReady;
+  const grab = (path, key) => getApi(path).then((j) => { for (const c of (j && j.coins) || []) if (c.id) extra[key].set(c.id, c); }).catch(() => {});
+  extraReady = Promise.all([grab("/burns", "burns"), grab("/unlocks", "unlocks"), grab("/liquidity", "liq")]);
+  return extraReady;
+}
+const pctS = (p) => (p >= 10 ? p.toFixed(1) : p >= 1 ? p.toFixed(2) : p.toFixed(2)).replace(/\.?0+$/, "") + "%";
+// Brag badges: only facts that are true and worth showing. Each one can be switched off under the card.
+const off = new Set();
+function badges(c) {
+  const out = [];
+  const b = extra.burns.get(c.id);
+  if (b && b.pct >= 0.1) out.push({ k: "burn", label: "Supply burned", val: pctS(b.pct), col: C.amber });
+  const u = extra.unlocks.get(c.id), now = Date.now();
+  if (u && u.lockedPct >= 0.5 && u.nextMs > now) out.push({ k: "lock", label: "Supply locked", val: pctS(u.lockedPct), col: C.text, sub: "until " + new Date(u.nextMs).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/New_York" }) + "+" });
+  const l = extra.liq.get(c.id);
+  if (l && l.ada > 0) out.push({ k: "pool", label: "Liquidity", val: compact(l.ada) + " ADA", col: C.text });
+  if (l && l.share && l.share.burned >= 1) out.push({ k: "lpburn", label: "LP burned", val: pctS(l.share.burned), col: C.amber });
+  if (c.cs === "graduated" && c.gAt && c.born && c.gAt > c.born) out.push({ k: "grad", label: "Graduated in", val: span(c.gAt - c.born), col: C.buy });
+  return out;
+}
+function badgeOpts(list) {
+  const box = $("[data-badge-opts]");
+  if (!box) return;
+  box.hidden = !list.length;
+  box.querySelector("[data-badge-list]").innerHTML = list.map((x) => `<label class="card-profile-opt"><input type="checkbox" data-badge="${x.k}"${off.has(x.k) ? "" : " checked"}> ${esc(x.label)}</label>`).join("");
+  box.querySelectorAll("[data-badge]").forEach((el) => (el.onchange = () => { el.checked ? off.delete(el.dataset.badge) : off.add(el.dataset.badge); refresh(); }));
+}
+let refresh = () => {};
 // Creator links that fit on the image: X handle and website first.
 const cardLinks = (p) => (p && p.links ? ["twitter", "website", "telegram", "discord"].filter((k) => p.links[k]).slice(0, 2).map((k) => (k === "twitter" ? "X " : "") + shortLink(k, p.links[k])) : []);
 
@@ -135,28 +167,47 @@ function draw() {
   text((chg != null ? pct(chg) : "–") + " in 24h", W - P, pu ? iy + 108 : iy + 86, { font: `700 20px ${F.b}`, color: chCol, align: "right" });
 
   // KPI row
-  const ky = 246, kh = 78, kw = (W - 2 * P - 3 * 12) / 4;
+  const ky = 240, kh = 78, kw = (W - 2 * P - 4 * 12) / 5;
   const kpis = sol ? [
     ["Traded", usd(sol.vUsd), C.text, sol.vAda ? `~${fmt(sol.vAda)} ADA` : ""],
     ["Buys / sells", `${fmt(sol.b)} / ${fmt(sol.s)}`, sol.b > sol.s ? C.buy : sol.b < sol.s ? C.sell : C.text, "by number of trades"],
     ["Trades", fmt(sol.b + sol.s), C.text, `${sol.dex} · ${sol.quote} pair`],
-    ["Market cap", c.mc ? compact(c.mc) + " ADA" : "–", C.text, [c.mc && R ? usdcxShort(c.mc, R) : "", c.hold ? `${fmt(c.hold)} holders` : ""].filter(Boolean).join(" · ")],
+    ["Holders", c.hold ? fmt(c.hold) : "–", c.hold ? C.amber : C.text, c.src === "snek" ? "Cardano wallets" : sol ? "Cardano side" : "wallets holding"],
+    ["Market cap", c.mc ? compact(c.mc) + " ADA" : "–", C.text, c.mc && R ? usdcxShort(c.mc, R) : ""],
   ] : [
     ["Traded", compact(w.v) + " ADA", C.text, data.adaUsd ? `~${fmt(w.v * data.adaUsd)} USDCx` : ""],
-    ["Net flow", signed(w.net) + " ADA", w.net > 0 ? C.buy : w.net < 0 ? C.sell : C.text, `${w.net && R ? usdcxShort(w.net, R) + " · " : ""}${compact(w.b)} in · ${compact(w.s)} out`],
+    ["Net flow", signed(w.net) + " ADA", w.net > 0 ? C.buy : w.net < 0 ? C.sell : C.text, `${compact(w.b)} in · ${compact(w.s)} out`],
     ["Trades", fmt(w.n), C.text, `${fmt(w.wal)} wallets`],
-    ["Market cap", c.mc ? compact(c.mc) + " ADA" : "–", C.text, [c.mc && R ? usdcxShort(c.mc, R) : "", c.hold ? `${fmt(c.hold)} holders` : ""].filter(Boolean).join(" · ")],
+    ["Holders", c.hold ? fmt(c.hold) : "–", c.hold ? C.amber : C.text, c.src === "snek" ? "Cardano wallets" : sol ? "Cardano side" : "wallets holding"],
+    ["Market cap", c.mc ? compact(c.mc) + " ADA" : "–", C.text, c.mc && R ? usdcxShort(c.mc, R) : ""],
   ];
   kpis.forEach(([l, v, col, sub], i) => {
     const x = P + i * (kw + 12);
-    rrect(x, ky, kw, kh + 14, 10, C.panel, C.line);
+    rrect(x, ky, kw, kh + 14, 10, C.panel, l === "Holders" && c.hold ? "rgba(227,164,60,0.55)" : C.line);
     text(l, x + 16, ky + 26, { font: `500 14px ${F.b}`, color: C.muted });
     text(fit(v, kw - 32, `500 22px ${F.m}`), x + 16, ky + 58, { font: `500 22px ${F.m}`, color: col });
     if (sub) text(fit(sub, kw - 32, `500 13px ${F.b}`), x + 16, ky + 80, { font: `500 13px ${F.b}`, color: C.faint });
   });
 
+  // brag badges
+  const bl = badges(c).filter((x) => !off.has(x.k)).slice(0, 5);
+  let cy = 346, ch = 228;
+  if (bl.length) {
+    const by = 344, bh = 46, gap = 10, bw = Math.min(340, (W - 2 * P - gap * (bl.length - 1)) / bl.length);
+    bl.forEach((x, i) => {
+      const bx = P + i * (bw + gap);
+      rrect(bx, by, bw, bh, 23, "rgba(227,164,60,0.07)", "rgba(227,164,60,0.35)");
+      const lab = fit(x.label, bw * 0.55, `500 14px ${F.b}`);
+      ctx.font = `500 14px ${F.b}`; const lw = ctx.measureText(lab).width;
+      ctx.font = `700 20px ${F.m}`; const vw = Math.min(ctx.measureText(x.val).width, bw - lw - 44);
+      const sx = bx + (bw - (lw + 10 + vw)) / 2;
+      text(lab, sx, by + 29, { font: `500 14px ${F.b}`, color: C.muted });
+      text(fit(x.val, bw - lw - 44, `700 20px ${F.m}`), sx + lw + 10, by + 30, { font: `700 20px ${F.m}`, color: x.col });
+    });
+    cy = 402; ch = 176;
+  }
   // price line
-  const cx = P, cy = 352, cw = 700, ch = 222;
+  const cx = P, cw = 700;
   rrect(cx, cy, cw, ch, 12, C.panel, C.line);
   text("Price, last 24 hours", cx + 18, cy + 30, { font: `700 15px ${F.b}` });
   const pts = series.filter((s) => s[1] > 0);
@@ -197,8 +248,8 @@ function draw() {
     y += 86;
   } else if (c.cs === "graduated") {
     text(c.src === "snek" ? "Graduated to Splash" : "Graduated to Minswap", rx + 18, y, { font: `700 15px ${F.b}` });
-    if (c.gAt) text(fit(c.born ? `Took ${span(c.gAt - c.born)} from launch` : "", rw - 36, `500 14px ${F.b}`), rx + 18, y + 26, { font: `500 14px ${F.b}`, color: C.muted });
-    y += 62;
+    if (c.gAt && off.has("grad")) text(fit(c.born ? `Took ${span(c.gAt - c.born)} from launch` : "", rw - 36, `500 14px ${F.b}`), rx + 18, y + 26, { font: `500 14px ${F.b}`, color: C.muted });
+    y += c.gAt && c.born && off.has("grad") ? 62 : 34;
   } else if (c.cs === "open" && c.src === "snek") {
     // Snek.fun doesn't publish curve progress, so just say where the coin is.
     text("On the Snek.fun bonding curve", rx + 18, y, { font: `700 15px ${F.b}` });
@@ -208,7 +259,7 @@ function draw() {
   text("Gator Eyes alerts, 24h", rx + 18, y, { font: `700 15px ${F.b}` });
   const al = Object.entries(c.al || {});
   if (!al.length) text("None", rx + 18, y + 28, { font: `500 14px ${F.b}`, color: C.muted });
-  al.slice(0, 3).forEach(([k, n], i) => text(`${n} ${AL[k] || k}${n > 1 ? " alerts" : " alert"}`, rx + 18, y + 28 + i * 24, { font: `500 14px ${F.b}`, color: C.muted }));
+  al.slice(0, Math.max(1, Math.floor((cy + ch - (sol ? 34 : 14) - (y + 28)) / 24) + 1)).forEach(([k, n], i) => text(`${n} ${AL[k] || k}${n > 1 ? " alerts" : " alert"}`, rx + 18, y + 28 + i * 24, { font: `500 14px ${F.b}`, color: C.muted }));
 
   if (sol) text(fit("Solana data: DexScreener, GeckoTerminal", rw - 36, `500 12px ${F.b}`), rx + 18, cy + ch - 16, { font: `500 12px ${F.b}`, color: C.faint });
   ctx.fillStyle = C.line; ctx.fillRect(P, H - 70, W - 2 * P, 1);
@@ -229,6 +280,8 @@ function caption() {
     return [`$${c.tk} on Solana (${sol.dex}), last 24 hours`, `${fmt(sol.b + sol.s)} trades: ${fmt(sol.b)} buys, ${fmt(sol.s)} sells. About ${usd(sol.vUsd)} traded${sol.vAda ? ` (~${fmt(sol.vAda)} ADA)` : ""}. Price ${chg}.`, link].join("\n");
   }
   const bits = [`$${c.tk} on ${siteOf(c)}, last 24 hours`, `${fmt(w.v || 0)} ADA${data && data.adaUsd ? ` (${usdcxShort(w.v || 0, data.adaUsd)})` : ""} traded by ${fmt(w.wal || 0)} wallets. Net flow ${signed(w.net || 0)} ADA${data && data.adaUsd && w.net ? ` (${usdcxShort(Math.abs(w.net), data.adaUsd)})` : ""}. Price ${w.ch != null ? pct(w.ch) : "flat"}.`];
+  const brag = [c.hold ? `${fmt(c.hold)} holders` : "", ...badges(c).filter((x) => !off.has(x.k)).map((x) => `${x.label.toLowerCase()} ${x.val}`)].filter(Boolean);
+  if (brag.length) bits.push(brag.join(" · ").replace(/^./, (m) => m.toUpperCase()) + ".");
   if (c.cs === "open" && c.prog != null) bits.push(`${(c.prog / 100).toFixed(0)}% of the way to graduating.`);
   bits.push(link);
   return bits.join("\n");
@@ -256,7 +309,7 @@ async function show(s) {
   sol = null; prof = null;
   $("[data-profile]").innerHTML = "";
   $("[data-profile-opt]").hidden = true;
-  const [im, , sw, pf] = await Promise.all([loadImg(c.img), loadSeries(c), loadSol(c), loadProfile(c)]);
+  const [im, , sw, pf] = await Promise.all([loadImg(c.img), loadSeries(c), loadSol(c), loadProfile(c), loadExtras()]);
   if (coin !== c) return;
   sol = sw; prof = pf;
   $("[data-profile]").innerHTML = profileHtml(prof, c);
@@ -266,6 +319,7 @@ async function show(s) {
   if (coin !== c) return;
   art = safeImage(im);
   await ready;
+  badgeOpts(badges(c));
   draw();
   const cap = caption();
   $("[data-caption-preview]").textContent = cap;
@@ -274,11 +328,15 @@ async function show(s) {
   // Make the PNG now, so a tap can hand it straight to the phone's share sheet
   // (phones drop the tap if we're still busy making the file).
   let file = null;
-  try {
-    const blob = await new Promise((res) => canvas.toBlob(res, "image/png"));
-    if (coin !== c) return;
-    if (blob) file = new File([blob], fname, { type: "image/png" });
-  } catch {}
+  const makeFile = async () => {
+    try {
+      const blob = await new Promise((res) => canvas.toBlob(res, "image/png"));
+      file = blob ? new File([blob], fname, { type: "image/png" }) : null;
+    } catch { file = null; }
+  };
+  await makeFile();
+  if (coin !== c) return;
+  refresh = async () => { if (coin !== c) return; draw(); $("[data-caption-preview]").textContent = caption(); await makeFile(); };
   const canShare = !!(file && navigator.canShare && navigator.canShare({ files: [file] }));
   const mobile = matchMedia("(pointer: coarse)").matches;
   dl.textContent = !mobile ? "Download PNG" : canShare ? "Save or share image" : "Save image";

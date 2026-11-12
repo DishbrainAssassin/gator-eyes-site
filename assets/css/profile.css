@@ -22,3 +22,6 @@
   .profile { padding: var(--space-4); }
   .profile-link, .profile-more { flex: 1 1 auto; justify-content: flex-start; min-height: 44px; }
 }
+.card-badge-opts { margin-top: var(--space-3); }
+.card-badge-list { display: flex; flex-wrap: wrap; gap: 0 var(--space-4); }
+[data-caption-preview] { overflow-wrap: anywhere; white-space: pre-line; }
