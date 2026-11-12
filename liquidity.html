@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gator Eyes | Liquidity tracker for Solada.fun coins</title>
+  <meta name="description" content="Every graduated Solada.fun coin's Minswap pool, read from the chain: how much ADA backs each coin, how deep the pool is next to its market cap, and who holds the LP tokens.">
+  <meta property="og:title" content="Gator Eyes | Lurking so you don't have to">
+  <meta property="og:description" content="Free, live tracker for Solada.fun and Snek.fun: whale buys, volume spikes, new launches, money flows and holder checks. No sign-up. Just ask Quagmire the gator.">
+  <meta property="og:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://www.gatoreyes.fun/assets/img/og.jpg">
+  <meta property="og:url" content="https://www.gatoreyes.fun/liquidity.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Gator Eyes">
+  <link rel="canonical" href="https://www.gatoreyes.fun/liquidity.html">
+  <meta name="twitter:site" content="@GatorEyesADA">
+  <meta name="theme-color" content="#06090a">
+  <link rel="icon" href="./assets/img/favicon-64.png">
+  <link rel="apple-touch-icon" href="./assets/img/apple-touch-icon.png">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Gator Eyes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/style.css?v=20261111-liq">
+  <link rel="stylesheet" href="./assets/css/clean-layout.css?v=20261103-apphome">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./index.html" aria-label="Gator Eyes home">
+        <img src="./assets/img/avatar-256.webp" alt="" width="32" height="32">
+        <span>Gator Eyes</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="./tokens.html">Tokens</a>
+        <a href="./watchlist.html">Watchlist</a>
+        <details class="tools-menu">
+          <summary>Tools <span aria-hidden="true">⌄</span></summary>
+          <div class="tools-dropdown"><a class="all-tools-link" href="./tools.html">All tools</a><a href="./race.html">Graduation race</a><a href="./graduated.html">Graduated coins</a><a href="./flows.html">Flows</a><a href="./unlocks.html">Unlock calendar</a><a href="./burns.html">Burn tracker</a><a href="./liquidity.html" aria-current="page">Liquidity tracker</a><a href="./followup.html">Alert follow-up</a><a href="./holders.html">Holder snapshot</a><a href="./trades.html">Trade history</a><a href="./coincard.html">Stat card</a><a href="./card.html">Daily flow card</a><a href="./about.html">How it works</a><a href="./gaey.html">$GAEY</a></div>
+        </details>
+        <button type="button" class="nav-ask" data-ask aria-haspopup="dialog" aria-controls="gator-panel"><img src="./assets/img/gator-nerd-head-160.webp" alt="" width="28" height="28"><span>Ask Quagmire</span></button>
+      </nav>
+      <a class="btn btn-sm btn-ghost header-discord" data-link="discord" href="#">Join Discord</a>
+    </div>
+  </header>
+  <div data-platform-bar></div>
+
+    <main id="main" class="dash">
+    <section class="dash-top" aria-labelledby="dash-title">
+      <div class="wrap">
+        <div class="dash-head">
+          <div>
+            <p class="eyebrow"><span class="live-dot" data-live-dot></span><span data-live-text>Watching the pools</span></p>
+            <h1 id="dash-title">Liquidity tracker</h1>
+            <p class="dash-lede">Every graduated Solada.fun coin's Minswap pool, read from the chain. See how much ADA backs each coin, how deep its pool is next to its market cap, and who holds the LP tokens that can take that liquidity out. Free, no sign-up.</p>
+          </div>
+          <div class="tabs" role="tablist" aria-label="Period" data-periods><button class="tab is-on" data-p="7">7 days</button><button class="tab" data-p="30">30 days</button><button class="tab" data-p="0">All</button></div>
+        </div>
+        <div class="notice" data-notice hidden role="status"></div>
+      </div>
+    </section>
+
+    <section class="wrap dash-body" aria-label="Liquidity tracker">
+      <div class="kpis kpis-unl" data-kpis></div>
+      <article class="panel" data-auto-panel hidden>
+        <header class="panel-head panel-head-wrap"><div><h2 class="panel-title">Liquidity growth setting</h2><p class="panel-meta">Coins whose launcher turned on Solada's liquidity growth option. Any LP added to their pools shows in the changes below.</p></div></header>
+        <div class="burn-auto" data-auto></div>
+      </article>
+      <article class="panel">
+        <header class="panel-head panel-head-wrap">
+          <div><h2 class="panel-title">By coin</h2><p class="panel-meta" data-coins-meta></p></div>
+          <div class="unl-tools">
+            <label class="search"><span class="sr-only">Find a coin</span><input type="search" placeholder="Find a coin" data-search autocomplete="off"></label>
+          </div>
+        </header>
+        <div class="table-wrap">
+          <table class="coin-table unl-table burn-table liq-table">
+            <thead><tr>
+              <th scope="col">Coin</th><th scope="col" class="num">ADA in pool</th><th scope="col" class="num hide-sm">Depth</th><th scope="col" class="num hide-sm">1,000 ADA buy</th><th scope="col" class="num hide-sm">24h</th><th scope="col">Who holds the LP</th>
+            </tr></thead>
+            <tbody data-coins></tbody>
+          </table>
+        </div>
+        <div class="list-foot"><button class="btn btn-ghost btn-sm" data-more-coins hidden>Show all pools</button></div>
+      </article>
+      <article class="panel">
+        <header class="panel-head panel-head-wrap">
+          <div><h2 class="panel-title" data-ev-title>Liquidity changes in the last 7 days</h2><p class="panel-meta" data-ev-meta></p></div>
+          <label class="toggle toggle-inline"><input type="checkbox" data-removes-only><span>Removals only</span></label>
+        </header>
+        <div class="burn-list" data-events></div>
+        <div class="list-foot"><button class="btn btn-ghost btn-sm" data-more hidden>Show more changes</button></div>
+      </article>
+      <article class="panel">
+        <header class="panel-head"><h2 class="panel-title">How this is checked</h2></header>
+        <div class="method">
+          <div><h3>The pools</h3><p>A Solada coin that reaches its graduation target opens its own Minswap pool, with ADA on one side and the coin on the other. Gator Eyes reads every pool from the chain every 10 minutes: the ADA and tokens inside it and the LP tokens that stand for it. Coins still on their bonding curve have no pool yet. Snek.fun pools are not listed here.</p></div>
+          <div><h3>Who holds the LP</h3><p>Whoever holds a pool's LP tokens can trade them back for its ADA and tokens. <span class="burn-who is-solada">Solada</span> means a wallet Solada publishes on its proof-of-reserves page. <span class="burn-who is-creator">Creator</span> is the coin's launcher wallet. <span class="burn-who is-burned">Burned</span> is LP sent to the Cardano Graveyard, which can never be taken out. Anything else is another wallet. Solada's <a href="https://www.solada.fun/terms" target="_blank" rel="noopener">terms</a> say it owns each coin's pool LP and only withdraws the pool's fee growth, never the principal. Removals by its wallets show below so you can check.</p></div>
+          <div><h3>Changes</h3><p><strong>Added</strong> and <strong>Removed</strong> mean a wallet's LP and the pool's total LP grew or shrank together. <strong>Moved</strong> means LP changed hands without leaving the pool, and <strong>Burned</strong> means it went to the Graveyard. Ordinary buys and sells change a pool's balance but are not liquidity changes. Changes are found by comparing each read with the last, so the list starts when this tracker went live and times are accurate to about 10 minutes.</p></div>
+          <div><h3>Depth and price impact</h3><p>Depth is the ADA in the pool as a share of the coin's market cap right now. The 1,000 ADA column is how far a single 1,000 ADA buy would move the price in that pool, including its trading fee. Bigger pools move less. It ignores trades routed through other venues.</p></div>
+        </div>
+      </article>
+      <p class="dash-foot">Pool balances, LP holders and changes come from Cardano through Koios. Coin names, market caps and settings come from Solada.fun. Address and transaction links open Cardanoscan; coin links open Solada with our referral code.</p>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>Gator Eyes is free and will never charge for access. It's an automated tracker for <a data-link="join" href="#">Solada</a> and Snek.fun. Alerts are not financial advice. $GAEY is the Gator Eyes team's token. Links to Solada include our referral code (GatorEyesADA), which may earn the team referral rewards at no extra cost to you. <a href="./about.html#disclosures">Disclosures</a>.</p>
+      <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./tokens.html">Tokens</a><a href="./tools.html">Tools</a><a href="./app.html">Get the app</a></nav>
+    </div>
+  </footer>
+  <script type="module" src="./assets/js/liquidity.js?v=20261111-liq"></script>
+</body>
+</html>
