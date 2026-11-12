@@ -281,13 +281,13 @@ async function apply() {
     const q = Number(h.qty);
     // Curve, pool and contract addresses stay as their own rows even when grouping by wallet.
     const solo = h.group !== "wallet" && h.group !== "dev";
-    rows.push({ key: rules.stake && h.stake && !solo ? h.stake : h.addr, addr: h.addr, stake: h.stake, qty: q, addrs: [h.addr], group: h.group, groups: new Set([h.group]), lockedUntilMs: h.lockedUntilMs || 0, name: h.name || null, venue: h.venue || null, lockSchedule: h.lockSchedule, lockDatesVerified: h.lockDatesVerified });
+    rows.push({ key: rules.stake && h.stake && !solo ? h.stake : h.addr, addr: h.addr, stake: h.stake, qty: q, addrs: [h.addr], group: h.group, groups: new Set([h.group]), lockedUntilMs: h.lockedUntilMs || 0, name: h.name || null, venue: h.venue || null, lockSchedule: h.lockSchedule, lockDatesVerified: h.lockDatesVerified, handle: h.handle || null, knownOwner: h.knownOwner || null });
   }
   if (rules.stake) {
     const m = new Map();
     for (const r of rows) {
       const x = m.get(r.key);
-      if (x) { x.qty += r.qty; x.addrs.push(r.addr); x.groups.add(r.group); if (r.qty > x.top) { x.top = r.qty; x.addr = r.addr; x.group = r.group; } }
+      if (x) { x.qty += r.qty; x.addrs.push(r.addr); x.groups.add(r.group); x.handle = x.handle || r.handle; x.knownOwner = x.knownOwner || r.knownOwner; if (r.qty > x.top) { x.top = r.qty; x.addr = r.addr; x.group = r.group; } }
       else m.set(r.key, { ...r, top: r.qty });
     }
     rows = [...m.values()];
@@ -357,6 +357,13 @@ function typeCell(r) {
   return `<span class="gtag" style="--c:${G.color}"><i></i>${esc(G.name)}</span>${extra ? `<span class="cell-sub">${esc(extra)}</span>` : ""}`;
 }
 
+// ADA Handle the wallet owner chose (from handle.me, top wallets only), or a known exchange/vendor name.
+function handleTag(r) {
+  if (r.handle) return `<a class="wal-handle" href="https://handle.me/${encodeURIComponent(r.handle)}" target="_blank" rel="noopener" title="ADA Handle chosen by this wallet's owner (handle.me)">$${esc(r.handle)}</a>`;
+  if (r.knownOwner) return `<span class="wal-handle is-owner" title="Known wallet owner, as listed by handle.me">${esc(r.knownOwner)}</span>`;
+  return "";
+}
+
 function renderRows() {
   const div = 10 ** st.dec;
   const shown = st.more ? st.out : st.out.slice(0, 100);
@@ -367,7 +374,7 @@ function renderRows() {
     const href = "https://cardanoscan.io/" + (id.startsWith("stake1") ? "stakekey/" : "address/") + esc(id);
     return `<tr class="${r.group !== "wallet" ? "is-" + r.group : ""}">
     <td class="num">${i + 1}</td>
-    <td><span class="wal"><span class="mono" title="${esc(id)}">${esc(short(id))}</span><a class="wal-link" href="${href}" target="_blank" rel="noopener" title="Open on Cardanoscan">Cardanoscan ↗</a></span></td>
+    <td><span class="wal">${handleTag(r)}<span class="mono" title="${esc(id)}">${esc(short(id))}</span><a class="wal-link" href="${href}" target="_blank" rel="noopener" title="Open on Cardanoscan">Cardanoscan ↗</a></span></td>
     <td>${typeCell(r)}</td>
     <td class="num">${fmt(r.qty / div, 2)}</td>
     <td class="num"><span class="share-num">${r.share.toFixed(r.share < 0.1 ? 3 : 2)}%</span><span class="bar" style="--w:${max ? ((r.share / max) * 100).toFixed(1) : 0}%"></span></td>
@@ -379,9 +386,9 @@ function renderRows() {
 function csv() {
   const div = 10 ** st.dec;
   const c = st.snap.coin;
-  const lines = ["rank,address,stake_address,balance,share_pct,addresses,type,venue,contract_name,lock_dates_verified"];
+  const lines = ["rank,address,stake_address,balance,share_pct,addresses,type,venue,contract_name,lock_dates_verified,ada_handle,known_owner"];
   const cell = (x) => '"' + String(x ?? "").replace(/"/g, '""') + '"';
-  st.out.forEach((r, i) => lines.push([i + 1, r.addr, r.stake || "", (r.qty / div).toFixed(st.dec), r.share.toFixed(6), r.addrs.length, r.group, r.venue, r.name, r.group === "lockcontract" ? !!r.lockDatesVerified : ""].map(cell).join(",")));
+  st.out.forEach((r, i) => lines.push([i + 1, r.addr, r.stake || "", (r.qty / div).toFixed(st.dec), r.share.toFixed(6), r.addrs.length, r.group, r.venue, r.name, r.group === "lockcontract" ? !!r.lockDatesVerified : "", r.handle ? "$" + r.handle : "", r.knownOwner || ""].map(cell).join(",")));
   const blob = new Blob([lines.join("\n") + "\n"], { type: "text/csv" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);

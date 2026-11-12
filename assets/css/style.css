@@ -807,6 +807,9 @@ button.link:hover { color: var(--color-amber-hover); }
 .holder-table .wal { display: inline-flex; flex-direction: column; gap: 1px; }
 .holder-table .wal .mono { font-size: 0.8125rem; white-space: nowrap; }
 .wal-link { font-size: 0.6875rem; color: var(--color-text-faint); text-decoration: none; }
+.wal-handle { font-size: 0.8125rem; font-weight: 700; color: var(--color-amber); text-decoration: none; white-space: nowrap; max-width: 22ch; overflow: hidden; text-overflow: ellipsis; }
+.wal-handle:hover { text-decoration: underline; }
+.wal-handle.is-owner { color: var(--color-text); }
 .wal-link:hover { color: var(--color-amber); }
 .gtag { display: inline-flex; align-items: center; gap: 6px; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--c); border: 1px solid color-mix(in oklab, var(--c) 40%, transparent); background: color-mix(in oklab, var(--c) 10%, transparent); border-radius: var(--radius-full); padding: 2px 8px; white-space: nowrap; }
 .gtag i { width: 6px; height: 6px; border-radius: 50%; background: var(--c); }
