@@ -43,13 +43,13 @@ const off = new Set();
 function badges(c) {
   const out = [];
   const b = extra.burns.get(c.id);
-  if (b && b.pct >= 0.1) out.push({ k: "burn", label: "Supply burned", val: pctS(b.pct), col: C.amber });
+  if (b && b.pct >= 0.1) out.push({ k: "burn", label: "Supply burned", val: pctS(b.pct), tail: "burned", col: C.amber });
   const u = extra.unlocks.get(c.id), now = Date.now();
-  if (u && u.lockedPct >= 0.5 && u.nextMs > now) out.push({ k: "lock", label: "Supply locked", val: pctS(u.lockedPct), col: C.text, sub: "until " + new Date(u.nextMs).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/New_York" }) + "+" });
+  if (u && u.lockedPct >= 0.5 && u.nextMs > now) out.push({ k: "lock", label: "Supply locked", val: pctS(u.lockedPct), tail: "locked", col: C.amber });
   const l = extra.liq.get(c.id);
-  if (l && l.ada > 0) out.push({ k: "pool", label: "Liquidity", val: compact(l.ada) + " ADA", col: C.text });
-  if (l && l.share && l.share.burned >= 1) out.push({ k: "lpburn", label: "LP burned", val: pctS(l.share.burned), col: C.amber });
-  if (c.cs === "graduated" && c.gAt && c.born && c.gAt > c.born) out.push({ k: "grad", label: "Graduated in", val: span(c.gAt - c.born), col: C.buy });
+  if (l && l.ada > 0) out.push({ k: "pool", label: "Liquidity", val: compact(l.ada) + " ADA", tail: "liquidity", col: C.amber });
+  if (l && l.share && l.share.burned >= 1) out.push({ k: "lpburn", label: "LP burned", val: pctS(l.share.burned), tail: "LP burned", col: C.amber });
+  if (c.cs === "graduated" && c.gAt && c.born && c.gAt > c.born) out.push({ k: "grad", label: "Graduation speed", val: span(c.gAt - c.born), head: "Graduated in", col: C.buy });
   return out;
 }
 function badgeOpts(list) {
@@ -193,16 +193,17 @@ function draw() {
   const bl = badges(c).filter((x) => !off.has(x.k)).slice(0, 5);
   let cy = 346, ch = 228;
   if (bl.length) {
-    const by = 344, bh = 46, gap = 10, bw = Math.min(340, (W - 2 * P - gap * (bl.length - 1)) / bl.length);
+    const by = 344, bh = 46, gap = 12, bw = Math.min(300, (W - 2 * P - gap * (bl.length - 1)) / bl.length);
+    const x0 = P + (W - 2 * P - (bw * bl.length + gap * (bl.length - 1))) / 2;
     bl.forEach((x, i) => {
-      const bx = P + i * (bw + gap);
-      rrect(bx, by, bw, bh, 23, "rgba(227,164,60,0.07)", "rgba(227,164,60,0.35)");
-      const lab = fit(x.label, bw * 0.55, `500 14px ${F.b}`);
-      ctx.font = `500 14px ${F.b}`; const lw = ctx.measureText(lab).width;
-      ctx.font = `700 20px ${F.m}`; const vw = Math.min(ctx.measureText(x.val).width, bw - lw - 44);
-      const sx = bx + (bw - (lw + 10 + vw)) / 2;
-      text(lab, sx, by + 29, { font: `500 14px ${F.b}`, color: C.muted });
-      text(fit(x.val, bw - lw - 44, `700 20px ${F.m}`), sx + lw + 10, by + 30, { font: `700 20px ${F.m}`, color: x.col });
+      const bx = x0 + i * (bw + gap);
+      rrect(bx, by, bw, bh, 23, "rgba(227,164,60,0.12)", "rgba(227,164,60,0.7)");
+      // Value first ("15.6% burned"); graduation reads "Graduated in 5h 39m".
+      const parts = x.head ? [[x.head, `600 16px ${F.b}`, C.text], [x.val, `700 21px ${F.m}`, x.col]] : [[x.val, `700 21px ${F.m}`, x.col], [x.tail, `600 16px ${F.b}`, C.text]];
+      const ws = parts.map(([t, f]) => { ctx.font = f; return ctx.measureText(t).width; });
+      const tot = ws[0] + 8 + ws[1];
+      let sx = bx + Math.max(14, (bw - tot) / 2);
+      parts.forEach(([t, f, col], j) => { text(fit(t, bw - 28, f), sx, by + 30, { font: f, color: col }); sx += ws[j] + 8; });
     });
     cy = 402; ch = 176;
   }
@@ -280,7 +281,7 @@ function caption() {
     return [`$${c.tk} on Solana (${sol.dex}), last 24 hours`, `${fmt(sol.b + sol.s)} trades: ${fmt(sol.b)} buys, ${fmt(sol.s)} sells. About ${usd(sol.vUsd)} traded${sol.vAda ? ` (~${fmt(sol.vAda)} ADA)` : ""}. Price ${chg}.`, link].join("\n");
   }
   const bits = [`$${c.tk} on ${siteOf(c)}, last 24 hours`, `${fmt(w.v || 0)} ADA${data && data.adaUsd ? ` (${usdcxShort(w.v || 0, data.adaUsd)})` : ""} traded by ${fmt(w.wal || 0)} wallets. Net flow ${signed(w.net || 0)} ADA${data && data.adaUsd && w.net ? ` (${usdcxShort(Math.abs(w.net), data.adaUsd)})` : ""}. Price ${w.ch != null ? pct(w.ch) : "flat"}.`];
-  const brag = [c.hold ? `${fmt(c.hold)} holders` : "", ...badges(c).filter((x) => !off.has(x.k)).map((x) => `${x.label.toLowerCase()} ${x.val}`)].filter(Boolean);
+  const brag = [c.hold ? `${fmt(c.hold)} holders` : "", ...badges(c).filter((x) => !off.has(x.k)).map((x) => (x.head ? `${x.head.toLowerCase()} ${x.val}` : `${x.val} ${x.tail}`))].filter(Boolean);
   if (brag.length) bits.push(brag.join(" · ").replace(/^./, (m) => m.toUpperCase()) + ".");
   if (c.cs === "open" && c.prog != null) bits.push(`${(c.prog / 100).toFixed(0)}% of the way to graduating.`);
   bits.push(link);
