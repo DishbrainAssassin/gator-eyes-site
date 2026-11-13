@@ -2,7 +2,7 @@
 import { getApi, price, pct, usdcxPrice } from "./api.js?v=20261102-usdcx2";
 import { coinUrl, isSnek, fetchFeed } from "./data.js?v=20261102-usdcx2";
 import { esc, fmt, timeAgo, usdcxShort } from "./ui.js?v=20261102-usdcx2";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx2";
+import { wireLinks, liveStatus } from "./common.js?v=20261113-toolsmenu";
 import * as platform from "./platform.js?v=20261102-usdcx2";
 import { pill } from "./platform.js?v=20261102-usdcx2";
 

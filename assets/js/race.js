@@ -2,7 +2,7 @@
 import { getApi, hours, span, signed } from "./api.js?v=20261102-usdcx2";
 import { coinUrl } from "./data.js?v=20261102-usdcx2";
 import { esc, fmt, compact, timeAgo, usdcxShort } from "./ui.js?v=20261102-usdcx2";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx2";
+import { wireLinks, liveStatus } from "./common.js?v=20261113-toolsmenu";
 
 wireLinks();
 const $ = (s) => document.querySelector(s);

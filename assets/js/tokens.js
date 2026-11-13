@@ -3,7 +3,7 @@
 import { getApi } from "./api.js?v=20261102-usdcx2";
 import { fetchFeed } from "./data.js?v=20261102-usdcx2";
 import { timeAgo } from "./ui.js?v=20261102-usdcx2";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx2";
+import { wireLinks, liveStatus } from "./common.js?v=20261113-toolsmenu";
 import * as platform from "./platform.js?v=20261102-usdcx2";
 import * as watchlist from "./watchlist.js?v=20261102-usdcx2";
 import { coinRow } from "./coinrow.js?v=20261109-profile";

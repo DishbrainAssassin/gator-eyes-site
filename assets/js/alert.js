@@ -6,7 +6,7 @@ import { getApi } from "./api.js?v=20261102-usdcx2";
 import { fetchFeed, coinUrl } from "./data.js?v=20261102-usdcx2";
 import { mountCompact } from "./profile.js?v=20261109-profile";
 import { esc, alertCard, emptyState } from "./ui.js?v=20261102-usdcx2";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx2";
+import { wireLinks, liveStatus } from "./common.js?v=20261113-toolsmenu";
 import * as watchlist from "./watchlist.js?v=20261102-usdcx2";
 
 wireLinks();
