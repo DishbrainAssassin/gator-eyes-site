@@ -8,7 +8,7 @@ export const KINDS = [
   { k: "big", label: "Whale trades", hint: "Big buys and sells, $1,000+ worth of ADA or a big slice of the coin's market cap" },
   { k: "spike", label: "Volume spikes", hint: "A coin suddenly trading many times its normal pace" },
   { k: "dev", label: "Creator sells", hint: "The wallet that launched a coin selling a meaningful amount" },
-  { k: "launch", label: "Fast Lunges", hint: "Fast launches: new coins pulling in 1,000+ ADA from 8+ wallets in their first hour" },
+  { k: "launch", label: "Fast Lunges", hint: "Fast launches: new coins reaching 15+ buyers and 1,000+ net ADA in their first hour" },
   { k: "hatch", label: "Hatchlings", hint: "Every new coin, once, soon after it goes live. Busy: about 15 a day" },
   { k: "watch", label: "$GAEY trades", hint: "Every $GAEY buy and sell" },
 ];
