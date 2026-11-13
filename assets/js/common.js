@@ -36,6 +36,10 @@ function wireToolsMenu() {
   const mobileLinks = document.createElement("div");
   mobileLinks.className = "mobile-nav-extra";
   mobileLinks.innerHTML = `<a href="./tokens.html">Tokens</a><a href="./watchlist.html">Watchlist</a><button type="button" class="menu-action" data-menu-ask>Ask Quagmire</button><button type="button" class="menu-action" data-menu-search>Search coins</button>`;
+  try {
+    const inApp = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true || new URLSearchParams(location.search).get("source") === "app" || sessionStorage.getItem("ge-app-mode") === "1";
+    if (inApp) dropdown.querySelectorAll("[data-app-hide]").forEach((el) => el.remove());
+  } catch {}
   const allTools = dropdown.querySelector(".all-tools-link");
   if (allTools) allTools.after(mobileLinks);
   else dropdown.prepend(mobileLinks);
@@ -47,7 +51,17 @@ function wireToolsMenu() {
     document.querySelector(action.hasAttribute("data-menu-ask") ? ".nav-ask" : ".hdr-search")?.click();
   });
   summary.setAttribute("aria-expanded", String(menu.open));
-  menu.addEventListener("toggle", () => summary.setAttribute("aria-expanded", String(menu.open)));
+  const fit = () => {
+    // Keep the two-column menu on screen when the Tools link sits near the right edge.
+    dropdown.style.transform = "";
+    if (!menu.open) return;
+    const r = dropdown.getBoundingClientRect();
+    const over = r.right - (document.documentElement.clientWidth - 12);
+    const shift = over > 0 ? Math.min(over, r.left - 12) : 0;
+    if (shift > 0) dropdown.style.transform = `translateX(${-shift}px)`;
+  };
+  menu.addEventListener("toggle", () => { summary.setAttribute("aria-expanded", String(menu.open)); fit(); });
+  addEventListener("resize", fit, { passive: true });
   document.addEventListener("click", (event) => {
     if (!menu.contains(event.target)) menu.open = false;
   });
@@ -97,13 +111,30 @@ function navTips() {
   document.body.appendChild(tip);
   let timer = 0;
   const show = (a) => {
-    const t = NAV_TIPS[(a.getAttribute("href") || "").replace(/\?[^#]*/, "")];
+    const t = a.dataset.tip ? [a.textContent.trim(), a.dataset.tip] : NAV_TIPS[(a.getAttribute("href") || "").replace(/\?[^#]*/, "")];
     if (!t) return;
     clearTimeout(timer);
     tip.innerHTML = `<strong>${t[0]}</strong><span>${t[1]}</span>`;
     tip.hidden = false;
     const r = a.getBoundingClientRect();
     const w = tip.offsetWidth;
+    const menu = a.closest(".tools-dropdown");
+    tip.classList.toggle("nav-tip--side", !!menu);
+    tip.classList.remove("nav-tip--right");
+    if (menu) {
+      // Inside the Tools menu, open beside the menu so it never covers the next link.
+      const m = menu.getBoundingClientRect();
+      const h = tip.offsetHeight;
+      const right = m.left - w - 12 < 12;
+      tip.classList.toggle("nav-tip--right", right);
+      tip.style.left = (right ? m.right + 12 : m.left - w - 12) + "px";
+      const top = Math.max(12, Math.min(innerHeight - h - 12, r.top + r.height / 2 - h / 2));
+      tip.style.top = top + "px";
+      tip.style.setProperty("--arrow-y", r.top + r.height / 2 - top + "px");
+      a.setAttribute("aria-describedby", "nav-tip");
+      requestAnimationFrame(() => tip.classList.add("is-on"));
+      return;
+    }
     const left = Math.max(12, Math.min(innerWidth - w - 12, r.left + r.width / 2 - w / 2));
     tip.style.left = left + "px";
     tip.style.top = r.bottom + 10 + "px";

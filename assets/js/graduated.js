@@ -4,7 +4,7 @@
 import { getApi, price, pct, signed, span, usdcxPrice } from "./api.js?v=20261102-usdcx2";
 import { coinUrl } from "./data.js?v=20261102-usdcx2";
 import { esc, fmt, compact, timeAgo, usdcxShort, usdcxOf } from "./ui.js?v=20261102-usdcx2";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx2";
+import { wireLinks, liveStatus } from "./common.js?v=20261113-toolsmenu";
 import * as platform from "./platform.js?v=20261102-usdcx2";
 import * as watchlist from "./watchlist.js?v=20261102-usdcx2";
 import { pill, LP } from "./platform.js?v=20261102-usdcx2";

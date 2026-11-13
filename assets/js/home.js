@@ -1,6 +1,6 @@
 import { subscribe } from "./data.js?v=20261102-usdcx2";
 import { alertCard, emptyState, skeleton, tracks, mergeDays, lpSplit, dayLabel, fmt, usdcx, timeAgo, compact } from "./ui.js?v=20261102-usdcx2";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx2";
+import { wireLinks, liveStatus } from "./common.js?v=20261113-toolsmenu";
 import * as platform from "./platform.js?v=20261102-usdcx2";
 import * as watchlist from "./watchlist.js?v=20261102-usdcx2";
 import { savedPrefs } from "./pwa.js?v=20261102-stats";

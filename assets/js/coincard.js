@@ -2,7 +2,7 @@
 import { getApi, price, pct, signed, hours, span, usdcxPrice } from "./api.js?v=20261102-usdcx2";
 import { coinUrl, fetchFeed } from "./data.js?v=20261102-usdcx2";
 import { esc, fmt, compact, timeAgo, usdcxShort, usdcxOf } from "./ui.js?v=20261102-usdcx2";
-import { wireLinks, liveStatus } from "./common.js?v=20261102-usdcx2";
+import { wireLinks, liveStatus } from "./common.js?v=20261113-toolsmenu";
 import * as platform from "./platform.js?v=20261102-usdcx2";
 import { loadProfile, profileHtml, shortLink, LINK_NAMES } from "./profile.js?v=20261109-profile";
 
