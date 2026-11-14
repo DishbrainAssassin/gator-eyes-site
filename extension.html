@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gator Eyes Chrome extension</title>
+  <meta name="description" content="Free Chrome extension that adds Gator Eyes flow, alerts, creator watch, a trade ribbon and Ask Quagmire to Solada.fun and Snek.fun coin pages, plus Gator Run Downs picks from the toolbar.">
+  <meta property="og:title" content="Gator Eyes Chrome extension">
+  <meta property="og:description" content="Free Chrome extension that adds Gator Eyes flow, alerts, creator watch, a trade ribbon and Ask Quagmire to Solada.fun and Snek.fun coin pages, plus Gator Run Downs picks from the toolbar.">
+  <meta property="og:image" content="https://www.gatoreyes.fun/assets/img/og-explainer.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@GatorEyesADA">
+  <meta name="twitter:image" content="https://www.gatoreyes.fun/assets/img/og-explainer.jpg">
+  <meta property="og:url" content="https://www.gatoreyes.fun/extension.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Gator Eyes">
+  <link rel="canonical" href="https://www.gatoreyes.fun/extension.html">
+  <meta name="theme-color" content="#06090a">
+  <link rel="icon" href="./assets/img/favicon-64.png">
+  <link rel="apple-touch-icon" href="./assets/img/apple-touch-icon.png">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Gator Eyes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/style.css?v=20261102-usdcx2">
+    <link rel="stylesheet" href="./assets/css/clean-layout.css?v=20261113-toolsmenu">
+  <link rel="stylesheet" href="./assets/css/extension.css?v=20261113-ext">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./index.html" aria-label="Gator Eyes home">
+        <img src="./assets/img/avatar-256.webp" alt="" width="32" height="32">
+        <span>Gator Eyes</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="./tokens.html">Tokens</a>
+        <a href="./watchlist.html">Watchlist</a>
+        <details class="tools-menu">
+          <summary>Tools <span aria-hidden="true">⌄</span></summary>
+          <div class="tools-dropdown"><a class="all-tools-link" href="./tools.html">All tools</a><div class="tools-cols"><div class="tools-col"><div class="tools-group" role="group" aria-labelledby="tm-explore-coins"><p class="tools-group-label" id="tm-explore-coins">Explore coins</p><a href="./race.html" data-tip="Coins on the bonding curve, ranked by how close they are to graduating.">Graduation race</a><a href="./graduated.html" data-tip="Every graduated coin, with Cardano, Solana and launchpad filters.">Graduated coins</a></div><div class="tools-group" role="group" aria-labelledby="tm-research-a-coin"><p class="tools-group-label" id="tm-research-a-coin">Research a coin</p><a href="./holders.html" data-tip="See where a coin&#x27;s supply sits and export a filtered holder list.">Holder snapshot</a><a href="./trades.html" data-tip="A coin&#x27;s buys, sells and wallets, with a CSV download.">Trade history</a><a href="./unlocks.html" data-tip="Upcoming Solada token unlocks, verified on Cardano.">Unlock calendar</a><a href="./burns.html" data-tip="How much of each Solada coin has been burned, and who burned it.">Burn tracker</a><a href="./liquidity.html" data-tip="ADA in each graduated coin&#x27;s pool and who holds the LP tokens.">Liquidity tracker</a><a href="./followup.html" data-tip="What a coin did 1 hour and 24 hours after each alert.">Alert follow-up</a></div></div><div class="tools-col"><div class="tools-group" role="group" aria-labelledby="tm-track-activity"><p class="tools-group-label" id="tm-track-activity">Track activity</p><a href="./flows.html" data-tip="Where ADA is moving today, by coin, hour and trading venue.">Flows</a><a href="./app.html" data-tip="Install Gator Eyes and choose which alerts buzz your phone.">Phone app</a><a href="./extension.html" aria-current="page" data-app-hide data-tip="The Gator Eyes panel right on Solada and Snek.fun coin pages. Free on the Chrome Web Store.">Chrome extension</a></div><div class="tools-group" role="group" aria-labelledby="tm-create-share"><p class="tools-group-label" id="tm-create-share">Create &amp; share</p><a href="./coincard.html" data-tip="A ready-to-post image of a coin&#x27;s latest activity.">Stat card</a><a href="./card.html" data-tip="Turn a day&#x27;s Solada trading into a shareable image.">Daily flow card</a></div><div class="tools-group" role="group" aria-labelledby="tm-learn-more"><p class="tools-group-label" id="tm-learn-more">Learn more</p><a href="./about.html" data-tip="What sets off each alert, where the data comes from and what it covers.">How it works</a><a href="./gaey.html" data-tip="The Gator Eyes team token: live trades, holder rewards and the creator lock.">$GAEY</a></div></div></div></div>
+        </details>
+        <button type="button" class="nav-ask" data-ask aria-haspopup="dialog" aria-controls="gator-panel"><img src="./assets/img/gator-nerd-head-160.webp" alt="" width="28" height="28"><span>Ask Quagmire</span></button>
+      </nav>
+      <a class="btn btn-sm btn-ghost header-discord" data-link="discord" href="#">Join Discord</a>
+    </div>
+  </header>
+
+
+  <main id="main" class="ext">
+    <section class="about-hero ext-hero" aria-labelledby="ext-title">
+      <div class="wrap ext-hero-grid">
+        <div>
+          <p class="eyebrow">Free Chrome extension</p>
+          <h1 id="ext-title">Gator Eyes on every coin page</h1>
+          <p class="lede">Open any coin on Solada.fun or Snek.fun and Gator Eyes shows up right there: where the money is moving, recent alerts, what the creator is doing and Ask Quagmire. Plus Gator Run Downs picks from your toolbar.</p>
+          <div class="ext-cta">
+            <a class="btn btn-amber" href="https://chromewebstore.google.com/detail/gator-eyes-for-cardano/mbngcmleckdlklnpgiehmbopggapnamp" target="_blank" rel="noopener">Add to Chrome, free</a>
+            <a class="ext-link" href="https://github.com/DishbrainAssassin/gator-eyes-extension" target="_blank" rel="noopener">See the code on GitHub</a>
+          </div>
+          <p class="ext-fine">For Chrome on a computer, plus Chrome-based browsers such as Brave and Edge. Not available on phones; use the <a href="./app.html">phone app</a> there.</p>
+        </div>
+        <figure class="ext-shot ext-hero-shot">
+          <img src="./assets/img/extension/panel.webp" width="1280" height="800" alt="The Gator Eyes panel on a Solada.fun coin page, showing 24-hour volume, net flow, creator holdings, next unlock, liquidity and recent alerts.">
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="what-title">
+      <div class="wrap">
+        <h2 id="what-title" class="section-title">What it does</h2>
+        <div class="ext-features">
+          <article class="ext-feature">
+            <img class="ext-closeup" src="./assets/img/extension/panel-closeup.webp" width="312" height="648" loading="lazy" alt="Close-up of the coin panel for $MEPE: volume, net flow, trades, creator, next unlock, liquidity and recent alerts.">
+            <div>
+              <h3>Coin panel</h3>
+              <p>A small panel on every Solada.fun and Snek.fun coin page, including graduated coins on Markets.</p>
+              <ul>
+                <li>24h volume and net flow (ADA bought minus sold), trades, wallets and price change</li>
+                <li>Gator Eyes alerts on that coin in the last 24 hours, and what the price did after</li>
+                <li>Creator watch: creator holdings, locked supply and any creator sells</li>
+                <li>Next unlock, launch speed and pool liquidity</li>
+                <li>Customize which sections show; hidden sections stop loading</li>
+              </ul>
+            </div>
+          </article>
+          <article class="ext-feature">
+            <img src="./assets/img/extension/ribbon.webp" width="1280" height="800" loading="lazy" alt="Trade ribbon along the bottom of a Solada.fun page, with the coin panel open.">
+            <div>
+              <h3>Trade ribbon</h3>
+              <p>An optional strip along the bottom of Solada.fun and Snek.fun pages.</p>
+              <ul>
+                <li>Switch between the live Gator Eyes trade feed, open Run Downs races and your watchlist</li>
+                <li>Star coins with ☆ in the panel to follow them here</li>
+                <li>Turn it off any time</li>
+              </ul>
+            </div>
+          </article>
+          <article class="ext-feature">
+            <img src="./assets/img/extension/popup.webp" width="1280" height="800" loading="lazy" alt="Toolbar popup listing the most traded coins in the last 24 hours with volume and net flow.">
+            <div>
+              <h3>Most traded, one click away</h3>
+              <p>Click the toolbar icon to see the 8 most traded coins across both launchpads in the last 24 hours, with net flow.</p>
+            </div>
+          </article>
+          <article class="ext-feature">
+            <img src="./assets/img/extension/rundowns.webp" width="1280" height="800" loading="lazy" alt="Gator Run Downs tab in the toolbar popup with open races, countdowns and Lunge or No Lunge buttons.">
+            <div>
+              <h3>Gator Run Downs tab</h3>
+              <p>Every open race with its pick countdown, buyers and net ADA against the Fast Lunge target, and Quagmire's call.</p>
+              <ul>
+                <li>Make your Lunge or No Lunge pick right from the toolbar</li>
+                <li>Free to play, no token gate</li>
+                <li>Sign in once at gatorrundowns.fun; same account and fair-play rules as the site</li>
+                <li>Optional desktop alerts when a new race opens</li>
+              </ul>
+            </div>
+          </article>
+          <article class="ext-feature ext-feature-text">
+            <div>
+              <h3>Ask Quagmire, right in the panel</h3>
+              <p>Ask about holders, burns, unlocks or anything else about the coin you're looking at. Answers come from live Gator Eyes data, and Quagmire already knows which coin is open.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="install-title">
+      <div class="wrap ext-two">
+        <div class="panel">
+          <h2 id="install-title" class="section-title">Install in under a minute</h2>
+          <ol class="ext-steps">
+            <li>Open the <a href="https://chromewebstore.google.com/detail/gator-eyes-for-cardano/mbngcmleckdlklnpgiehmbopggapnamp" target="_blank" rel="noopener">Chrome Web Store listing</a> on your computer.</li>
+            <li>Click <strong>Add to Chrome</strong>, then <strong>Add extension</strong>.</li>
+            <li>Click the puzzle icon in Chrome's toolbar and pin Gator Eyes so it's one click away.</li>
+            <li>Open any coin on Solada.fun or Snek.fun. The panel shows up on its own.</li>
+          </ol>
+        </div>
+        <div class="panel" id="privacy">
+          <h2 class="section-title">Your wallet stays out of it</h2>
+          <ul class="ext-checks">
+            <li>No wallet connection or signing. It can't move funds or see balances.</li>
+            <li>Permissions: storage and alarms only. Notifications are optional and off until you turn them on.</li>
+            <li>Talks only to Gator Eyes and gatorrundowns.fun. No tabs, history or cookies.</li>
+            <li>On coin pages it reads only which coin is open, never the page or what you type.</li>
+            <li>Sends only your Ask Quagmire question (with the coin's ticker) and your Run Downs picks.</li>
+            <li>No remote code and the source is public.</li>
+          </ul>
+          <p class="ext-fine">Details are in our <a href="./privacy.html">privacy policy</a>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section ext-final" aria-label="Get the extension">
+      <div class="wrap">
+        <p><strong>Free forever.</strong> Gator Eyes will never charge for access. Not financial advice. Not affiliated with Solada.fun or Snek.fun.</p>
+        <a class="btn btn-amber" href="https://chromewebstore.google.com/detail/gator-eyes-for-cardano/mbngcmleckdlklnpgiehmbopggapnamp" target="_blank" rel="noopener">Add to Chrome, free</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>Gator Eyes is free and will never charge for access. It's an automated tracker for <a data-link="join" href="#">Solada</a> and Snek.fun. Alerts are not financial advice. $GAEY is the Gator Eyes team's token. Links to Solada include our referral code (GatorEyesADA), which may earn the team referral rewards at no extra cost to you. <a href="./about.html#disclosures">Disclosures</a>.</p>
+      <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./flows.html">Flows</a><a href="./card.html">Flow card</a><a href="./app.html">Get the app</a></nav>
+    </div>
+  </footer>
+
+  <script type="module" src="./assets/js/extension.js?v=20261113-ext"></script>
+</body>
+</html>
