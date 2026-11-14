@@ -6,6 +6,8 @@ import { esc } from "./ui.js?v=20261102-usdcx2";
 import * as watchlist from "./watchlist.js?v=20261102-usdcx2";
 
 export const ITEMS = [
+  { type: "feature", key: "extension", tag: "Chrome extension", title: "Gator Eyes on every coin page", href: "./extension.html", cta: "See what the extension does", desktopOnly: true,
+    text: "Our free Chrome extension puts Gator Eyes right on Solada.fun and Snek.fun coin pages: flow, alerts, creator watch, a trade ribbon and Ask Quagmire. Make Run Downs picks from the toolbar too." },
   { type: "feature", key: "liquidity", tag: "Liquidity tracker", title: "Who holds the liquidity", href: "./liquidity.html", cta: "Open the liquidity tracker",
     text: "Every graduated Solada.fun coin's Minswap pool, read from the chain. See how much ADA backs each coin, how much a 1,000 ADA buy moves its price, and who holds the LP tokens that could pull it." },
   { type: "feature", key: "burns", tag: "Burn tracker", title: "See what's been burned", href: "./burns.html", cta: "Open the burn tracker",
@@ -49,6 +51,16 @@ function newSession() {
     return true;
   } catch { return true; }
 }
+// Phones and the installed app can't run Chrome extensions, so desktop-only slides stay out there.
+const onPhone = () => {
+  try {
+    if (matchMedia("(display-mode: standalone)").matches || navigator.standalone === true) return true;
+    if (new URLSearchParams(location.search).get("source") === "app" || sessionStorage.getItem("ge-app-mode") === "1") return true;
+  } catch {}
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || "");
+};
+export const itemsFor = (phone = onPhone()) => ITEMS.filter((it) => !(phone && it.desktopOnly));
+
 const usable = (it) => { try { return !(it.skip && it.skip()); } catch { return true; } };
 
 /** Which spotlight to show on this visit. First visit starts with #1; each return moves on one. */
@@ -81,7 +93,7 @@ function slide(it, i, n) {
 
 export function mountNest(root = document.querySelector("[data-nest]")) {
   if (!root) return;
-  const items = ITEMS;
+  const items = itemsFor();
   const n = items.length;
   let i = pick(items);
   root.hidden = false;
