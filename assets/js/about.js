@@ -18,7 +18,6 @@ function renderRules(r) {
     ["k-launch", "Fast Lunge", `A new coin reaches ${fmt(r.launchMinBuyers)} or more buyers and ${fmt(r.launchMinAda)} net ADA in (buys minus sells; the creator's buys don't count) within its first ${fmt(r.launchWindowMin)} minutes. Same target as Gator Run Downs.`, "#fast-lunge"],
     ["k-whale", "Snek.fun whale trade", `Any single Snek.fun trade worth $${fmt((r.snek && r.snek.bigUsd) || r.bigUsd || 1000)} or more in ADA (about ${fmt((r.snek && r.snek.bigAda) || r.bigAda)} ADA at today's price). On the Snek.fun curve, a trade also qualifies at ${fmt(r.mcapPct, 2)}% of market cap or more (minimum ${fmt(r.mcapMinAda || 250)} ADA). The market-cap rule does not apply to Splash trades. Snek.fun alerts post to their own channel.`, "#snek-alerts"],
     ["k-tracks", "Gator Tracks", `The day's recap at ${hour(r.recapHourET, r.recapMinET)} Eastern, right after midnight: volume, net flow, busiest hour, top venue, most traded coins, and where the money went. One post covers every launchpad, split by launchpad with a combined total.`, "#gator-tracks"],
-    ["k-gaey", "$GAEY trades", "Every buy and sell of $GAEY, the team's own token, in its own channel so it never crowds the others.", "#gaey-trades"],
   ];
   $("[data-rules]").innerHTML = rows
     .map(([cls, name, text, ch]) => `<div class="rule ${cls}"><div class="rule-k"><span class="watch-k">${esc(name)}</span><span class="rule-ch mono">${esc(ch)}</span></div><p>${esc(text)}</p></div>`)

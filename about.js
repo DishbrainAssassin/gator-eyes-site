@@ -17,7 +17,6 @@ function renderRules(r) {
     ["k-dev", "Creator sell", `The wallet that created a coin sells ${fmt(r.creatorMinAda || 500)} ADA or more, or at least ${fmt(r.creatorMcapPct || 5)}% of the coin's market cap (minimum ${fmt(r.mcapMinAda || 250)} ADA). Posted for transparency. Creators sell for lots of reasons.`, "#creator-sells"],
     ["k-launch", "Fast launch", `A new coin reaches ${fmt(r.launchMinBuyers)} or more buyers and ${fmt(r.launchMinAda)} net ADA in (buys minus sells; the creator's buys don't count) within its first ${fmt(r.launchWindowMin)} minutes. Same target as Gator Run Downs.`, "#fast-lunge"],
     ["k-tracks", "Gator Tracks", `The day's recap at ${hour(r.recapHourET, r.recapMinET)} Eastern, right after midnight: volume, net flow, busiest hour, top venue, most traded coins, and where the money went.`, "#gator-tracks"],
-    ["k-gaey", "$GAEY trades", "Every buy and sell of $GAEY, the team's own token, in its own channel so it never crowds the others.", "#gaey-trades"],
   ];
   $("[data-rules]").innerHTML = rows
     .map(([cls, name, text, ch]) => `<div class="rule ${cls}"><div class="rule-k"><span class="watch-k">${esc(name)}</span><span class="rule-ch mono">${esc(ch)}</span></div><p>${esc(text)}</p></div>`)

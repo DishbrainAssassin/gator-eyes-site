@@ -17,4 +17,5 @@ assert.equal((result.innerHTML.match(/7\.5%/g) || []).length, 2);
 assert.ok(!result.innerHTML.includes("8%"));
 assert.ok(result.innerHTML.includes("12:01 AM"));
 assert.ok(result.innerHTML.includes("does not apply to Splash trades"));
+assert.ok(!result.innerHTML.includes("gaey-trades"), "deleted #gaey-trades channel not listed");
 console.log("PASS: fractional whale thresholds, recap time, and Splash exception.");
