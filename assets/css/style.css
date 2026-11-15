@@ -262,6 +262,17 @@ a.panel-meta { color: var(--color-amber); }
 .hnet { position: absolute; left: 0; right: 0; height: 2px; background: var(--color-text); transform: translateY(-1px); }
 .hcol:hover { background: color-mix(in oklab, var(--color-text) 5%, transparent); border-radius: 3px; }
 .hcol.is-future { opacity: 0.25; }
+/* Typical-day markers: average bought (above) and sold (below) for this hour. */
+.havg { position: absolute; left: 2%; right: 2%; height: 0; border-top: 2px dashed var(--color-spike); pointer-events: none; z-index: 1; }
+.hcol.is-future .havg { opacity: 1; }
+.hcol.is-future:has(.havg) { opacity: 1; }
+.hcol.is-future:has(.havg) > .hb, .hcol.is-future:has(.havg) > .hnet { opacity: 0.25; }
+.dot.avg { background: none; border-top: 2px dashed var(--color-spike); border-radius: 0; height: 0; width: 12px; vertical-align: middle; display: inline-block; }
+.hours-tools { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-3) var(--space-4); }
+.seg-sm button { padding: 5px 10px; }
+.seg-sm button[disabled] { opacity: 0.4; cursor: default; }
+.hours-sum { margin: var(--space-4) 0 0; }
+.hours-sum .muted { color: var(--color-text-faint); }
 .hcol.is-now::after { content: ""; position: absolute; inset: 0; border: 1px dashed color-mix(in oklab, var(--color-amber) 60%, transparent); border-radius: 3px; pointer-events: none; }
 .hlab { position: absolute; bottom: -18px; left: 0; font-family: var(--font-mono); font-size: 0.6875rem; color: var(--color-text-faint); white-space: nowrap; }
 
@@ -1049,4 +1060,7 @@ button.link:hover { color: var(--color-amber-hover); }
   .liq-table td, .liq-table th { padding-inline: var(--space-1); }
   .liq-holder { grid-template-columns: 1fr auto; }
   .liq-holder .unl-addr { grid-column: 1 / -1; grid-row: 2; }
+}
+@media (max-width: 760px) {
+  .seg-sm button { min-height: 34px; padding: 6px 12px; }
 }

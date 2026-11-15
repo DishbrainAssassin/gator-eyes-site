@@ -18,6 +18,9 @@ const el = {
   notice: $("[data-notice]"),
   kpis: $("[data-kpis]"),
   hours: $("[data-hours]"),
+  hoursSum: $("[data-hours-sum]"),
+  avgPick: $("[data-avg-pick]"),
+  avgLegend: $("[data-avg-legend]"),
   venues: $("[data-venues]"),
   inflow: $("[data-inflow]"),
   outflow: $("[data-outflow]"),
@@ -42,6 +45,9 @@ let day = "today";
 let sortKey = "v";
 let showAll = false;
 let query = "";
+// Typical-day comparison on the hourly chart: 7 or 30 closed days, or off. Remembered per browser.
+let avgDays = 7;
+try { const v = localStorage.getItem("ge.flows.avg"); if (v === "0" || v === "7" || v === "30") avgDays = Number(v); } catch (_) {}
 
 el.kpis.innerHTML = '<div class="kpi skel-block"></div>'.repeat(6);
 el.alerts.innerHTML = skeleton(3);
@@ -125,24 +131,103 @@ function renderKpis(d, rate) {
   el.rate.textContent = rateNote(rate);
 }
 
+/** Closed days with hour detail for the chosen launchpad, newest first: [{ key, h: [[bought, sold], ...24] }].
+ * Uses the worker's 30-day hour history when the feed has it, otherwise the 7 daily recaps. */
+function hourHistory() {
+  const rows = (list, recaps) =>
+    (Array.isArray(list) && list.length ? list : (recaps || []).filter((r) => r.hours).map((r) => ({ key: r.key, h: r.hours })))
+      .filter((r) => r && r.key && Array.isArray(r.h) && r.h.length === 24);
+  const sol = rows(feed.hourHist, feed.recaps);
+  const snek = rows(feed.snek && feed.snek.hourHist, feed.snek && feed.snek.recaps);
+  const scope = platform.get();
+  if (scope === "solada") return sol;
+  if (scope === "snek") return snek;
+  const by = new Map();
+  for (const r of [...sol, ...snek]) {
+    const m = by.get(r.key) || { key: r.key, h: Array.from({ length: 24 }, () => [0, 0]) };
+    r.h.forEach((x, i) => { m.h[i][0] += x[0] || 0; m.h[i][1] += x[1] || 0; });
+    by.set(r.key, m);
+  }
+  return [...by.values()].sort((a, b) => (a.key < b.key ? 1 : -1));
+}
+
+/** Average bought/sold per hour over up to `n` closed days before the shown day. */
+function typicalDay(shownKey, n) {
+  const before = hourHistory().filter((r) => !shownKey || r.key < shownKey);
+  const days = before.slice(0, n);
+  if (!days.length) return null;
+  const h = Array.from({ length: 24 }, (_, i) => [days.reduce((a, r) => a + (r.h[i][0] || 0), 0) / days.length, days.reduce((a, r) => a + (r.h[i][1] || 0), 0) / days.length]);
+  return { h, n: days.length, available: before.length };
+}
+
+function renderAvgPick(shownKey) {
+  const avail = hourHistory().filter((r) => !shownKey || r.key < shownKey).length;
+  el.avgPick.hidden = !avail;
+  const opts = [[7, "7-day avg"], [30, "30-day avg"], [0, "Off"]];
+  el.avgPick.innerHTML = opts
+    .map(([v, label]) => {
+      const short = v && avail < v;
+      const tip = v === 0 ? "Hide the typical-day markers" : short ? `Only ${avail} day${avail === 1 ? "" : "s"} saved so far, averages what's there` : `Average of the ${v} days before this one`;
+      return `<button type="button" class="${v === avgDays ? "is-on" : ""}" aria-pressed="${v === avgDays}" data-avg="${v}" title="${esc(tip)}">${label}</button>`;
+    })
+    .join("");
+  el.avgPick.querySelectorAll("[data-avg]").forEach((b) =>
+    b.addEventListener("click", () => {
+      avgDays = Number(b.dataset.avg);
+      try { localStorage.setItem("ge.flows.avg", String(avgDays)); } catch (_) {}
+      render();
+    })
+  );
+}
+
+const pctVs = (a, b) => (b > 0 ? ` <span class="${a >= b ? "pos" : "neg"}">(${a >= b ? "+" : "−"}${Math.round((Math.abs(a - b) / b) * 100)}%)</span>` : "");
+
+function renderHoursSum(d, isToday, typ, nowH) {
+  if (!typ || !d.hours) {
+    el.hoursSum.hidden = true;
+    el.hoursSum.innerHTML = "";
+    return;
+  }
+  const upto = isToday ? nowH : 23;
+  let vol = 0, net = 0, tVol = 0, tNet = 0, peak = 0;
+  for (let i = 0; i <= upto; i++) {
+    vol += d.hours[i][0] + d.hours[i][1];
+    net += d.hours[i][0] - d.hours[i][1];
+    tVol += typ.h[i][0] + typ.h[i][1];
+    tNet += typ.h[i][0] - typ.h[i][1];
+  }
+  typ.h.forEach((x, i) => { if (x[0] + x[1] > typ.h[peak][0] + typ.h[peak][1]) peak = i; });
+  const span = typ.n === 1 ? "the day before" : `the ${typ.n} days before`;
+  const label = isToday ? "Today so far" : esc(dayLabel(d.key).slice(0, 3));
+  el.hoursSum.hidden = false;
+  el.hoursSum.innerHTML = `<span>${label}: <b>${compact(vol)} ADA</b> vs <b>${compact(tVol)}</b> typical${isToday ? " by this hour" : ""}${pctVs(vol, tVol)}</span><span>Net <b class="${net >= 0 ? "pos" : "neg"}">${shortSigned(net)}</b> vs typical <b class="${tNet >= 0 ? "pos" : "neg"}">${shortSigned(tNet)}</b></span><span>Usually busiest <b>${hourLabel(peak)}–${hourLabel((peak + 1) % 24)}</b></span><span class="muted">Typical = average of ${span}${avgDays === 30 && hourHistory().length < 30 ? ", 30-day history fills in daily" : ""}</span>`;
+}
+
 const hourLabel = (h) => (h === 0 ? "12a" : h < 12 ? h + "a" : h === 12 ? "12p" : h - 12 + "p");
 
 function renderHours(d, isToday) {
   if (!d.hours) {
     el.hours.innerHTML = emptyState("Hour-by-hour detail wasn't tracked yet on this day.");
+    el.hoursSum.hidden = true;
+    el.avgLegend.hidden = true;
     return;
   }
   const nowH = Number(new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", hourCycle: "h23" }).format(new Date())) % 24;
-  const max = Math.max(1, ...d.hours.map((h) => Math.max(h[0], h[1])));
+  const typ = avgDays ? typicalDay(isToday ? null : d.key, avgDays) : null;
+  el.avgLegend.hidden = !typ;
+  renderHoursSum(d, isToday, typ, nowH);
+  const max = Math.max(1, ...d.hours.map((h) => Math.max(h[0], h[1])), ...(typ ? typ.h.map((h) => Math.max(h[0], h[1])) : []));
   const cols = d.hours
     .map((h, i) => {
       const future = isToday && i > nowH;
       const net = h[0] - h[1];
-      const tip = `${hourLabel(i)}–${hourLabel((i + 1) % 24)} ET: bought ${fmt(h[0])} ADA, sold ${fmt(h[1])} ADA, net ${signed(net)} ADA (${usdcxSigned(net, feed.rate)}), ${fmt(h[2])} trades`;
+      const t = typ && typ.h[i];
+      const tip = `${hourLabel(i)}–${hourLabel((i + 1) % 24)} ET: bought ${fmt(h[0])} ADA, sold ${fmt(h[1])} ADA, net ${signed(net)} ADA (${usdcxSigned(net, feed.rate)}), ${fmt(h[2])} trades${t ? `. Typical: bought ${fmt(t[0])}, sold ${fmt(t[1])}` : ""}`;
       const netPos = 50 - (net / max) * 50;
       return `<div class="hcol ${future ? "is-future" : ""} ${isToday && i === nowH ? "is-now" : ""}" title="${esc(tip)}" aria-label="${esc(tip)}" role="img">
         <span class="hb buy" style="height:${(h[0] / max) * 50}%"></span>
         <span class="hb sell" style="height:${(h[1] / max) * 50}%"></span>
+        ${t ? `<span class="havg" style="top:${50 - (t[0] / max) * 50}%"></span><span class="havg" style="top:${50 + (t[1] / max) * 50}%"></span>` : ""}
         ${h[2] ? `<span class="hnet ${net >= 0 ? "pos" : "neg"}" style="top:${netPos}%"></span>` : ""}
         <span class="hlab">${i % 3 === 0 ? hourLabel(i) : ""}</span>
       </div>`;
@@ -327,12 +412,16 @@ function render() {
     const msg = lp === "all" ? "Counting starts with the first trade of the day." : `No ${platform.label(lp)} trades counted yet today.`;
     for (const t of [el.hours, el.venues, el.inflow, el.outflow, el.week]) t.innerHTML = emptyState(msg, lp === "all" ? "" : SHOW_ALL);
     el.coins.innerHTML = "";
+    el.hoursSum.hidden = true;
+    el.avgPick.innerHTML = "";
+    el.avgLegend.hidden = true;
     return;
   }
   renderDays(opts);
   const cur = opts.find((o) => o.id === day);
   renderKpis(cur.d, feed.rate);
   if (el.split) el.split.innerHTML = lpSplit(cur.parts, feed.rate, platform.get());
+  renderAvgPick(cur.live ? null : cur.d.key);
   renderHours(cur.d, !!cur.live);
   renderVenues(cur.d);
   renderFlows(cur.d);
