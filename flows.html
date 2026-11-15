@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
   <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/css/style.css?v=20261102-usdcx2">
+  <link rel="stylesheet" href="./assets/css/style.css?v=20261114-typical">
   <link rel="stylesheet" href="./assets/css/clean-layout.css?v=20261113-toolsmenu">
 </head>
 <body>
@@ -73,8 +73,9 @@
 
       <div class="dash-grid">
         <article class="panel panel-wide">
-          <header class="panel-head"><h2 class="panel-title">Buys and sells by hour</h2><div class="legend"><span><i class="dot buy"></i>Bought</span><span><i class="dot sell"></i>Sold</span><span><i class="dot net"></i>Net</span></div></header>
+          <header class="panel-head panel-head-wrap"><h2 class="panel-title">Buys and sells by hour</h2><div class="hours-tools"><div class="legend"><span><i class="dot buy"></i>Bought</span><span><i class="dot sell"></i>Sold</span><span><i class="dot net"></i>Net</span><span data-avg-legend hidden><i class="dot avg"></i>Typical</span></div><div class="seg seg-sm" role="group" aria-label="Compare with a typical day" data-avg-pick></div></div></header>
           <div class="chart" data-hours></div>
+          <p class="week-sum hours-sum" data-hours-sum hidden></p>
         </article>
         <article class="panel">
           <header class="panel-head"><h2 class="panel-title">Where it traded</h2></header>
@@ -142,6 +143,6 @@
       <nav aria-label="Footer"><a href="./index.html">Home</a><a data-link="discord" href="#">Discord</a><a data-link="x" href="#">X</a><a href="./gaey.html">$GAEY</a><a href="./about.html">How it works</a><a href="./card.html">Flow card</a><a href="./app.html">Get the app</a></nav>
     </div>
   </footer>
-  <script type="module" src="./assets/js/flows.js?v=20261102-usdcx2"></script>
+  <script type="module" src="./assets/js/flows.js?v=20261114-typical"></script>
 </body>
 </html>

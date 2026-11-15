@@ -75,13 +75,15 @@ export const RULES_DEFAULT = { bigUsd: 1000, bigAda: 5200, mcapPct: 7.5, mcapMin
 function normalize(j) {
   const rate = Number(j.adaUsd) || null;
   const alerts = j.alerts.map((a) => ({ ...a, ...neutral(a), src: a.src === "snek" ? "snek" : "solada", url: a.url ? withRef(a.url) : coinUrl(a.tokenId) }));
-  const snek = j.snek && (j.snek.today || (j.snek.recaps || []).length) ? { today: j.snek.today || null, recaps: j.snek.recaps || [] } : null;
+  const snek = j.snek && (j.snek.today || (j.snek.recaps || []).length) ? { today: j.snek.today || null, recaps: j.snek.recaps || [], hourHist: Array.isArray(j.snek.hourHist) ? j.snek.hourHist : null } : null;
   return {
     updatedAt: j.updatedAt ? new Date(j.updatedAt) : null,
     rate,
     alerts,
     today: j.today || null,
     recaps: j.recaps || [],
+    // Up to 30 closed days of hour-by-hour bought/sold, newest first (older bots: absent).
+    hourHist: Array.isArray(j.hourHist) ? j.hourHist : null,
     // Last 40 trades, newest first (the running ticker) and the last few posted weeks.
     tape: Array.isArray(j.tape) ? j.tape : [],
     weeks: Array.isArray(j.weeks) ? j.weeks : [],
