@@ -4,8 +4,8 @@
 //
 // Layout choice (added 2026-11-16): Top (default), Left or Right, remembered on this device in
 // localStorage `ge-tape-layout`. Left/Right turn the strip into a column down that side of the page that
-// shows the full trade feed (every size, up to 300, from the worker's /trade-feed) and scrolls upward
-// instead of sideways. Each trade shows the same details as the top strip. Side layouts need a wide
+// shows the full trade feed (every size, up to 300, from the worker's /trade-feed) as a live feed: newest
+// at the top, new trades slide in and push older ones down. It does not loop. Each trade shows the same details as the top strip. Side layouts need a wide
 // screen (>= 1100px); narrower screens and the installed app always use the top strip.
 // A ?tape=left|right|top link sets the layout too (added 2026-11-16 for the About page link).
 //
@@ -28,7 +28,7 @@ const DAY_MS = 24 * 3600e3;
 const LAYOUT_KEY = "ge-tape-layout";
 const LAYOUTS = ["top", "left", "right"];
 const SIDE_MQ = "(min-width: 1100px)";
-const CSS_HREF = "./assets/css/tape-side.css?v=20261116-watch";
+const CSS_HREF = "./assets/css/tape-side.css?v=20261116-live";
 const FILTER_KEY = "ge-tape-filter";
 
 let host, track, view, header, lastKey = "", items = [], fullOk = null, fullTimer = null, paused = false;
@@ -220,6 +220,7 @@ function render() {
   }
   host.hidden = false;
   const key = (side ? "S|" : "T|") + rows.map(tkey).join(",") + "|" + platform.get();
+  if (key === lastKey && side) { renderSide(rows, lastKey); return; } // side column refreshes ages by trade, not position
   if (key === lastKey) {
     // Same trades: only refresh the ages so the strip doesn't jump.
     track.querySelectorAll(".tape-set").forEach((set) => {
@@ -235,7 +236,7 @@ function render() {
   lastKey = key;
   const html = rows.map(item).join("");
   if (side) {
-    renderSide(rows, html, prevKey);
+    renderSide(rows, prevKey);
     return;
   }
   stopSideScroll();
@@ -248,61 +249,89 @@ function render() {
   });
 }
 
-// Side column: newest at the top, the column drifts upward like the top strip drifts left. New trades
-// slide in above without yanking the reader's place: the scroll offset grows by the height they add.
-function renderSide(rows, html, prevKey) {
-  const firstOld = track.querySelector(".tape-set .tape-item");
-  const oldTopKey = prevKey.startsWith("S|") && firstOld ? firstOld.dataset.k : null;
-  const rowsHtml = rows.map((t) => item(t).replace("<a ", `<a data-k="${esc(tkey(t))}" `)).join("");
-  track.innerHTML = `<div class="tape-set">${rowsHtml}</div><div class="tape-set" aria-hidden="true" inert>${rowsHtml}</div>`;
-  let added = 0;
-  if (oldTopKey) {
-    const idx = rows.findIndex((t) => tkey(t) === oldTopKey);
-    const el = idx > 0 ? track.firstElementChild.children[idx] : null;
-    if (el) added = el.offsetTop; // height of the new rows above the old first row
-  } else {
-    yPos = 0;
+// Side column: a live feed, like the Discord #trade-feed channel. Newest trade at the top; each new trade
+// slides in above and pushes the older ones down and, eventually, off the bottom. It doesn't loop back
+// through older trades. Trades arrive from the worker in batches (it checks once a minute), so a batch is
+// let in one trade at a time, oldest first, spread over the next minute. Every row keeps its real age.
+// Hover or Pause holds new trades back (they queue and come in on resume); if you've scrolled down to
+// read older trades, your place is kept while new ones land above.
+let shown = []; // trades in the column, newest first
+let queue = []; // trades waiting to slide in, oldest first
+let sideCtx = "";
+let pumpT = 0, gap = 1500;
+const BATCH_SPREAD_MS = 45000;
+
+const sideItem = (t) => item(t).replace("<a ", `<a data-k="${esc(tkey(t))}" `);
+
+function renderSide(rows, prevKey) {
+  stopSideScroll();
+  track.style.transform = "";
+  const ctx = (watchOnly ? "W:" + watchlist.ids().join(",") : "A") + "|" + platform.get();
+  let set = track.querySelector(".tape-set");
+  const fresh = ctx !== sideCtx || !set || !prevKey.startsWith("S|") || !shown.length;
+  if (fresh) {
+    sideCtx = ctx;
+    queue = [];
+    clearTimeout(pumpT); pumpT = 0;
+    shown = rows.slice();
+    track.innerHTML = `<div class="tape-set">${shown.map(sideItem).join("")}</div>`;
     if (view) view.scrollTop = 0;
-  }
-  // Paused or reduced motion: the column is a plain scrollable list; keep the reader on the same trade.
-  if (manualMode()) {
-    track.style.transform = "";
-    if (added && view && view.scrollTop > 0) view.scrollTop += added;
     return;
   }
-  if (added && yPos > 0) yPos += added;
-  const h = track.firstElementChild.offsetHeight;
-  if (h && yPos >= h) yPos = yPos % h;
-  track.style.transform = `translateY(${-yPos}px)`;
-  startSideScroll();
+  const topAt = shown[0].at;
+  const have = new Set(shown.map(tkey).concat(queue.map(tkey)));
+  const incoming = rows.filter((t) => t.at >= topAt && !have.has(tkey(t)));
+  if (incoming.length) {
+    queue = queue.concat(incoming).sort((a, b) => a.at - b.at);
+    gap = Math.max(400, Math.min(5000, Math.round(BATCH_SPREAD_MS / queue.length)));
+  }
+  // Older trades that dropped out (past 24 hours or the 300 cap) leave; older ones that arrived late
+  // (e.g. the full list loading after the first 40) are filled in below without animation.
+  const queued = new Set(queue.map(tkey));
+  const target = rows.filter((t) => !queued.has(tkey(t)) && (t.at < topAt || have.has(tkey(t))));
+  const same = target.length === shown.length && target.every((t, i) => tkey(t) === tkey(shown[i]));
+  if (!same) {
+    const keepTop = view ? view.scrollTop : 0;
+    shown = target;
+    set.innerHTML = shown.map(sideItem).join("");
+    if (view) view.scrollTop = keepTop;
+  } else {
+    const at = new Map(shown.map((t) => [tkey(t), t.at]));
+    set.querySelectorAll(".tape-item").forEach((el) => { const s = el.querySelector("small"); const a = at.get(el.dataset.k); if (s && a) s.textContent = ago(a); });
+  }
+  pump();
+}
+
+function pump() {
+  if (pumpT || !queue.length) return;
+  pumpT = setTimeout(() => {
+    pumpT = 0;
+    if (!isSide() || !queue.length) return;
+    if (paused || hovering() || document.visibilityState !== "visible") { pump(); return; } // hold, check again shortly
+    const t = queue.shift();
+    const set = track.querySelector(".tape-set");
+    if (!set) return;
+    const tpl = document.createElement("template");
+    tpl.innerHTML = sideItem(t);
+    const el = tpl.content.firstElementChild;
+    const reading = view && view.scrollTop > 4;
+    if (!reduced() && !reading) el.classList.add("is-new");
+    set.prepend(el);
+    shown.unshift(t);
+    if (reading) view.scrollTop += el.offsetHeight; // keep the reader's place
+    while (shown.length > FULL_MAX) { shown.pop(); if (set.lastElementChild) set.lastElementChild.remove(); }
+    lastKey = "S|" + shown.map(tkey).join(",") + "|" + platform.get();
+    pump();
+  }, queue.length ? gap : 1000);
 }
 
 const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
-const manualMode = () => paused || reduced();
-const hovering = () => host && (host.matches(":hover") || host.matches(":focus-within"));
-
-function step(ts) {
-  raf = requestAnimationFrame(step);
-  if (!lastTs) { lastTs = ts; return; }
-  const dt = Math.min(0.1, (ts - lastTs) / 1000);
-  lastTs = ts;
-  if (!isSide() || manualMode() || hovering() || document.visibilityState !== "visible") return;
-  const set = track.firstElementChild;
-  const h = set ? set.offsetHeight : 0;
-  if (!h || h <= view.clientHeight) { yPos = 0; track.style.transform = ""; return; } // fits: nothing to scroll
-  yPos += PX_PER_SEC * dt;
-  if (yPos >= h) yPos -= h; // the second copy makes the loop seamless, like the top strip
-  track.style.transform = `translateY(${-yPos}px)`;
-}
-function startSideScroll() {
-  if (raf || manualMode()) return;
-  lastTs = 0;
-  raf = requestAnimationFrame(step);
-}
-function stopSideScroll() {
-  if (raf) cancelAnimationFrame(raf);
-  raf = 0;
-}
+// Hold new trades while the pointer is over the column or keyboard focus is in the list (not the buttons,
+// or clicking Resume would keep holding them).
+const hovering = () => host && (host.matches(":hover") || !!(view && view.matches(":focus-within")));
+// The side column no longer drifts; these stay as no-ops for the layout code.
+function startSideScroll() {}
+function stopSideScroll() {}
 
 function syncToggle() {
   const toggle = host.querySelector(".tape-toggle");
@@ -312,20 +341,9 @@ function syncToggle() {
   toggle.setAttribute("aria-label", (paused ? "Resume " : "Pause ") + what);
   toggle.setAttribute("aria-pressed", String(paused));
   if (!isSide()) return;
-  // Side column: pausing turns it into a list you can scroll yourself, starting where it stopped.
-  if (manualMode()) {
-    stopSideScroll();
-    const set = track.firstElementChild;
-    const h = set ? set.offsetHeight : 0;
-    track.style.transform = "";
-    host.classList.add("is-manual");
-    if (view) view.scrollTop = h ? yPos % h : 0;
-  } else {
-    host.classList.remove("is-manual");
-    if (view) { yPos = view.scrollTop || yPos; view.scrollTop = 0; }
-    track.style.transform = `translateY(${-yPos}px)`;
-    startSideScroll();
-  }
+  // Side column: always a list you can scroll; Pause just holds new trades back until Resume.
+  host.classList.add("is-manual");
+  if (!paused) pump();
 }
 
 export function mountTape() {
