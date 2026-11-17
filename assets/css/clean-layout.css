@@ -90,10 +90,10 @@
 .alert-help > a { display: inline-block; margin-bottom: var(--space-4); }
 .alert-definitions { padding: var(--space-4); background: var(--color-surface); border-radius: var(--radius-md); }
 .alert-definitions .watch-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.quiet-suri { border-block: 1px solid var(--color-divider); }
-.quiet-suri .eyebrow { display: none; }
-.quiet-suri .section-title { font-size: var(--text-lg); }
-.quiet-suri .prose { font-size: var(--text-sm); }
+.quiet-teaser { border-block: 1px solid var(--color-divider); }
+.quiet-teaser .eyebrow { display: none; }
+.quiet-teaser .section-title { font-size: var(--text-lg); }
+.quiet-teaser .prose { font-size: var(--text-sm); }
 .directory-inner { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); }
 .directory-inner .section-title { font-size: var(--text-lg); margin-bottom: var(--space-2); }
 .directory-inner p { font-size: var(--text-sm); }
