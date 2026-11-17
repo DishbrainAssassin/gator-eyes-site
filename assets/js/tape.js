@@ -8,6 +8,7 @@
 // at the top, new trades slide in and push older ones down. It does not loop. Each trade shows the same details as the top strip. Side layouts need a wide
 // screen (>= 1100px); narrower screens and the installed app always use the top strip.
 // A ?tape=left|right|top link sets the layout too (added 2026-11-16 for the About page link).
+// On the top strip, a "Full live feed" button beside LIVE opens the right-side column (wide screens only).
 //
 // Watchlist filter (added 2026-11-16): the star button narrows either layout to trades on coins starred
 // on this device (the website watchlist, watchlist.js). Remembered in localStorage `ge-tape-filter`.
@@ -28,7 +29,7 @@ const DAY_MS = 24 * 3600e3;
 const LAYOUT_KEY = "ge-tape-layout";
 const LAYOUTS = ["top", "left", "right"];
 const SIDE_MQ = "(min-width: 1100px)";
-const CSS_HREF = "./assets/css/tape-side.css?v=20261116-live";
+const CSS_HREF = "./assets/css/tape-side.css?v=20261116-expand";
 const FILTER_KEY = "ge-tape-filter";
 
 let host, track, view, header, lastKey = "", items = [], fullOk = null, fullTimer = null, paused = false;
@@ -116,6 +117,9 @@ function paintLayoutButtons() {
   });
   const seg = host.querySelector(".tape-layouts");
   if (seg) seg.hidden = !allowed;
+  // Top strip on a wide screen: a "Full live feed" button beside LIVE so people find the side column.
+  const ex = host.querySelector(".tape-expand");
+  if (ex) ex.hidden = !allowed || isSide();
 }
 
 function trackHeader() {
@@ -361,7 +365,7 @@ export function mountTape() {
   host.setAttribute("aria-label", "Live trade tape");
   const seg = LAYOUTS.map((v) => `<button type="button" class="tape-layout" data-tape-layout="${v}" aria-pressed="false" aria-label="${LAYOUT_LABEL[v]}" title="${LAYOUT_LABEL[v]}">${ICONS[v]}</button>`).join("");
   const star = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.6l1.9 4 4.4.5-3.3 3 .9 4.3L8 11.2l-3.9 2.2.9-4.3-3.3-3 4.4-.5z" fill="currentColor"/></svg>`;
-  host.innerHTML = `<div class="tape-label"><span class="live-dot is-live" aria-hidden="true"></span>Live</div><div class="tape-view"><div class="tape-track"></div></div><button type="button" class="tape-watch" aria-pressed="false" aria-label="Watchlist only">${star}<span>Watchlist</span></button><div class="tape-layouts" role="group" aria-label="Ticker position" hidden>${seg}</div><button type="button" class="tape-toggle" aria-label="Pause trade ticker" aria-pressed="false">Pause</button>`;
+  host.innerHTML = `<div class="tape-label"><span class="live-dot is-live" aria-hidden="true"></span>Live</div><button type="button" class="tape-expand" hidden title="Open the full live trade feed down the side of the page: every trade, any size, newest first">Full live feed <span aria-hidden="true">›</span></button><div class="tape-view"><div class="tape-track"></div></div><button type="button" class="tape-watch" aria-pressed="false" aria-label="Watchlist only">${star}<span>Watchlist</span></button><div class="tape-layouts" role="group" aria-label="Ticker position" hidden>${seg}</div><button type="button" class="tape-toggle" aria-label="Pause trade ticker" aria-pressed="false">Pause</button>`;
   header.appendChild(host);
   track = host.querySelector(".tape-track");
   view = host.querySelector(".tape-view");
@@ -385,6 +389,12 @@ export function mountTape() {
   host.querySelector(".tape-toggle").addEventListener("click", () => {
     paused = !paused;
     syncToggle();
+  });
+  host.querySelector(".tape-expand").addEventListener("click", () => {
+    if (!sideAllowed()) return;
+    layout = "right";
+    saveLayout("right");
+    applyLayout();
   });
   host.querySelectorAll("[data-tape-layout]").forEach((b) => b.addEventListener("click", () => {
     const v = b.dataset.tapeLayout;
