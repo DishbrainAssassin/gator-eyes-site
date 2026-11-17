@@ -7,6 +7,7 @@
 // shows the full trade feed (every size, up to 300, from the worker's /trade-feed) and scrolls upward
 // instead of sideways. Each trade shows the same details as the top strip. Side layouts need a wide
 // screen (>= 1100px); narrower screens and the installed app always use the top strip.
+// A ?tape=left|right|top link sets the layout too (added 2026-11-16 for the About page link).
 //
 // Watchlist filter (added 2026-11-16): the star button narrows either layout to trades on coins starred
 // on this device (the website watchlist, watchlist.js). Remembered in localStorage `ge-tape-filter`.
@@ -331,6 +332,10 @@ export function mountTape() {
   header = document.querySelector(".site-header");
   if (!header || document.querySelector(".tape")) return;
   layout = savedLayout();
+  // ?tape=left|right|top (e.g. the About page's "Full trade feed" link) picks the layout and remembers it.
+  // Only switches to a side column where one is allowed; phones and the installed app keep the top strip.
+  const want = new URLSearchParams(location.search).get("tape");
+  if (LAYOUTS.includes(want) && (want === "top" || sideAllowed())) { layout = want; saveLayout(want); }
   host = document.createElement("div");
   host.className = "tape";
   host.hidden = true;
