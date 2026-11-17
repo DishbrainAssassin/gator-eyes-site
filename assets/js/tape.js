@@ -188,13 +188,39 @@ async function loadFull() {
     if (j && Array.isArray(j.trades)) { fullOk = true; merge(j.trades); render(); }
   } catch {}
 }
+// Side column polls fast so trades land within seconds; it eases off when nobody's touched the page
+// for a few minutes and stops while the tab is hidden. Horizontal (watchlist) mode keeps the slow pace.
+const LIVE_POLL_MS = 5000, IDLE_POLL_MS = 20000, IDLE_AFTER_MS = 180000;
+let lastActive = Date.now();
+const pollMs = () => !isSide() ? (CONFIG.refreshMs || 60000) : (Date.now() - lastActive > IDLE_AFTER_MS ? IDLE_POLL_MS : LIVE_POLL_MS);
+let pollGen = 0;
+function tickFull(gen = pollGen) {
+  fullTimer = setTimeout(async () => {
+    if (gen !== pollGen) return;
+    if (!needFull()) { fullTimer = null; return; }
+    await loadFull();
+    if (gen === pollGen) tickFull(gen);
+  }, pollMs());
+}
 function startFull() {
   loadFull();
-  if (!fullTimer) fullTimer = setInterval(() => { if (needFull()) loadFull(); }, CONFIG.refreshMs || 60000);
+  if (!fullTimer) tickFull();
 }
 function stopFull() {
-  if (fullTimer) { clearInterval(fullTimer); fullTimer = null; }
+  pollGen++;
+  if (fullTimer) { clearTimeout(fullTimer); fullTimer = null; }
 }
+function wake() {
+  const wasIdle = Date.now() - lastActive > IDLE_AFTER_MS;
+  lastActive = Date.now();
+  if (wasIdle && fullTimer && isSide()) { stopFull(); startFull(); } // back from idle: catch up now
+}
+["pointerdown", "pointermove", "keydown", "wheel", "touchstart", "scroll"].forEach((e) => addEventListener(e, wake, { passive: true, capture: true }));
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState !== "visible") { stopFull(); return; }
+  lastActive = Date.now();
+  if (needFull()) startFull();
+});
 
 // ---------- render ----------
 
@@ -255,15 +281,15 @@ function render() {
 
 // Side column: a live feed, like the Discord #trade-feed channel. Newest trade at the top; each new trade
 // slides in above and pushes the older ones down and, eventually, off the bottom. It doesn't loop back
-// through older trades. Trades arrive from the worker in batches (it checks once a minute), so a batch is
-// let in one trade at a time, oldest first, spread over the next minute. Every row keeps its real age.
+// through older trades. The column polls every few seconds; a batch is let in one trade at a time, oldest
+// first, spread over the next few seconds. Every row keeps its real age.
 // Hover or Pause holds new trades back (they queue and come in on resume); if you've scrolled down to
 // read older trades, your place is kept while new ones land above.
 let shown = []; // trades in the column, newest first
 let queue = []; // trades waiting to slide in, oldest first
 let sideCtx = "";
 let pumpT = 0, gap = 1500;
-const BATCH_SPREAD_MS = 45000;
+const BATCH_SPREAD_MS = 4500; // about one poll, so the column never falls behind
 
 const sideItem = (t) => item(t).replace("<a ", `<a data-k="${esc(tkey(t))}" `);
 
@@ -287,7 +313,7 @@ function renderSide(rows, prevKey) {
   const incoming = rows.filter((t) => t.at >= topAt && !have.has(tkey(t)));
   if (incoming.length) {
     queue = queue.concat(incoming).sort((a, b) => a.at - b.at);
-    gap = Math.max(400, Math.min(5000, Math.round(BATCH_SPREAD_MS / queue.length)));
+    gap = Math.max(250, Math.min(1200, Math.round(BATCH_SPREAD_MS / queue.length)));
   }
   // Older trades that dropped out (past 24 hours or the 300 cap) leave; older ones that arrived late
   // (e.g. the full list loading after the first 40) are filled in below without animation.
