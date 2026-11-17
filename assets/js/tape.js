@@ -7,10 +7,16 @@
 // shows the full trade feed (every size, up to 300, from the worker's /trade-feed) and scrolls upward
 // instead of sideways. Each trade shows the same details as the top strip. Side layouts need a wide
 // screen (>= 1100px); narrower screens and the installed app always use the top strip.
+//
+// Watchlist filter (added 2026-11-16): the star button narrows either layout to trades on coins starred
+// on this device (the website watchlist, watchlist.js). Remembered in localStorage `ge-tape-filter`.
+// While it's on, the top strip also reads /trade-feed so it can find starred-coin trades older than
+// the newest 40.
 import { CONFIG } from "./config.js?v=20261102-usdcx2";
 import { subscribe } from "./data.js?v=20261102-usdcx2";
 import * as platform from "./platform.js?v=20261102-usdcx2";
 import { fmt, esc, usdcxShort } from "./ui.js?v=20261102-usdcx2";
+import * as watchlist from "./watchlist.js?v=20261102-usdcx2";
 
 let rate = null;
 
@@ -21,10 +27,12 @@ const DAY_MS = 24 * 3600e3;
 const LAYOUT_KEY = "ge-tape-layout";
 const LAYOUTS = ["top", "left", "right"];
 const SIDE_MQ = "(min-width: 1100px)";
-const CSS_HREF = "./assets/css/tape-side.css?v=20261116-side";
+const CSS_HREF = "./assets/css/tape-side.css?v=20261116-watch";
+const FILTER_KEY = "ge-tape-filter";
 
 let host, track, view, header, lastKey = "", items = [], fullOk = null, fullTimer = null, paused = false;
 let layout = "top";
+let watchOnly = false;
 let raf = 0, lastTs = 0, yPos = 0;
 
 function ago(ms) {
@@ -55,6 +63,22 @@ function savedLayout() {
 }
 function saveLayout(v) {
   try { localStorage.setItem(LAYOUT_KEY, v); } catch {}
+}
+function savedFilter() {
+  try { return localStorage.getItem(FILTER_KEY) === "watch"; } catch { return false; }
+}
+function saveFilter(on) {
+  try { if (on) localStorage.setItem(FILTER_KEY, "watch"); else localStorage.removeItem(FILTER_KEY); } catch {}
+}
+const needFull = () => isSide() || watchOnly;
+
+function paintWatch() {
+  const b = host && host.querySelector(".tape-watch");
+  if (!b) return;
+  b.classList.toggle("is-on", watchOnly);
+  b.setAttribute("aria-pressed", String(watchOnly));
+  const n = watchlist.count();
+  b.title = watchOnly ? "Showing trades on your starred coins only. Click to show all trades." : n ? `Show only trades on your ${n} starred coin${n === 1 ? "" : "s"}` : "Show only trades on your starred coins (star coins on Tokens or Watchlist first)";
 }
 
 let cssReady = null;
@@ -119,7 +143,7 @@ async function applyLayout() {
   syncToggle();
   lastKey = ""; // force a fresh render in the new shape
   render();
-  if (side) startFull(); else stopFull();
+  if (needFull()) startFull(); else stopFull();
 }
 
 // ---------- full feed (side column) ----------
@@ -161,7 +185,7 @@ async function loadFull() {
 }
 function startFull() {
   loadFull();
-  if (!fullTimer) fullTimer = setInterval(() => { if (isSide()) loadFull(); }, CONFIG.refreshMs || 60000);
+  if (!fullTimer) fullTimer = setInterval(() => { if (needFull()) loadFull(); }, CONFIG.refreshMs || 60000);
 }
 function stopFull() {
   if (fullTimer) { clearInterval(fullTimer); fullTimer = null; }
@@ -172,10 +196,25 @@ function stopFull() {
 function render() {
   if (!track) return;
   const side = isSide();
-  const scoped = items.filter((t) => platform.inScope(t));
+  const mine = watchOnly ? new Set(watchlist.ids()) : null;
+  const scoped = items.filter((t) => platform.inScope(t) && (!mine || mine.has(t.id)));
   const rows = side ? scoped : scoped.slice(0, TOP_N);
   if (!rows.length) {
-    host.hidden = true;
+    if (!watchOnly) {
+      host.hidden = true;
+      return;
+    }
+    // Watchlist filter with nothing to show: keep the bar so the filter can be switched back off.
+    host.hidden = false;
+    stopSideScroll();
+    track.style.transform = "";
+    const msg = watchlist.count()
+      ? (!items.length ? "Loading trades…" : "No trades on your starred coins in the last 24 hours" + (platform.get() === "all" ? "." : " on " + platform.label(platform.get()) + "."))
+      : `No starred coins yet. Star coins on <a href="./tokens.html">Tokens</a> to follow their trades here.`;
+    const key = "E|" + msg + "|" + (side ? "S" : "T");
+    if (key === lastKey) return;
+    lastKey = key;
+    track.innerHTML = `<div class="tape-set"><p class="tape-empty">${msg}</p></div>`;
     return;
   }
   host.hidden = false;
@@ -298,13 +337,28 @@ export function mountTape() {
   host.setAttribute("role", "region");
   host.setAttribute("aria-label", "Live trade tape");
   const seg = LAYOUTS.map((v) => `<button type="button" class="tape-layout" data-tape-layout="${v}" aria-pressed="false" aria-label="${LAYOUT_LABEL[v]}" title="${LAYOUT_LABEL[v]}">${ICONS[v]}</button>`).join("");
-  host.innerHTML = `<div class="tape-label"><span class="live-dot is-live" aria-hidden="true"></span>Live</div><div class="tape-view"><div class="tape-track"></div></div><div class="tape-layouts" role="group" aria-label="Ticker position" hidden>${seg}</div><button type="button" class="tape-toggle" aria-label="Pause trade ticker" aria-pressed="false">Pause</button>`;
+  const star = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.6l1.9 4 4.4.5-3.3 3 .9 4.3L8 11.2l-3.9 2.2.9-4.3-3.3-3 4.4-.5z" fill="currentColor"/></svg>`;
+  host.innerHTML = `<div class="tape-label"><span class="live-dot is-live" aria-hidden="true"></span>Live</div><div class="tape-view"><div class="tape-track"></div></div><button type="button" class="tape-watch" aria-pressed="false" aria-label="Watchlist only">${star}<span>Watchlist</span></button><div class="tape-layouts" role="group" aria-label="Ticker position" hidden>${seg}</div><button type="button" class="tape-toggle" aria-label="Pause trade ticker" aria-pressed="false">Pause</button>`;
   header.appendChild(host);
   track = host.querySelector(".tape-track");
   view = host.querySelector(".tape-view");
   trackHeader();
-  // The layout chooser is styled in tape-side.css; load it whenever the chooser can show.
-  if (sideAllowed()) loadCss();
+  // The watchlist button and layout chooser are styled in tape-side.css.
+  loadCss();
+  watchOnly = savedFilter();
+  paintWatch();
+  host.querySelector(".tape-watch").addEventListener("click", () => {
+    watchOnly = !watchOnly;
+    saveFilter(watchOnly);
+    paintWatch();
+    yPos = 0;
+    if (view) view.scrollTop = 0;
+    lastKey = "";
+    render();
+    if (needFull()) startFull(); else stopFull();
+  });
+  // Starring or un-starring a coin anywhere on the page updates the filtered ticker straight away.
+  watchlist.on(() => { paintWatch(); if (watchOnly) { lastKey = ""; render(); } });
   host.querySelector(".tape-toggle").addEventListener("click", () => {
     paused = !paused;
     syncToggle();
@@ -318,7 +372,7 @@ export function mountTape() {
     applyLayout();
   }));
   const mq = matchMedia(SIDE_MQ);
-  const onMq = () => { if (sideAllowed()) loadCss(); applyLayout(); };
+  const onMq = () => applyLayout();
   if (mq.addEventListener) mq.addEventListener("change", onMq); else if (mq.addListener) mq.addListener(onMq);
   subscribe((feed) => {
     if (!feed) return;
