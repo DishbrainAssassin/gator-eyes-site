@@ -10,11 +10,11 @@ for (const id of groupIds) {
   assert(html.includes(`href="#${id}"`), `Missing category shortcut: ${id}`);
 }
 const tools = [...html.matchAll(/<(a|button)\b[^>]*class="directory-tool(?: [^"]*)?"[^>]*>/g)];
-assert.equal(tools.length, 23, "Keep the displayed tool count accurate");
+assert.equal(tools.length, 24, "Keep the displayed tool count accurate");
 for (const [tag] of tools) {
   const href = tag.match(/href="([^"]+)"/)?.[1];
   if (!href?.startsWith("./")) continue;
-  const [file, hash] = href.slice(2).split("#");
+  const [file, hash] = href.slice(2).split("#").map((p, i) => i ? p : p.split("?")[0]);
   assert(fs.existsSync(path.join(root, file)), `Missing destination: ${href}`);
   if (hash) assert(fs.readFileSync(path.join(root, file), "utf8").includes(`id="${hash}"`), `Missing anchor: ${href}`);
 }
@@ -31,4 +31,4 @@ for (const file of fs.readdirSync(root).filter(f => f.endsWith(".html"))) {
   if (!content.includes('class="tools-dropdown"')) continue;
   assert(/class="tools-dropdown">\s*<a class="all-tools-link"/.test(content), `All tools must be first: ${file}`);
 }
-console.log("PASS: five categories, 23 tools, local destinations, Discord setup, website chat, homepage entry and All tools ordering.");
+console.log("PASS: five categories, 24 tools, local destinations, Discord setup, website chat, homepage entry and All tools ordering.");
