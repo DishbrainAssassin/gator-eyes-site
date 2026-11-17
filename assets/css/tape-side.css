@@ -1,0 +1,77 @@
+/* Trade ticker extras: watchlist-only button, position chooser and side column (left/right full trade
+   feed). Loaded by tape.js on every page; side-column rules only apply when a side layout is on.
+   The top strip's own styles stay in style.css. */
+:root { --tape-side-w: 340px; }
+
+/* Watchlist-only switch (both layouts, every screen size). */
+.tape-watch { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 var(--space-3); border: 0; border-left: 1px solid var(--color-divider); background: var(--color-surface); color: var(--color-text-muted); font: 500 var(--text-xs) var(--font-body); cursor: pointer; }
+.tape-watch svg { flex: none; width: 14px; height: 14px; color: var(--color-text-faint); }
+.tape-watch:hover, .tape-watch:hover svg { color: var(--color-amber); }
+.tape-watch.is-on { color: var(--color-amber); background: color-mix(in oklab, var(--color-amber) 12%, transparent); }
+.tape-watch.is-on svg { color: var(--color-amber); }
+.tape-watch:focus-visible { outline: 2px solid var(--color-amber); outline-offset: -2px; }
+@media (max-width: 640px) { .tape-watch { min-width: 44px; justify-content: center; padding: 0 var(--space-2); } .tape-watch span { display: none; } }
+.tape-empty { margin: 0; display: flex; align-items: center; min-height: 34px; padding: var(--space-1) var(--space-4); color: var(--color-text-muted); font-size: var(--text-xs); white-space: nowrap; }
+.tape-empty a { color: var(--color-amber); }
+.tape--side .tape-empty { white-space: normal; padding: var(--space-4); line-height: 1.5; }
+
+/* Chooser: three small icon buttons beside Pause, on the top strip and the side column alike. */
+.tape-layouts { flex: none; display: flex; align-items: stretch; border-left: 1px solid var(--color-divider); background: var(--color-surface); }
+.tape-layouts[hidden] { display: none; }
+.tape-layout { display: inline-flex; align-items: center; justify-content: center; width: 34px; min-height: 34px; padding: 0; border: 0; background: transparent; color: var(--color-text-faint); cursor: pointer; }
+.tape-layout svg { width: 15px; height: 15px; }
+.tape-layout:hover { color: var(--color-amber); }
+.tape-layout.is-on { color: var(--color-amber); background: color-mix(in oklab, var(--color-amber) 12%, transparent); }
+.tape-layout:focus-visible { outline: 2px solid var(--color-amber); outline-offset: -2px; }
+.tape-layout[hidden] { display: none; }
+
+/* Side column: fixed below the sticky header, full height, page content makes room for it. */
+.tape.tape--side {
+  position: fixed; top: var(--ge-hdr-h, 64px); bottom: 0; z-index: 45;
+  width: var(--tape-side-w);
+  display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; grid-template-rows: auto 1fr;
+  border: 0; border-top: 1px solid var(--color-divider);
+  background: color-mix(in oklab, var(--color-surface) 96%, transparent);
+}
+html[data-tape-side="left"] .tape.tape--side { left: 0; border-right: 1px solid var(--color-divider); }
+html[data-tape-side="right"] .tape.tape--side { right: 0; border-left: 1px solid var(--color-divider); }
+.tape--side .tape-label { grid-column: 1; grid-row: 1; min-height: 38px; min-width: 0; overflow: hidden; white-space: nowrap; padding: 0 var(--space-3); border-right: 0; border-bottom: 1px solid var(--color-divider); }
+.tape--side .tape-label .live-dot { flex: none; }
+.tape--side .tape-label { letter-spacing: 0.04em; gap: 6px; }
+.tape--side .tape-watch { grid-column: 2; grid-row: 1; border-bottom: 1px solid var(--color-divider); }
+.tape--side .tape-watch { min-width: 38px; justify-content: center; padding: 0; }
+.tape--side .tape-watch span { display: none; }
+.tape--side .tape-layouts { grid-column: 3; grid-row: 1; border-bottom: 1px solid var(--color-divider); }
+.tape--side .tape-toggle { grid-column: 4; grid-row: 1; min-width: 64px; border-bottom: 1px solid var(--color-divider); }
+.tape--side .tape-view {
+  grid-column: 1 / -1; grid-row: 2; min-height: 0; overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 92%, transparent);
+  mask-image: linear-gradient(180deg, #000 0, #000 92%, transparent);
+}
+/* The column drifts upward via transform from tape.js, not the sideways keyframes. */
+.tape--side .tape-track { display: block; width: auto; animation: none; will-change: transform; }
+.tape--side .tape-set { display: block; }
+.tape--side .tape-item {
+  display: flex; width: 100%; min-height: 34px; gap: 6px; padding: var(--space-1) var(--space-3);
+  border-right: 0; border-bottom: 1px solid var(--color-divider);
+}
+.tape--side .tape-item b { min-width: 0; flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; }
+.tape--side .tape-item .tape-side { margin-left: auto; flex: none; }
+.tape--side .tape-item small { flex: none; min-width: 2.2em; text-align: right; }
+/* Paused (or reduced motion): a plain list you scroll yourself, without the looping second copy. */
+.tape--side.is-manual .tape-view { overflow-y: auto; overscroll-behavior: contain; -webkit-mask-image: none; mask-image: none; }
+.tape--side.is-manual .tape-set[aria-hidden] { display: none; }
+.tape--side.is-manual .tape-track { transform: none !important; }
+
+/* Make room for the column. The header stays full width above it. */
+html[data-tape-side="left"] main,
+html[data-tape-side="left"] .site-footer { margin-left: var(--tape-side-w); }
+html[data-tape-side="right"] main,
+html[data-tape-side="right"] .site-footer { margin-right: var(--tape-side-w); }
+/* Quagmire's button sits bottom-right: keep it clear of a right-hand column. */
+html[data-tape-side="right"] .gator { right: calc(var(--tape-side-w) + var(--space-5)); }
+
+@media (prefers-reduced-motion: reduce) {
+  .tape--side .tape-view { overflow-y: auto; -webkit-mask-image: none; mask-image: none; }
+  .tape--side .tape-set[aria-hidden] { display: none; }
+}
