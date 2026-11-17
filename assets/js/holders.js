@@ -7,6 +7,7 @@ import { wireLinks, liveStatus } from "./common.js?v=20261113-toolsmenu";
 import * as platform from "./platform.js?v=20261102-usdcx2";
 import { pill } from "./platform.js?v=20261102-usdcx2";
 import { mountCompact } from "./profile.js?v=20261109-profile";
+import { loadDups, dupTag } from "./dups.js?v=20261117-rewards";
 
 wireLinks();
 platform.mount();
@@ -119,7 +120,7 @@ async function loadCoin(e) {
   notice("");
   try {
     const j = await getApi("/holders", { coin: id });
-    st.snap = j; st.trades = null; st.more = false; st.on = null;
+    st.snap = j; st.trades = null; st.hold = null; st.more = false; st.on = null;
     const c = j.coin;
     let dec = Number(c.decimals) || 0;
     if (!dec && c.supply) dec = Math.max(0, Math.round(Math.log10(Number(c.supply))) - 9);
@@ -129,6 +130,8 @@ async function loadCoin(e) {
     const snek = c.src === "snek";
     $("[data-head]").innerHTML = `${im}<div><h2 class="panel-title">Where <a href="${esc(coinUrl(snek ? c.id : c.slug || c.id))}" target="_blank" rel="noopener">${esc(c.tk || "?")}</a>'s supply sits ${pill(snek ? "snek" : "solada", { button: false })}</h2><span class="cell-sub">${esc(c.name || "")} · ${plural(j.holders.length, "address", "addresses")} on Cardano hold the coin</span></div>`;
     mountCompact($("[data-head]").closest(".panel-head"), c);
+    loadDups().then((d) => { const tag = dupTag(d, c.tk, c.id); const box = $("[data-head] > div"); if (tag && box && st.snap === j) box.insertAdjacentHTML("beforeend", tag); });
+    $("[data-hold]").disabled = false; $("[data-hold]").textContent = "Add hold times"; $("[data-hold-head]").hidden = true;
     $("[data-taken]").textContent = "Snapshot taken " + new Date(j.at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" }) + " ET";
     $("[data-story]").hidden = false;
     $("[data-rules]").hidden = false;
@@ -344,6 +347,57 @@ async function apply() {
   $("[data-csv]").disabled = $("[data-copy]").disabled = !rows.length;
 }
 
+// Hold times from the coin's launchpad trades: each wallet's earliest buy seen, its latest sell,
+// and how many of its sells came within 24 hours of one of its own buys. Facts only, no labels.
+const DAY = 864e5;
+function holdStats(trades) {
+  const by = new Map();
+  for (const t of trades) { if (!t.trader) continue; let a = by.get(t.trader); if (!a) by.set(t.trader, (a = [])); a.push(t); }
+  const out = new Map();
+  for (const [who, list] of by) {
+    list.sort((a, b) => a.at - b.at);
+    let first = 0, lastSell = 0, lastBuy = 0, quick = 0;
+    for (const t of list) {
+      if (t.side === "buy") { if (!first) first = t.at; lastBuy = t.at; }
+      else if (t.side === "sell") { lastSell = t.at; if (lastBuy && t.at - lastBuy <= DAY) quick++; }
+    }
+    out.set(who, { first, lastSell, quick });
+  }
+  return out;
+}
+function holdOf(r) {
+  if (!st.hold) return null;
+  let h = null;
+  for (const k of r.addrs.concat(r.stake ? [r.stake] : [])) {
+    const x = st.hold.get(k);
+    if (!x) continue;
+    if (!h) h = { ...x };
+    else { if (x.first && (!h.first || x.first < h.first)) h.first = x.first; if (x.lastSell > h.lastSell) h.lastSell = x.lastSell; h.quick += x.quick; }
+  }
+  return h;
+}
+const daysAgo = (ms) => { const d = Math.floor((Date.now() - ms) / DAY); return d < 1 ? "today" : d === 1 ? "1 day ago" : fmt(d) + " days ago"; };
+function holdCell(r) {
+  const h = holdOf(r);
+  if (!h || !h.first) return `<td class="hide-sm hold-cell"><span class="cell-sub">No launchpad buy seen</span></td>`;
+  return `<td class="hide-sm hold-cell" title="${esc(dateET(h.first))}">${esc(daysAgo(h.first))}${h.lastSell ? `<span class="cell-sub">last sold ${esc(daysAgo(h.lastSell))}</span>` : ""}${h.quick ? `<span class="rt-tag" title="Sells that came within 24 hours of one of this wallet's own buys">${fmt(h.quick)} sold within 24h of buying</span>` : ""}</td>`;
+}
+async function addHold() {
+  const b = $("[data-hold]");
+  b.disabled = true; b.textContent = "Reading trades…";
+  try {
+    const trades = await tradesUntil(0);
+    st.hold = holdStats(trades);
+    $("[data-hold-head]").hidden = false;
+    b.textContent = "Hold times added";
+    if (st.trades.capped) notice("<strong>Long trade history.</strong> Only the most recent 5,000 trades were read, so some first buys may be missing.");
+    renderRows();
+  } catch (err) {
+    b.disabled = false; b.textContent = "Add hold times";
+    notice(`<strong>Couldn't read the trade history.</strong> ${esc(err.message || err)}.`);
+  }
+}
+
 function typeCell(r) {
   if (r.group === "wallet") return r.addrs.length > 1 ? `<span class="cell-sub">${r.addrs.length} addresses</span>` : "";
   const G = GROUPS[r.group];
@@ -377,8 +431,8 @@ function renderRows() {
     <td><span class="wal">${handleTag(r)}<span class="mono" title="${esc(id)}">${esc(short(id))}</span><a class="wal-link" href="${href}" target="_blank" rel="noopener" title="Open on Cardanoscan">Cardanoscan ↗</a></span></td>
     <td>${typeCell(r)}</td>
     <td class="num">${fmt(r.qty / div, 2)}</td>
-    <td class="num"><span class="share-num">${r.share.toFixed(r.share < 0.1 ? 3 : 2)}%</span><span class="bar" style="--w:${max ? ((r.share / max) * 100).toFixed(1) : 0}%"></span></td>
-  </tr>`; }).join("") : `<tr><td colspan="5"><div class="empty"><p>No holders match these rules.</p></div></td></tr>`;
+    <td class="num"><span class="share-num">${r.share.toFixed(r.share < 0.1 ? 3 : 2)}%</span><span class="bar" style="--w:${max ? ((r.share / max) * 100).toFixed(1) : 0}%"></span></td>${st.hold ? holdCell(r) : ""}
+  </tr>`; }).join("") : `<tr><td colspan="${st.hold ? 6 : 5}"><div class="empty"><p>No holders match these rules.</p></div></td></tr>`;
   $("[data-more]").hidden = st.more || st.out.length <= 100;
   $("[data-more]").textContent = `Show all ${fmt(st.out.length)}`;
 }
@@ -386,9 +440,9 @@ function renderRows() {
 function csv() {
   const div = 10 ** st.dec;
   const c = st.snap.coin;
-  const lines = ["rank,address,stake_address,balance,share_pct,addresses,type,venue,contract_name,lock_dates_verified,ada_handle,known_owner"];
+  const lines = ["rank,address,stake_address,balance,share_pct,addresses,type,venue,contract_name,lock_dates_verified,ada_handle,known_owner" + (st.hold ? ",first_buy_iso,days_since_first_buy,last_sell_iso,quick_round_trips" : "")];
   const cell = (x) => '"' + String(x ?? "").replace(/"/g, '""') + '"';
-  st.out.forEach((r, i) => lines.push([i + 1, r.addr, r.stake || "", (r.qty / div).toFixed(st.dec), r.share.toFixed(6), r.addrs.length, r.group, r.venue, r.name, r.group === "lockcontract" ? !!r.lockDatesVerified : "", r.handle ? "$" + r.handle : "", r.knownOwner || ""].map(cell).join(",")));
+  st.out.forEach((r, i) => lines.push([i + 1, r.addr, r.stake || "", (r.qty / div).toFixed(st.dec), r.share.toFixed(6), r.addrs.length, r.group, r.venue, r.name, r.group === "lockcontract" ? !!r.lockDatesVerified : "", r.handle ? "$" + r.handle : "", r.knownOwner || ""].concat(st.hold ? (() => { const h = holdOf(r) || {}; return [h.first ? new Date(h.first).toISOString() : "", h.first ? Math.floor((Date.now() - h.first) / DAY) : "", h.lastSell ? new Date(h.lastSell).toISOString() : "", h.first || h.lastSell ? h.quick : ""]; })() : []).map(cell).join(",")));
   const blob = new Blob([lines.join("\n") + "\n"], { type: "text/csv" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -400,6 +454,7 @@ function csv() {
 $("[data-pick]").addEventListener("submit", loadCoin);
 document.querySelectorAll("[data-r]").forEach((el) => el.addEventListener(el.tagName === "TEXTAREA" || el.type === "number" ? "input" : "change", () => { clearTimeout(st.t); st.t = setTimeout(apply, 250); }));
 $("[data-csv]").addEventListener("click", csv);
+$("[data-hold]").addEventListener("click", addHold);
 $("[data-copy]").addEventListener("click", async (e) => {
   const b = e.currentTarget;
   try { await navigator.clipboard.writeText(st.out.map((r) => r.addr).join("\n")); b.textContent = "Copied " + fmt(st.out.length); }

@@ -7,6 +7,7 @@ import { wireLinks, liveStatus } from "./common.js?v=20261113-toolsmenu";
 import * as platform from "./platform.js?v=20261102-usdcx2";
 import { pill } from "./platform.js?v=20261102-usdcx2";
 import { mountCompact } from "./profile.js?v=20261109-profile";
+import { loadDups, dupTag } from "./dups.js?v=20261117-rewards";
 
 wireLinks();
 platform.mount();
@@ -130,9 +131,22 @@ function allRows() {
   if (st.chain === "sol") return sol;
   return card.concat(sol).sort((a, b) => b.at - a.at);
 }
+// Marks each sell whose wallet bought this coin in the 24 hours before it (within the trades loaded so far).
+// A plain fact for the row, not a label for the wallet.
+const DAY = 864e5;
+function markQuick(rows) {
+  const lastBuy = new Map();
+  for (let i = rows.length - 1; i >= 0; i--) {
+    const t = rows[i];
+    if (!t.trader) continue;
+    if (t.side === "buy") lastBuy.set(t.trader, t.at);
+    else if (t.side === "sell") { const b = lastBuy.get(t.trader); t.quick = b != null && t.at - b <= DAY && t.at >= b; }
+  }
+  return rows;
+}
 function filtered() {
   const w = st.wallet.toLowerCase();
-  return allRows().filter((t) => (!st.side || t.side === st.side) && (t.ada ?? 0) >= st.min && (!w || t.trader.toLowerCase().includes(w)));
+  return markQuick(allRows()).filter((t) => (!st.side || (st.side === "quick" ? t.side === "sell" && t.quick : t.side === st.side)) && (t.ada ?? 0) >= st.min && (!w || t.trader.toLowerCase().includes(w)));
 }
 
 function render() {
@@ -182,7 +196,7 @@ function render() {
     const mirror = sol && t.mirror && st.chain !== "sol";
     return `<tr class="is-${t.side}${sol ? " is-sol" : ""}${mirror ? " is-mirror" : ""}${t.fromChain ? " is-chain" : ""}"${mirror ? ` title="Solada settling the Cardano ${t.side} above on Solana: same trade, not counted again"` : t.fromChain ? ` title="Read from the Cardano chain: this trade moved through Solada's reserve wallet before Solada's own record begins"` : ""}>
       <td class="th-when"><time datetime="${new Date(t.at).toISOString()}" title="${esc(when(t.at))} ET">${esc(clock(t.at))}</time><span class="cell-sub">${esc(day(t.at))}</span></td>
-      <td><span class="badge" style="--k:var(--color-${t.side})">${t.side === "buy" ? "Buy" : "Sell"}</span>${sol ? `<span class="cell-sub">Solana</span>` : t.fromChain ? `<span class="cell-sub">from chain</span>` : ""}</td>
+      <td><span class="badge" style="--k:var(--color-${t.side})">${t.side === "buy" ? "Buy" : "Sell"}</span>${t.side === "sell" && t.quick ? `<span class="rt-tag" title="This wallet bought this coin in the 24 hours before this sell">Sold within 24h of buying</span>` : ""}${sol ? `<span class="cell-sub">Solana</span>` : t.fromChain ? `<span class="cell-sub">from chain</span>` : ""}</td>
       <td class="num ${t.side === "buy" ? "pos" : "neg"}">${adaCell}</td>
       <td class="num">${amt(t.tokens)}</td>
       <td class="num hide-sm">${p != null ? (sol ? "~" : "") + fmtPrice(p) : "–"}${p != null && sol && t.tokens > 0 && t.usd ? `<span class="cell-sub">${esc(usdcxPrice(t.usd / t.tokens, 1))}</span>` : p != null && R ? `<span class="cell-sub">${esc(usdcxPrice(p, R))}</span>` : ""}</td>
@@ -224,6 +238,7 @@ async function loadCoin(e) {
   const im = cc.img ? `<img src="${esc(cc.img)}" alt="" width="36" height="36">` : "";
   $("[data-head]").innerHTML = `${im}<div><h2 class="panel-title">Every <a href="${esc(coinUrl(snek ? cc.id : cc.slug || cc.id))}" target="_blank" rel="noopener">${esc(cc.tk || "?")}</a> trade ${pill(snek ? "snek" : "solada", { button: false })}</h2><span class="cell-sub">${esc(cc.name || "")}${cc.name ? " · " : ""}<a href="./holders.html?coin=${encodeURIComponent(cc.tk || cc.id)}">Holder snapshot</a> · <a href="./followup.html?coin=${encodeURIComponent(cc.tk || cc.id)}">Alert follow-up</a></span></div>`;
     mountCompact($("[data-head]").closest(".panel-head"), cc);
+    loadDups().then((d) => { const tag = dupTag(d, cc.tk, cc.id); const box = $("[data-head] > div"); if (tag && box && st.coin === cc) box.insertAdjacentHTML("beforeend", tag); });
   // The under-development note points at this coin's own launchpad page (the reference list).
   const dl = $("[data-dev-link]");
   if (dl) { dl.href = coinUrl(snek ? cc.id : cc.slug || cc.id); dl.textContent = `${cc.tk || "The coin"} on ${snek ? "Snek.fun" : "Solada"}`; }
@@ -362,12 +377,12 @@ const counted = (t) => !(t.mirror && st.chain !== "sol");
 function csv() {
   const c = st.coin, rows = filtered();
   if (!c || !rows.length) return;
-  const lines = ["time_et,time_iso,chain,side,ada,ada_is_estimate,quote_amount,quote_symbol,usd,tokens,price_ada_per_token,wallet,venue,tx,settles_cardano_trade,source,usdcx_approx"];
+  const lines = ["time_et,time_iso,chain,side,ada,ada_is_estimate,quote_amount,quote_symbol,usd,tokens,price_ada_per_token,wallet,venue,tx,settles_cardano_trade,source,usdcx_approx,sold_within_24h_of_buying"];
   const cell = (x) => '"' + String(x ?? "").replace(/"/g, '""') + '"';
   for (const t of rows) {
     const sol = t.chain === "sol";
     const adaOut = t.ada == null ? "" : sol ? t.ada.toFixed(2) : t.ada;
-    lines.push([when(t.at), new Date(t.at).toISOString(), sol ? "solana" : "cardano", t.side, adaOut, sol ? "yes" : "no", sol ? (t.quoteAmt == null ? "" : t.quoteAmt) : adaOut, sol ? t.quote : "ADA", sol ? t.usd.toFixed(2) : "", t.tokens, t.tokens > 0 && t.ada != null ? (t.ada / t.tokens).toPrecision(8) : "", t.trader, t.fromChain ? "Solada reserve wallet (chain)" : t.venue, t.tx, sol ? (t.mirror ? "yes" : "no") : "", sol ? "geckoterminal/solada-archive" : t.fromChain ? "cardano-chain" : st.coin.src === "snek" ? "snek.fun" : "solada", sol ? t.usd.toFixed(2) : t.ada != null && st.adaUsd ? (t.ada * st.adaUsd).toFixed(2) : ""].map(cell).join(","));
+    lines.push([when(t.at), new Date(t.at).toISOString(), sol ? "solana" : "cardano", t.side, adaOut, sol ? "yes" : "no", sol ? (t.quoteAmt == null ? "" : t.quoteAmt) : adaOut, sol ? t.quote : "ADA", sol ? t.usd.toFixed(2) : "", t.tokens, t.tokens > 0 && t.ada != null ? (t.ada / t.tokens).toPrecision(8) : "", t.trader, t.fromChain ? "Solada reserve wallet (chain)" : t.venue, t.tx, sol ? (t.mirror ? "yes" : "no") : "", sol ? "geckoterminal/solada-archive" : t.fromChain ? "cardano-chain" : st.coin.src === "snek" ? "snek.fun" : "solada", sol ? t.usd.toFixed(2) : t.ada != null && st.adaUsd ? (t.ada * st.adaUsd).toFixed(2) : "", t.side === "sell" ? (t.quick ? "yes" : "no") : ""].map(cell).join(","));
   }
   const blob = new Blob([lines.join("\n") + "\n"], { type: "text/csv" });
   const a = document.createElement("a");
