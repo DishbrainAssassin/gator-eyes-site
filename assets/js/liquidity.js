@@ -19,6 +19,13 @@ const usd = (v) => {
   const r = st.data && st.data.adaUsd;
   return v != null && v >= 1 && r ? `<small>~${fmt(v * r, v * r < 10 ? 2 : 0)} USDCx</small>` : "";
 };
+// Inline form for sentences: " (~1,234 USDCx)".
+const usdIn = (v) => {
+  const r = st.data && st.data.adaUsd;
+  if (v == null || v < 1 || !r) return "";
+  const u = v * r;
+  return ` (~${u >= 1e4 ? compact(Math.round(u)) : fmt(u, u < 10 ? 2 : 0)} USDCx)`;
+};
 const short = (a) => (a ? a.slice(0, 10) + "…" + a.slice(-6) : "–");
 const tick = (c) => "$" + (c.tk || "?");
 const ROLE = { solada: "Solada", creator: "Creator", burned: "Burned", other: "Other wallets", order: "Pending withdrawal" };
@@ -89,10 +96,10 @@ function render() {
   const wkEv = d.events.filter((e) => e.ms >= now - 7 * DAY_MS);
   const wkSum = (k) => wkEv.filter((e) => e.kind === k).reduce((s, e) => s + (e.ada || 0), 0);
   $("[data-kpis]").innerHTML = `
-    <div class="kpi"><span class="kpi-label">ADA in pools</span><span class="kpi-value">${adaTxt(t.ada)}</span><span class="kpi-sub">ADA side of ${fmt(t.pools)} Minswap pool${t.pools === 1 ? "" : "s"}</span></div>
+    <div class="kpi"><span class="kpi-label">ADA in pools</span><span class="kpi-value">${adaTxt(t.ada)}</span><span class="kpi-sub">${usdIn(t.ada) ? usdIn(t.ada).slice(2, -1) + " · " : ""}ADA side of ${fmt(t.pools)} Minswap pool${t.pools === 1 ? "" : "s"}</span></div>
     <div class="kpi"><span class="kpi-label">LP held by Solada</span><span class="kpi-value">${pctTxt(t.solada)}</span><span class="kpi-sub">by value · other wallets ${pctTxt((t.other || 0) + (t.creator || 0))}</span></div>
     <div class="kpi"><span class="kpi-label">LP burned</span><span class="kpi-value">${pctTxt(t.burned)}</span><span class="kpi-sub">${t.burned > 0 ? "sent to the Graveyard for good" : "no LP at the Graveyard yet"}</span></div>
-    <div class="kpi"><span class="kpi-label">Changes in 7 days</span><span class="kpi-value">${fmt(wkEv.length)}</span><span class="kpi-sub">${wkEv.length ? `≈ ${adaTxt(wkSum("add"))} added · ${adaTxt(wkSum("remove"))} removed` : "no LP added or removed"}</span></div>`;
+    <div class="kpi"><span class="kpi-label">Changes in 7 days</span><span class="kpi-value">${fmt(wkEv.length)}</span><span class="kpi-sub">${wkEv.length ? `≈ ${adaTxt(wkSum("add"))}${usdIn(wkSum("add"))} added · ${adaTxt(wkSum("remove"))}${usdIn(wkSum("remove"))} removed` : "no LP added or removed"}</span></div>`;
 
   // Liquidity growth setting.
   const autos = d.autoOn || [];
@@ -100,8 +107,8 @@ function render() {
   $("[data-auto]").innerHTML = autos.map((a) => {
     const c = byId[a.id];
     const adds = d.events.filter((e) => e.id === a.id && e.kind === "add");
-    const status = !c ? "Not graduated yet, so it has no pool." : adds.length ? `Last LP added ${esc(timeAgo(adds[0].ms))}, ≈ ${adaTxt(adds[0].ada)} ADA side.` : "No LP added since this tracker went live. The next add will show here.";
-    return `<div class="burn-auto-row"><span class="coin-cell">${c && c.img ? `<img src="${esc(c.img)}" alt="" loading="lazy">` : `<span class="coin-dot"></span>`}<span><a href="${esc(coinUrl(a.id))}" target="_blank" rel="noopener">$${esc(a.tk || "?")}</a></span></span><span class="burn-auto-status ${c ? "is-on" : ""}">${c ? "Pool open" : "Bonding"}</span><span class="burn-auto-text">${status}${c ? ` ${adaTxt(c.ada)} in its pool now.` : ""}</span></div>`;
+    const status = !c ? "Not graduated yet, so it has no pool." : adds.length ? `Last LP added ${esc(timeAgo(adds[0].ms))}, ≈ ${adaTxt(adds[0].ada)}${usdIn(adds[0].ada)} on the ADA side.` : "No LP added since this tracker went live. The next add will show here.";
+    return `<div class="burn-auto-row"><span class="coin-cell">${c && c.img ? `<img src="${esc(c.img)}" alt="" loading="lazy">` : `<span class="coin-dot"></span>`}<span><a href="${esc(coinUrl(a.id))}" target="_blank" rel="noopener">$${esc(a.tk || "?")}</a></span></span><span class="burn-auto-status ${c ? "is-on" : ""}">${c ? "Pool open" : "Bonding"}</span><span class="burn-auto-text">${status}${c ? ` ${adaTxt(c.ada)}${usdIn(c.ada)} in its pool now.` : ""}</span></div>`;
   }).join("");
 
   // By coin.
@@ -135,7 +142,7 @@ function render() {
   const sum = (k) => evs.filter((e) => e.kind === k).reduce((s, e) => s + (e.ada || 0), 0);
   const since = d.since ? new Date(d.since).getTime() : null;
   $("[data-ev-meta]").innerHTML = evs.length
-    ? `${fmt(evs.length)} change${evs.length === 1 ? "" : "s"} · ≈ ${adaTxt(sum("add"))} added, ≈ ${adaTxt(sum("remove"))} removed (ADA side) · newest first`
+    ? `${fmt(evs.length)} change${evs.length === 1 ? "" : "s"} · ≈ ${adaTxt(sum("add"))}${usdIn(sum("add"))} added, ≈ ${adaTxt(sum("remove"))}${usdIn(sum("remove"))} removed (ADA side) · newest first`
     : since ? `Watching since ${esc(etTime(since))}` : "";
   const shown = st.more ? evs : evs.slice(0, MAX_EVENTS);
   $("[data-events]").innerHTML = shown.length
