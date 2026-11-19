@@ -1,5 +1,12 @@
 // Embeddable live-flows box. Use ?coin=<Solada coin id> for one coin, or leave it
 // off for all of Solada. Add &theme=light for light backgrounds.
+//
+// Live trades (2026-11-18): the list under the totals is the same live trade feed as the site's side
+// column (tape.js): every trade, any size, from the worker's /trade-feed (both launchpads, or just the
+// chosen coin). Newest at the top; new trades slide in and push older ones down, no looping. Hover holds
+// new trades back; scrolling down to read keeps your place. Polls every 5s while the widget is on screen,
+// 20s after 3 minutes with no pointer activity on it, and stops while it's off screen or the tab is hidden.
+import { CONFIG } from "./config.js?v=20261102-usdcx2";
 import { subscribe, setFeedParams } from "./data.js?v=20261102-usdcx2";
 import { esc, fmt, compact, timeAgo, KINDS, usdcx, usdcxSigned, usdcxShort } from "./ui.js?v=20261102-usdcx2";
 
