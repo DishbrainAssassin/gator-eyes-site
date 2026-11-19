@@ -37,7 +37,7 @@ function embedSrc() {
 }
 function renderEmbed() {
   const src = embedSrc();
-  $("[data-embed-code]").textContent = `<iframe src="${src}" width="360" height="340" style="border:0;border-radius:12px" title="Gator Eyes live flows" loading="lazy"></iframe>`;
+  $("[data-embed-code]").textContent = `<iframe src="${src}" width="360" height="420" style="border:0;border-radius:12px" title="Gator Eyes live flows" loading="lazy"></iframe>`;
   if (frame.src !== src) frame.src = src;
 }
 let t;
