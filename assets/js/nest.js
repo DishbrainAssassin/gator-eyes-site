@@ -9,7 +9,7 @@ export const ITEMS = [
   { type: "feature", key: "liquidity", tag: "Liquidity tracker", title: "Who holds the liquidity", href: "./liquidity.html", cta: "Open the liquidity tracker",
     text: "Every graduated Solada.fun coin's Minswap pool, read from the chain. See how much ADA backs each coin, how much a 1,000 ADA buy moves its price, and who holds the LP tokens that could pull it." },
   { type: "feature", key: "extension", tag: "Chrome extension", title: "Gator Eyes on every coin page", href: "./extension.html", cta: "See what the extension does", desktopOnly: true,
-    text: "Our free Chrome extension puts Gator Eyes right on Solada.fun and Snek.fun coin pages: flow, alerts, creator watch, a trade ribbon and Ask Quagmire. Make Run Downs picks from the toolbar too." },
+    text: "Our free Chrome extension puts Gator Eyes right on Solada.fun and Snek.fun coin pages: flow, alerts, creator watch, a trade ribbon and Ask Quagmire." },
   { type: "feature", key: "burns", tag: "Burn tracker", title: "See what's been burned", href: "./burns.html", cta: "Open the burn tracker",
     text: "Every Solada.fun token sent to the Cardano Graveyard, read from the chain. See how much of each coin is gone for good, who sent it, and which coins buy back and burn automatically." },
   { type: "feature", key: "ask", tag: "Ask Quagmire", title: "Ask about any coin", ask: "What graduated today?", cta: "Ask Quagmire",

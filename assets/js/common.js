@@ -20,8 +20,8 @@ export function wireLinks(root = document) {
   });
   navTips();
   wireToolsMenu();
-  import("./gator.js?v=20261110-onebrain").then((m) => m.mountGator()).catch(() => {});
-  import("./extras.js?v=20261102-usdcx2").then((m) => m.mountExtras()).catch(() => {});
+  import("./gator.js?v=20261121-rdpause").then((m) => m.mountGator()).catch(() => {});
+  import("./extras.js?v=20261121-rdpause").then((m) => m.mountExtras()).catch(() => {});
   import("./tape.js?v=20261116-live").then((m) => m.mountTape()).catch(() => {});
   import("./pwa.js?v=20261102-stats").then((m) => m.mountPwa()).catch(() => {});
   import("./appnav.js?v=20261103-apptrim2").then((m) => m.mountAppNav()).catch(() => {});

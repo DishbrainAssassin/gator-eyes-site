@@ -10,7 +10,7 @@ const SHOW_ALL = ' <button type="button" class="link" data-platform="all">Show a
 wireLinks();
 platform.mount();
 import("./since.js?v=20261102-usdcx2").then((m) => m.mountSince()).catch(() => {});
-import("./nest.js?v=20261116-nest4").then((m) => m.mountNest()).catch(() => {});
+import("./nest.js?v=20261121-rdpause").then((m) => m.mountNest()).catch(() => {});
 platform.on(() => {
   shown = 6;
   renderAlerts();
