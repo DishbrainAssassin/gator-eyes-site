@@ -35,7 +35,7 @@ const rdEt = (ms) => new Intl.DateTimeFormat("en-US", { timeZone: "America/New_Y
 const rdOpen = (d) => ((d && d.open) || []).filter((x) => !x.called && x.closesAt > Date.now());
 
 // ---------- widget ----------
-const SUGGEST = ["What do the alerts mean?", "What's close to graduating?", "Any Run Downs races open?", "Most traded today", "How do I make a holder list?", "What is net flow?"];
+const SUGGEST = ["What do the alerts mean?", "What's close to graduating?", "Most traded today", "How do I make a holder list?", "What is net flow?"];
 const KEY = "gator-chat-v1";
 
 export function mountGator() {
